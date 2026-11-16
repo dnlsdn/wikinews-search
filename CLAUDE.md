@@ -17,6 +17,11 @@ Follow these rules exactly.
    step, the issues addressed to you. If you do not see it, run
    `uv run python scripts/briefing.py` yourself.
 2. `git pull --rebase` if the briefing says you are behind.
+
+   A second hook runs `scripts/inbox.py` **every time your user sends a message**: if new issues
+   for your user (or new blockers and contract changes) or new commits arrived since the last
+   check, a "TEAM INBOX" note appears in your context. Tell your user about it before anything
+   else, and deal with it as described below. When it prints nothing, there is no news.
 3. Read, in this order: `STATE.md`, `PLAN.md`, `docs/course.md` (what the course and the
    professor expect: methods, metrics, statistical robustness), `docs/contracts.md`, then the
    brief of your user
@@ -147,14 +152,16 @@ Use `gh` (GitHub CLI). Labels: `for:daniel`, `for:fabio`, `for:gioia`, `blocker`
    user.
 8. If what you pushed unblocks someone, comment on their issue or open one for them
    (`for:<name>`): "the sample is pushed, you can start F1" (see "Handoffs" in `PLAN.md`).
-9. After pushing, check again `gh issue list --label for:<name>`: messages may have arrived while
-   you worked (the briefing only runs at session start). Tell your user about new ones.
+9. After pushing, and between steps when you work for a long time without messages from your
+   user, run `uv run python scripts/inbox.py`: messages may have arrived while you worked (the
+   hook only fires when your user writes). Tell your user about anything it prints.
 
 ## Commands
 
 | What | Command |
 |---|---|
 | session briefing | `uv run python scripts/briefing.py` |
+| news since the last check | `uv run python scripts/inbox.py` (prints nothing if there is none) |
 | messages for me | `gh issue list --label for:<name>` |
 | install or update dependencies | `uv sync` |
 | start Elasticsearch | `docker compose up -d`, check with `curl localhost:9200` (Windows: `curl.exe localhost:9200`) |

@@ -68,6 +68,14 @@ unticked step, explaining before and after each step and asking me when in doubt
 always (CLAUDE.md). Talk to me in Italian.
 ```
 
+## How you learn that someone pushed something
+
+Every time you write to your Claude, it checks GitHub: if someone sent you a message (issue) or
+pushed new commits, it tells you first. So, when a teammate says "I pushed the sample", just
+write anything to your Claude (e.g. "novità?"). A Claude that works for a long time without
+your messages also checks between steps. If you are not using Claude at that moment, nothing
+happens until you write to it: sessions never start by themselves.
+
 ## When a session gets long
 
 Before closing a long session, ask Claude to write the log entry and push, even if the step is

@@ -56,6 +56,16 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026, Daniel: inbox check at every message
+
+New hook (`UserPromptSubmit` in `.claude/settings.json`) that runs `scripts/inbox.py` every time
+a user writes to their Claude: if new issues for that user, new blockers or contract changes, or
+new commits arrived since the last check, a short "TEAM INBOX" note enters the session, which
+tells its user first. Silent when there is no news; about 2 seconds per message. Issues already
+reported are remembered in `.git/wikisearch-inbox.json` (never committed). Long autonomous work
+also runs the script between steps (`CLAUDE.md`). Tested with a temporary issue for Fabio:
+reported once, then silent.
+
 ### 16 Nov 2026, Daniel: faster timeline
 
 The team wants to finish earlier than the official deadline. New target: **code freeze Tuesday
