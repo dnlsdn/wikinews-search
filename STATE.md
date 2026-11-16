@@ -62,6 +62,25 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026 18:15, Daniel: demo links checked on Daniel's laptop (issue #8), issue #6 closed
+
+Issue #8 (Fabio): every link of `docs/demo.md` checked on Daniel's laptop, through `/api/search`
+with the parameters of the links, after pulling cef8d31 (indices and shared embeddings already
+built). All results are the ones the script describes: special page first with `hybrid-rrf` and
+out of the top 10 with `hybrid-rrf-published`; 3 articles with the date and ANSA filters;
+Pontecorvo found by BM25, not by `knn`; Benedetto XVI 1st for `knn`, 78th for BM25 at k=100, 6th
+for `hybrid-rrf`; 9 of 10 lottery draws; spare query as described. Screenshot 4b compared by eye:
+identical. Timing on this Mac: the first vector query took 19 s (model load), then hybrid
+0.2-0.8 s and BM25 under 0.1 s, so the warm-up before class is needed.
+
+Decided by Daniel: the rehearsal with Fabio at Daniel's laptop as soon as possible (today or by
+Tuesday afternoon); Fabio proposes the time (asked in #8, which stays open until the rehearsal).
+Issue #6 (E8 contract change) closed: Fabio and Gioia acknowledged it.
+
+How to run the check: Elasticsearch running, `uv run uvicorn wikisearch.web.app:app`, then the
+links of `docs/demo.md`. No code change; 107 tests passed. Next: D7 (slides with the official
+numbers on Tuesday evening, deck on Wednesday), review of Gioia's 30 queries when pushed.
+
 ### 16 Nov 2026 17:05, Fabio: F6 README usage, slide outline (work in progress)
 
 F6 in progress. Done: the "Search and web app" subsection of `README.md` (start, what the
