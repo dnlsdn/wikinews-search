@@ -68,6 +68,31 @@ unticked step, explaining before and after each step and asking me when in doubt
 always (CLAUDE.md). Talk to me in Italian.
 ```
 
+## Sessions started outside the repository folder (Daniel)
+
+Daniel starts his Claude Code conversations from his usual environment, not from inside the
+repository. There `CLAUDE.md` is not loaded automatically and the two hooks (briefing at start,
+inbox at every message) do not run, so the prompt asks for both explicitly:
+
+```text
+Lavoriamo all'homework 4 di Ingegneria dei Dati: il progetto è in
+~/Library/Developer/wikinews-search (repo dnlsdn/wikinews-search). Io sono Daniel.
+Questa sessione non è aperta dentro la cartella del progetto, quindi CLAUDE.md non è caricato e
+gli hook non partono: fai tu a mano quello che fanno.
+
+1. Lancia dalla cartella del progetto `uv run python scripts/briefing.py` e
+   `uv run python scripts/inbox.py`, poi `git pull --rebase` se serve.
+2. Leggi per intero, in quest'ordine: CLAUDE.md, STATE.md, PLAN.md, docs/course.md,
+   docs/contracts.md, docs/briefs/daniel.md, e le issue aperte per me
+   (`gh issue list --label for:daniel`).
+3. Dimmi in poche righe lo stato del progetto, cosa hanno pubblicato Gioia e Fabio, i messaggi
+   per me e il mio prossimo passo.
+4. Poi lavora sul mio prossimo passo seguendo il brief e tutte le regole di CLAUDE.md. Rilancia
+   `scripts/inbox.py` fra un passo e l'altro e dopo ogni push, e dimmi se ci sono novità.
+   Prima e dopo ogni passo spiegami cosa fai e cosa devo sapere per l'orale; se hai un dubbio
+   chiedimelo.
+```
+
 ## How you learn that someone pushed something
 
 Every time you write to your Claude, it checks GitHub: if someone sent you a message (issue) or

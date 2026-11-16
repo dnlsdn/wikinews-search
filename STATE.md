@@ -56,6 +56,14 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026, Daniel: prompt for sessions outside the repository
+
+Daniel works from conversations started outside the repository folder, where `CLAUDE.md` and
+the hooks are not active. `docs/briefs/README.md` now has a prompt for that case: it makes the
+session run `scripts/briefing.py` and `scripts/inbox.py` by hand, read the same files, and rerun
+the inbox between steps. Everything is ready: work starts now, Daniel from D1, Fabio from Step 0
+and F3a, Gioia from Step 0 and G1.
+
 ### 16 Nov 2026, Daniel: inbox check at every message
 
 New hook (`UserPromptSubmit` in `.claude/settings.json`) that runs `scripts/inbox.py` every time
