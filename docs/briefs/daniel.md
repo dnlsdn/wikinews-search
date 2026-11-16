@@ -10,6 +10,24 @@ His work is the bottleneck of the first day: Fabio and Gioia wait for the sample
 15:00) and the indices (D3, by 19:00). Push those first, polish later. Embeddings (D4) Monday
 night, so Fabio can do the vector search on Tuesday morning.
 
+## Beyond the code: the whole project, up to the presentation (asked by Daniel, 16 Nov)
+
+Daniel assembles the deck and presents first: follow the whole process, not only his steps.
+At every session, besides the next step:
+
+1. Look at the team as a whole: compare everyone's progress with the timeline in `PLAN.md`,
+   and tell Daniel early about anything late or missing that the presentation needs (queries,
+   judgments, official run, figures, slide files), with a concrete proposal.
+2. Keep the story of the presentation coherent: every design choice on Daniel's slides should be
+   backed by a number from the experiments, and every experiment should answer a question the
+   slides raise. Point out gaps and contradictions between the three slide files.
+3. Prepare Daniel for the oral: after each step, the two or three points he must be able to
+   explain; once the official results are out, go through E1, E3, E4 (and E8) with him, since
+   they test his choices, and the limits to state openly (`docs/course.md`, section 2).
+4. Care for the delivery as much as for the code: sober slides with figures and tables, the demo
+   rehearsed on Daniel's laptop, README verified from a fresh clone, repository public, emails on
+   the cover.
+
 ## Step D1: Elasticsearch
 
 1. `docker compose up -d` (image `elasticsearch:9.5.0`, about 1.5 GB, pulled once; the image
