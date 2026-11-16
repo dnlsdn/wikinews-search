@@ -56,6 +56,13 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026, Daniel: push and news checks are always automatic
+
+`CLAUDE.md`, new section "Pushing and checking for news: always on your own": every session
+pushes by itself at the end of each step and at every working checkpoint inside a long step
+(about hourly, with a "work in progress" log entry), and runs `scripts/inbox.py` by itself at the
+start, between steps, after every push and before ending a long reply. Users never have to ask.
+
 ### 16 Nov 2026 12:40, Fabio: F3a web app skeleton with fake mode
 
 Step F3a done: the web API of `docs/contracts.md` section 4 exists and works without

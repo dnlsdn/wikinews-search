@@ -134,6 +134,20 @@ Use `gh` (GitHub CLI). Labels: `for:daniel`, `for:fabio`, `for:gioia`, `blocker`
    your local data before measuring anything: `uv run python -m wikisearch.ingest.parse`, then
    `uv run python -m wikisearch.ingest.index`.
 
+## Pushing and checking for news: always on your own
+
+Your user should never have to remind you of these two things.
+
+1. **Push on your own**, without asking: at the end of every step, and also in the middle of a
+   long step every time a working piece is ready (tests pass, nothing of the others breaks),
+   at least about once an hour of work. A push in the middle of a step is a "work in progress"
+   log entry saying what works and what remains. Sessions can end at any moment (usage limits,
+   the laptop closed): what is not pushed is lost for the others.
+2. **Check for news on your own** with `uv run python scripts/inbox.py`: at the start, between
+   steps, after every push, and before ending any reply in which you worked for more than a few
+   minutes. The hooks do it too when they are active, but do not rely on them.
+3. If your user says the session is about to end, write the log and push immediately.
+
 ## Before every push (mandatory)
 
 1. Run the tests: `uv run pytest -q` (and the step's own check, if any).
