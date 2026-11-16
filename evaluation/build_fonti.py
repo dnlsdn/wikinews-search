@@ -6,7 +6,7 @@ document (grade 1).
 
     uv run python -m evaluation.build_fonti                       # full docs.jsonl
     uv run python -m evaluation.build_fonti --input data/sample/docs.sample.jsonl --out <dir>
-    uv run python -m evaluation.build_fonti --show-language 50    # eye check of the English rule
+    uv run python -m evaluation.build_fonti --show-language 50    # eye check of the language rule
 
 Writes `evaluation/testsets/fonti/queries.tsv`, `qrels.txt` and `queries_dev.tsv` (fixed subset
 of 1000 queries, seed 42), and prints the funnel, the bucket sizes and the leakage check.
@@ -27,9 +27,31 @@ DEV_SIZE = 1000
 LEAKAGE_SAMPLE = 300
 MIN_WORDS = 4
 
-# Language rule: a title is English when it has one of these words and none of the Italian ones.
-# Words that are the same in both languages ("a", "in") are in neither list.
+# Language rule (`not_italian`): a title without any of the Italian function words below is not
+# Italian when it has one of ENGLISH_WORDS, or two occurrences of ENGLISH_MARKERS, or a letter of
+# a non-Latin script. Words that are the same in both languages ("a", "in") are in no list; words
+# that appear in names inside Italian headlines ("New York", "Why not", "McDonald's", the surname
+# "Police") are left out of the markers, and two markers are needed so that a single English
+# loanword does not drop an Italian headline.
+# Fourth case, for the other languages and the English titles without markers: at most half of
+# the words are known Italian words (they appear in the title or lead of at least VOCAB_MIN_DF
+# articles of the corpus) AND at most half end in a vowel, as Italian words almost always do.
+# Either signal alone drops Italian headlines full of foreign names ("Fiorentina: Delio Rossi
+# aggredisce Ljaic"); together they did not on the eye check of 16 Nov.
+VOCAB_MIN_DF = 3
+MIXED_SHARE = 0.5
+_VOWELS = set("aeiouàèéìíòóù")
+_LETTERS = re.compile(r"[^\W\d_]{3,}")
 ENGLISH_WORDS = {"the", "of", "for", "and", "with", "to", "is"}
+ENGLISH_MARKERS = {
+    "on", "at", "from", "by", "as", "after", "are", "was", "were", "has", "have", "had", "will",
+    "be", "been", "says", "said", "over", "into", "its", "his", "her", "their", "against", "amid",
+    "than", "who", "what", "how", "an", "this", "that", "up", "out", "about", "killed", "kills",
+    "dies", "dead", "wins", "people", "year", "years", "women", "men", "jail", "near", "arrested",
+    "more", "woman", "study", "bomb", "resigns", "first", "found", "shot", "three", "two", "four",
+    "five", "seven", "ever",
+}
+NON_LATIN = re.compile(r"[Ͱ-ϿЀ-ӿ֐-׿؀-ۿ぀-ヿ一-鿿]")
 ITALIAN_WORDS = {
     "il", "lo", "la", "i", "gli", "le", "un", "uno", "una", "di", "del", "dello", "della", "dei",
     "degli", "delle", "da", "dal", "dalla", "dai", "al", "allo", "alla", "ai", "agli", "alle",
@@ -64,9 +86,45 @@ def normalise(text: str) -> str:
     return " ".join(words(text))
 
 
-def is_english(title: str) -> bool:
-    ws = set(words(title))
-    return bool(ws & ENGLISH_WORDS) and not (ws & ITALIAN_WORDS)
+def vocabulary(docs: list[dict], min_df: int = VOCAB_MIN_DF) -> set[str]:
+    """Words (3 letters or more) in the title or lead of at least `min_df` articles."""
+    df = Counter()
+    for doc in docs:
+        df.update({w for w in words(f"{doc['title']} {doc['lead']}") if _LETTERS.fullmatch(w)})
+    return {w for w, n in df.items() if n >= min_df}
+
+
+def vowel_share(title: str) -> float | None:
+    """Share of the words (3 letters or more) ending in a vowel. Only the lowercase words count
+    when there are at least two (an Italian headline capitalises names, which are often foreign);
+    otherwise (Title Case, capitals) all of them. None with fewer than two words."""
+    tokens = _LETTERS.findall(title)
+    lower = [t for t in tokens if t[0].islower()]
+    use = [t.lower() for t in (lower if len(lower) >= 2 else tokens)]
+    if len(use) < 2:
+        return None
+    return sum(t[-1] in _VOWELS for t in use) / len(use)
+
+
+def not_italian(title: str, vocab: set[str] | None = None) -> bool:
+    """True for a title in another language (see the language rule above). The first version of
+    the rule (one of ENGLISH_WORDS only) let about 3% of the queries through in English, German,
+    Dutch, French, Portuguese, Ukrainian, Russian, ... (eye check, 16 Nov). Without `vocab` the
+    fourth case is not applied."""
+    ws = words(title)
+    if set(ws) & ITALIAN_WORDS:
+        return False
+    if (set(ws) & ENGLISH_WORDS or sum(w in ENGLISH_MARKERS for w in ws) >= 2
+            or NON_LATIN.search(title)):
+        return True
+    if vocab is None:
+        return False
+    letters = [w for w in ws if _LETTERS.fullmatch(w)]
+    vowels = vowel_share(title)
+    if len(letters) < 2 or vowels is None:
+        return False
+    known = sum(w in vocab for w in letters) / len(letters)
+    return known <= MIXED_SHARE and vowels <= MIXED_SHARE
 
 
 def overlap(query: str, doc_title: str) -> float:
@@ -99,6 +157,7 @@ def build(docs: list[dict]) -> dict:
     # A normalised title is ambiguous when it is the source title of more than one document. All
     # documents count, published or not: a non-published page is in the index too, so it would be
     # a second plausible answer to the query.
+    vocab = vocabulary(docs)
     title_docs: dict[str, set[str]] = defaultdict(set)
     for doc in docs:
         for src in doc["sources"]:
@@ -107,7 +166,7 @@ def build(docs: list[dict]) -> dict:
                 title_docs[key].add(doc["id"])
 
     funnel = Counter()
-    dropped_english: list[str] = []
+    dropped_language: list[str] = []
     kept_language: list[str] = []
     queries: list[dict] = []
     for doc in docs:
@@ -121,11 +180,11 @@ def build(docs: list[dict]) -> dict:
             if src.get("foreign"):
                 continue
             funnel["after: not foreign"] += 1
-            if is_english(title):
-                dropped_english.append(title)
+            if not_italian(title, vocab):
+                dropped_language.append(title)
                 continue
             kept_language.append(title)
-            funnel["after: not English"] += 1
+            funnel["after: in Italian"] += 1
             if len(title_docs[normalise(title)]) > 1:
                 continue
             funnel["after: not ambiguous"] += 1
@@ -146,7 +205,7 @@ def build(docs: list[dict]) -> dict:
     funnel["final: one query per document"] = len(queries)
     for i, q in enumerate(queries, start=1):
         q["qid"] = f"F{i:04d}"
-    return {"queries": queries, "funnel": funnel, "dropped_english": dropped_english,
+    return {"queries": queries, "funnel": funnel, "dropped_language": dropped_language,
             "kept_language": kept_language}
 
 
@@ -188,7 +247,7 @@ def main() -> None:
     parser.add_argument("--input", type=Path, default=config.DOCS_JSONL)
     parser.add_argument("--out", type=Path, default=OUT_DIR)
     parser.add_argument("--show-language", type=int, default=0, metavar="N",
-                        help="print N random titles dropped and N kept by the English rule")
+                        help="print N random titles dropped and N kept by the language rule")
     args = parser.parse_args()
 
     docs = read_docs(args.input)
@@ -223,7 +282,7 @@ def main() -> None:
 
     if args.show_language:
         rng = random.Random(SEED)
-        for label, titles in (("DROPPED as English", result["dropped_english"]),
+        for label, titles in (("DROPPED as not Italian", result["dropped_language"]),
                               ("KEPT", result["kept_language"])):
             pick = rng.sample(titles, min(args.show_language, len(titles)))
             print(f"\n{label} ({len(titles)} in all), {len(pick)} at random:")

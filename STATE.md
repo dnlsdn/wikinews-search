@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:15): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,56 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 22:15, Gioia: stricter language rule for the `fonti` queries (G2 fix)
+
+Bug found in G2: the language rule dropped a source title only when it had one of `the, of, for,
+and, with, to, is` and no Italian function word. An eye check of 100 final queries without Italian
+function words found 17 in other languages (English without those words, German, Dutch, French,
+Portuguese, Ukrainian, Russian, ...): about 200 queries, 3% of the set, 2 in 3 in the `low`
+bucket. They favour `knn`: e5 is multilingual and matches "Steve Jobs Resigns as Apple CEO" with
+"si dimette", BM25 cannot (dev, 9 such queries in the low bucket: MRR@10 `knn` 0.833, BM25
+0.448). So they inflated the vector side of E3 exactly in the paraphrase bucket. Decided by Gioia:
+fix the rule before the official run, since the brief asks for Italian queries.
+
+New rule (`not_italian` in `evaluation/build_fonti.py`). A title with an Italian function word is
+Italian; otherwise it is dropped when any of these holds:
+1. one of the old English words (as before);
+2. two occurrences of a list of frequent English words, chosen to avoid names inside Italian
+   headlines ("New York", "Why not", "McDonald's", the surname "Police");
+3. a letter of a non-Latin script (Cyrillic, Greek, Devanagari is caught by 4);
+4. at most half of its words are known Italian words (in the title or lead of at least 3 articles
+   of the corpus) AND at most half end in a vowel (only lowercase words count when there are two,
+   so capitalised foreign names in an Italian headline do not). Each signal alone dropped Italian
+   headlines full of foreign names ("Fiorentina: Delio Rossi aggredisce Ljaic"); together they
+   drop 5 Italian titles in all ("Mostra Gauguin Van Gogh", two "Nobel letteratura a ...",
+   "Parigi, assassinato Brahim Deby", "Crociate antiP2P? No, grazie.") and 3 bare match scores.
+
+Eye check (`uv run python -m evaluation.build_fonti --show-language 50`): 50 of 50 dropped titles
+are not Italian; 1 of 50 kept is (a Finnish title, which ends in vowels like Italian). Residual
+estimate: below 1% of the queries.
+
+New funnel (full corpus): candidates 17,192; at least 4 words 15,002; not foreign 14,377; in
+Italian 13,255 (1,122 titles dropped by the rule; the old rule dropped 716); not
+ambiguous 12,632; article published 12,346; **final 7,072 queries** (was 7,223; fewer than the
+titles dropped, because a document whose first source was foreign keeps its next Italian one).
+Buckets: low 2,643, mid 3,571, high 858; dev subset low 381, mid 512, high 107. 50 queries
+identical to the article title; leakage check 7 / 300 (2.3%), natural overlap as before. The
+query ids and the dev subset changed: any number computed before this entry is not comparable.
+
+Dev run after the fix (`uv run python -m evaluation.run --dev`, new 1000 dev queries): MRR@10
+`bm25-standard` 0.738, `bm25-italian` 0.759, `-title` 0.654, `-body` 0.717, `-flat` 0.795, `knn`
+0.776, `hybrid-rrf` 0.806, `hybrid-rrf-published` 0.808, `-leak` 0.894, `random` 0.000. A conclusion
+changed: `knn` vs `bm25-italian` is now +0.017, **p = 0.12, not significant** (was +0.030,
+p = 0.004), and on the low bucket +0.040, p = 0.08 (was p = 0.01). The hybrid stays clearly best
+(+0.047 over BM25, p < 0.0001; +0.030 over `knn`, p = 0.0003). The dev subset is different too, so
+part of the change may be sampling: the official run on all queries decides. E2 still says equal
+weights (`-flat`) beat `title^3 lead^2 body` (+0.036, p < 0.0001).
+
+Tests: `uv run pytest -q tests/test_build_fonti.py` (7 tests, new: the four cases of the rule,
+the vowel share). Full suite 124 passed, 2 skipped. For the others: `fonti` files changed
+(`evaluation/testsets/fonti/`), nobody else uses them. Next: pooling after the query review
+(Tuesday 10:00-12:00), judging 12:00-15:00, official run by 20:00.
 
 ### 16 Nov 2026 22:05, Gioia: figures commit reverted (G6 not started)
 

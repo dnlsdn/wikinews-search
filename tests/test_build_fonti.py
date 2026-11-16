@@ -2,7 +2,7 @@
 
 import pytest
 
-from evaluation.build_fonti import bucket, build, dev_subset, is_english, normalise, overlap
+from evaluation.build_fonti import bucket, build, dev_subset, normalise, not_italian, overlap, vowel_share
 
 
 def doc(id, title, sources, published=True):
@@ -15,10 +15,41 @@ def test_normalise_lowercases_and_removes_punctuation():
     assert normalise("L'Italia vince") == "l italia vince"
 
 
-def test_english_rule():
-    assert is_english("Moldova: Direct assignment for Rotterdam")  # "for", no Italian word
-    assert not is_english("Festival of Venezia: il programma")  # "of" but also "il"
-    assert not is_english("Romano Prodi vince le elezioni")  # no English word
+def test_language_rule():
+    assert not_italian("Moldova: Direct assignment for Rotterdam")  # "for", no Italian word
+    assert not not_italian("Festival of Venezia: il programma")  # "of" but also "il"
+    assert not not_italian("Romano Prodi vince le elezioni")  # no English word
+    # two English markers, none of the first list (missed by the first version of the rule)
+    assert not_italian("Whitney Houston, Pop Superstar, Dies at 48")  # dies, at
+    assert not_italian("Bomb kills 11 on military bus in Iran")  # bomb, kills, on
+    assert not_italian("Янукович просить військових не стріляти")  # non-Latin script
+    assert not_italian("Άνδρες το 91% των συντακτών")
+    # Italian headlines with names or a single English word are kept
+    assert not not_italian("New York, finito sciopero trasporti")
+    assert not not_italian("Why not: Saladino, ho solo offerto lavoro")
+    assert not not_italian("McDonald's preannuncia calo utili")
+    assert not not_italian("Alitalia: CdA nomina presidente Aristide Police")
+    assert not not_italian("Coming out a Sanremo")  # one marker only
+
+
+def test_language_rule_with_the_corpus_vocabulary():
+    vocab = {"fiorentina", "rossi", "aggredisce", "morta", "netflix", "malaysia", "partita"}
+    # few known words AND few words ending in a vowel: another language
+    assert not_italian("Netflix tests cheaper mobile-only plan in Malaysia", vocab)
+    assert not_italian("Baerbock reagiert zurückhaltend auf ukrainischen Beitrittsantrag", vocab)
+    # unknown foreign names, but the Italian words end in a vowel: kept
+    assert not not_italian("Fiorentina: Delio Rossi aggredisce Ljaic", vocab)
+    assert not not_italian("Morta l'olimpionica Colette Besson", vocab)
+    # without the vocabulary the fourth case is off
+    assert not not_italian("Netflix tests cheaper mobile-only plan in Malaysia")
+
+
+def test_vowel_share_counts_lowercase_words_when_there_are_two():
+    # lowercase words "batte", "terzo": the capitalised names do not count
+    assert vowel_share("Hamilton batte Button, Webber terzo") == 1.0
+    # Title Case: every word counts; steve, apple end in a vowel, jobs, resigns do not
+    assert vowel_share("Steve Jobs Resigns Apple") == 0.5
+    assert vowel_share("Ok") is None
 
 
 def test_overlap_and_bucket():
@@ -54,7 +85,7 @@ def test_filters_and_one_query_per_document():
     assert funnel["candidates"] == 8
     assert funnel["after: at least 4 words"] == 7
     assert funnel["after: not foreign"] == 6
-    assert funnel["after: not English"] == 5
+    assert funnel["after: in Italian"] == 5
     assert funnel["after: not ambiguous"] == 3
     assert funnel["after: article published"] == 2
     assert funnel["final: one query per document"] == 1
