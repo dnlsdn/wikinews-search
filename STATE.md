@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 done (16 Nov 14:02): full indices with vectors on Daniel's laptop, embeddings committed in `data/shared/`; next: D5 (Tuesday morning) |
+| Data and indexing | Daniel | D1-D4 done (16 Nov 14:02): full indices with vectors on Daniel's laptop, embeddings committed in `data/shared/`; next: D6 data report, then the D5 extras (E8 after F4) |
 | Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,19 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 14:15, Daniel: order of the remaining data steps
+
+Decided by Daniel:
+1. D5 item 1 (`sources_text`) is already done inside D3. D5 stays unticked because its extras are
+   still wanted.
+2. Next: **D6 data report** now (Monday afternoon instead of Tuesday), since it is the base of
+   Daniel's slides and needs nothing from the others.
+3. Then the D5 extras, in this order: **E8** (same vectors in `int8_hnsw` and `bbq_hnsw` indices)
+   on Tuesday late morning, once Fabio's F4 knn configuration exists (open an issue to Fabio and
+   Gioia for the matching configurations); the `italian` + `asciifolding` variant only if time is
+   left, because it changes a contract on the busiest day.
+4. Tuesday 10:00: review Gioia's 30 manual queries (handoff in `PLAN.md`).
 
 ### 16 Nov 2026 14:02, Daniel: D4 done, shared embeddings and indices with vectors
 
