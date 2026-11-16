@@ -1,0 +1,18 @@
+# data (download the dump, see README)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# models and caches
+models/
+*.npy
+
+# os
+.DS_Store

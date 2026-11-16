@@ -1,0 +1,22 @@
+# Single-node Elasticsearch for local development.
+# Same image as the course lab (tteofili/lucenex, es/), with a 1 GB heap so it fits on an 8 GB laptop.
+# Kibana is left out on purpose to save memory.
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
+    container_name: wikinews-es
+    environment:
+      - node.name=es01
+      - cluster.name=wikinews
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    mem_limit: 2g
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+volumes:
+  esdata:
+    driver: local
