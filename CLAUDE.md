@@ -111,7 +111,9 @@ Use `gh` (GitHub CLI). Labels: `for:daniel`, `for:fabio`, `for:gioia`, `blocker`
    in `uv.lock` take the incoming version and run `uv lock`; anywhere else, stop and ask your
    user.
 8. If what you pushed unblocks someone, comment on their issue or open one for them
-   (`for:<name>`): "the sample is pushed, you can start F1".
+   (`for:<name>`): "the sample is pushed, you can start F1" (see "Handoffs" in `PLAN.md`).
+9. After pushing, check again `gh issue list --label for:<name>`: messages may have arrived while
+   you worked (the briefing only runs at session start). Tell your user about new ones.
 
 ## Commands
 
