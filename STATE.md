@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed; next: review of the queries by Daniel and Fabio (Tue 10:00), then pooling (Tue 12:00) |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:35): runner `evaluation/run.py` works, dev run of every configuration next |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,48 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 21:35, Gioia: experiment runner (G5, work in progress)
+
+The runner is pushed and works; the dev run of every configuration comes next. One command:
+`uv run python -m evaluation.run` (official, all queries) or `--dev` (the 1000 dev queries of
+`fonti`, outputs under `results/runs/dev/`, not committed). PowerShell the same.
+
+What it does, for every test set and configuration:
+1. `search(text, config, k=100)` for each query, timed with `perf_counter` after a warm-up of 20
+   queries per configuration (searched once and discarded: model loading, caches); the run goes to
+   `results/runs/<set>/<config>.txt`, the latencies next to it.
+2. A `random` baseline computed in the runner: for each query 100 documents drawn without
+   replacement from all the documents of `docs.jsonl` (seed `42-<qid>`, so a query gets the
+   same ranking in the dev and in the full run).
+3. Metrics from the runs: `fonti` MRR@10, R@10, R@100, and MRR@10, R@100 per overlap bucket
+   (`MRR@10:low`, ...); `manual` P@10, nDCG@10, AP, MRR@10. Each mean with its 95% percentile
+   bootstrap interval (10,000 resamples, seed 42). Files: `results/metrics/<set>.csv` (one row
+   per configuration, columns `<metric>`, `<metric>_ci95_lo`, `<metric>_ci95_hi`) and
+   `results/metrics/<set>_per_query.csv`.
+4. `evaluation/experiments.py` lists the comparisons of PLAN.md as (baseline, variant) pairs with
+   the metrics tested on each set: E1, E2, E3 (also per bucket on `fonti`: the figures Fabio
+   asked for), E4, E5, and E8 (stretch, run only where its indices are built). Paired
+   randomization test, two-sided, 10,000 permutations: `results/metrics/significance.csv`.
+5. E6: `results/metrics/latency.csv` (p50, p95, mean in ms) and `results/summary.md` (tables per
+   experiment, a generated line per comparison, the machine and the commit).
+
+Decisions, and why:
+1. `manual` is scored only on the five pooled configurations: the others would be judged against
+   documents they did not help to pool. It is skipped until `qrels.txt` exists (G4).
+2. `--configs` reruns only some configurations and reuses the other runs from disk (printed with
+   their time), to save time while developing; the official run reruns everything.
+3. A configuration whose index is not built on the laptop (the E8 indices `-int8`, `-bbq`) is
+   skipped with a message, not failed: E8 is stretch.
+
+First number, dev subset, `bm25-italian` only, Gioia's MacBook (8 GB): MRR@10 0.749
+[0.725, 0.773], R@10 0.869 [0.848, 0.890]; `random` 0.000 (the pipeline works); latency p50
+14.7 ms, p95 23.7 ms. Not a result yet: dev subset, and other heavy containers were running.
+
+Tests: `uv run pytest -q tests/test_run.py` (7 tests with a fake search: warm-up, random baseline
+deterministic and near zero, bucket metrics, dev subset, significance rows, summary, sets without
+judgments). Full suite 113 passed, 2 skipped. Nothing changes for the others. Next: the dev run of
+every configuration, then the pooling after the review of the queries (Tuesday 10:00-12:00).
 
 ### 16 Nov 2026 21:30, Gioia: the 30 `manual` queries (G3, work in progress)
 
