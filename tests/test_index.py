@@ -51,6 +51,13 @@ def test_embeddings_are_matched_by_id(tmp_path, monkeypatch):
         indexer.load_embeddings(["a", "c"])
 
 
+def test_embedded_text_follows_the_contract():
+    from wikisearch.ingest.embed import passage
+
+    assert passage({"title": "Titolo ", "lead": " Primo paragrafo."}) == "passage: Titolo. Primo paragrafo."
+    assert passage({"title": "Solo titolo", "lead": ""}) == "passage: Solo titolo"
+
+
 @pytest.fixture(scope="module")
 def es_index():
     from wikisearch.search.es import client
