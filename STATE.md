@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:35): runner `evaluation/run.py` works, dev run of every configuration next |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:40): runner `evaluation/run.py` works, dev run of every configuration done; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,61 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 21:40, Gioia: dev run of every configuration, judgment merge script (G5, G4, work in progress)
+
+**Dev run** (`uv run python -m evaluation.run --dev`, 1000 dev queries of `fonti`, about 2 minutes;
+outputs in `results/runs/dev/`, not committed). Every configuration ran; E8 skipped (indices not
+built on this laptop), `manual` skipped (no judgments yet). Correction to the 21:35 entry: Gioia's
+laptop is an Apple M4 with 16 GB of RAM, not 8 GB. These are development numbers, not results: the
+official run on all 7,223 queries is on Tuesday.
+
+| configuration | MRR@10 | R@100 | MRR@10 low overlap |
+|---|---|---|---|
+| `random` | 0.000 | 0.011 | 0.000 |
+| `bm25-standard` | 0.728 | 0.934 | 0.460 |
+| `bm25-italian` | 0.749 | 0.946 | 0.500 |
+| `bm25-italian-title` | 0.641 | 0.861 | 0.266 |
+| `bm25-italian-body` | 0.712 | 0.948 | 0.599 |
+| `bm25-italian-flat` | 0.783 | 0.963 | 0.615 |
+| `knn` | 0.779 | 0.931 | 0.556 |
+| `hybrid-rrf` | 0.799 | 0.955 | 0.590 |
+| `bm25-italian-leak` | 0.902 | 1.000 | 0.826 |
+| `hybrid-rrf-published` | 0.803 | 0.955 | 0.601 |
+
+What it says so far (all with p < 0.01 unless noted): the random floor is at zero (R@100 0.011,
+close to 100 / 12,213 = 0.008 expected by chance), so the pipeline is sound. E1: the Italian
+analyzer helps (+0.021 MRR@10). E3: hybrid > kNN > BM25 on MRR@10, the gain is on the low-overlap
+(paraphrase) queries (+0.090 for hybrid over BM25), none on the high-overlap ones (all about
+0.99). E4: indexing the sources inflates MRR@10 by +0.153. Three points to check in the official
+run:
+1. E2: equal field weights (`bm25-italian-flat`, 0.783) beat the default `title^3 lead^2 body`
+   (0.749), p < 0.0001; the hybrid uses the default weights. If the official run confirms it,
+   Fabio's E2 slide must say so (Gioia will tell Fabio once the official numbers are there).
+2. Latencies are not reliable yet: `hybrid-rrf` (p50 19 ms) came out faster than `knn` (23 ms)
+   although it runs kNN and BM25, probably warm caches for the configurations that run later on
+   the same queries, plus other containers running on the laptop. To fix before the official run.
+3. Many tests (24 pairs-metrics in E3 alone): a few p values near 0.05 may be false positives;
+   to state as a limit or correct.
+
+**Judgment merge** `evaluation/merge_judgments.py` (G4 step 2, ready before the judging):
+`uv run python -m evaluation.merge_judgments` (PowerShell the same).
+1. Prints per judge the assigned documents still without a grade (they would count as not
+   relevant).
+2. Cohen's kappa on the documents graded by two judges (queries M01-M10), on the three grades and
+   on relevant / not relevant (grade >= 1), overall and per pair of judges. Decided by Gioia: both
+   kappas, because binary relevance is what P@10, MAP and MRR use and the three grades are what
+   nDCG uses.
+3. Disagreements go to `judgments/disagreements.tsv`; the two judges write the agreed grade in
+   `judgments/resolved.tsv` (`qid<TAB>doc_id<TAB>grade`). Decided by Gioia: a disagreement still
+   open gets the **lower** grade (guidelines rule 5), and the command prints how many are open, so
+   the official run is never blocked by a missing answer.
+4. Writes `qrels.txt` and prints the grade distribution and the queries without any relevant
+   document (skipped by the metrics).
+
+Tests: `uv run pytest -q tests/test_merge_judgments.py` (5 tests, kappa examples computed by hand
+in the comments). Full suite 118 passed, 2 skipped. Nothing changes for the others. Next: fix the
+latency measurement, pooling after the query review (Tuesday 10:00-12:00).
 
 ### 16 Nov 2026 21:35, Gioia: experiment runner (G5, work in progress)
 
