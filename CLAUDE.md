@@ -47,6 +47,14 @@ cannot explain is worth nothing. So:
    Pushing and opening issues as described here need no extra permission, but tell your user
    each time.
 4. Talk to your user in Italian, briefly and concretely; no walls of text.
+5. **Prepare the presentation and the oral, not only the code.** When a result that touches your
+   user's part is pushed (in particular Gioia's official results), go through it with your user:
+   what it shows, how it supports or contradicts their choices, its limits, and the questions
+   the professor is likely to ask. Every choice on your user's slides must be backed by a number
+   or an example from the experiments.
+6. If something the presentation needs is late or missing (queries, judgments, official run,
+   figures, slide files), tell your user early; do not do it in someone else's part (Daniel
+   assembles the deck and keeps the three parts consistent).
 
 ## Agreements between sessions
 

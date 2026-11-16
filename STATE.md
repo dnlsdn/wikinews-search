@@ -62,6 +62,17 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026 16:00, Daniel: preparing the presentation and the oral is part of every session
+
+Decided by Daniel: `CLAUDE.md`, "Working with your user", two new rules for every session.
+(5) When a result that touches your user's part is pushed (above all Gioia's official results),
+go through it with your user: what it shows, how it supports their choices, its limits, the
+likely questions at the oral; every choice on the slides is backed by a number or an example.
+(6) If something the presentation needs is late or missing, tell your user early, without doing
+it in someone else's part. Daniel's brief also has a section "Beyond the code" (he assembles the
+deck and keeps the three parts consistent). Nothing else changes: same steps, same scope rules.
+Issue opened for Fabio and Gioia so that their running sessions see it.
+
 ### 16 Nov 2026 15:45, Daniel: D5 done, no asciifolding variant
 
 Checked whether the optional `italian` + `asciifolding` variant (D5 item 3) is worth a contract
