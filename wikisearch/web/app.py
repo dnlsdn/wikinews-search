@@ -46,7 +46,7 @@ def _run_search(q: str, config: str, k: int, filters: Filters) -> list[Hit]:
     try:
         return search(q, config, k=k, filters=filters)
     except NotImplementedError as exc:
-        raise HTTPException(501, f"search not implemented yet ({exc}); use WIKISEARCH_FAKE=1") from exc
+        raise HTTPException(501, f"configuration not available yet ({exc})") from exc
     except ESConnectionError as exc:
         raise HTTPException(503, "Elasticsearch is not reachable") from exc
 

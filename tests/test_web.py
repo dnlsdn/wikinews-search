@@ -90,3 +90,13 @@ def test_facets(client):
     for key in ("categories", "agencies", "years"):
         assert data[key] and all(set(b) == {"value", "count"} for b in data[key])
     assert client.get("/api/facets", params={"config": "nope"}).status_code == 400
+
+
+def test_page_has_every_f3b_element(client):
+    # The UI is plain HTML and JS: check that the elements app.js relies on are in the page.
+    html = client.get("/").text
+    for element_id in (
+        "search-form", "q", "config", "compare", "config2", "date-from", "date-to", "published",
+        "facet-categories", "facet-agencies", "columns", "pager", "prev", "next", "doc-view", "back",
+    ):
+        assert f'id="{element_id}"' in html, element_id

@@ -8,17 +8,57 @@
 </head>
 <body>
   <header>
-    <h1>Wikinews search</h1>
-    <form id="search-form">
-      <input id="q" name="q" type="search" placeholder="Search the Italian Wikinews archive" autofocus>
-      <select id="config" name="config" aria-label="Configuration"></select>
-      <button type="submit">Search</button>
-    </form>
+    <div class="wrap">
+      <h1><a href="./" id="home">Wikinews search</a></h1>
+      <form id="search-form">
+        <input id="q" name="q" type="search" placeholder="Search the Italian Wikinews archive" autofocus>
+        <select id="config" name="config" aria-label="Configuration"></select>
+        <label class="inline" title="Show two configurations side by side">
+          <input id="compare" type="checkbox"> Compare
+        </label>
+        <select id="config2" name="config2" aria-label="Second configuration" hidden></select>
+        <button type="submit">Search</button>
+      </form>
+    </div>
   </header>
-  <main>
-    <p id="status"></p>
-    <ol id="results"></ol>
-  </main>
+
+  <div id="search-view" class="wrap layout">
+    <aside id="filters" aria-label="Filters">
+      <section>
+        <h2>Date</h2>
+        <label class="field">From <input id="date-from" type="date"></label>
+        <label class="field">To <input id="date-to" type="date"></label>
+      </section>
+      <section>
+        <label class="inline"><input id="published" type="checkbox"> Published only</label>
+      </section>
+      <section>
+        <h2>Categories</h2>
+        <ul id="facet-categories" class="facet"></ul>
+      </section>
+      <section>
+        <h2>Sources</h2>
+        <ul id="facet-agencies" class="facet"></ul>
+      </section>
+      <button id="clear-filters" type="button" class="link">Clear filters</button>
+    </aside>
+
+    <main>
+      <p id="status"></p>
+      <div id="columns"></div>
+      <nav id="pager" hidden>
+        <button id="prev" type="button">Previous</button>
+        <span id="page-label"></span>
+        <button id="next" type="button">Next</button>
+      </nav>
+    </main>
+  </div>
+
+  <div id="doc-view" class="wrap" hidden>
+    <p><a href="./" id="back">&larr; Back to results</a></p>
+    <article id="doc"></article>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
