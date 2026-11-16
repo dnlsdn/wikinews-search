@@ -62,6 +62,42 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026 15:50, Gioia: G3 judging tool, pooling script, guidelines (work in progress)
+
+G3 in progress. Pushed what does not depend on the 30 queries; the queries are being written by
+Gioia now (before looking at any result) and come in the next push. Nothing is pooled yet.
+
+1. **Judging tool** `evaluation/judge.py`: `uv run python -m evaluation.judge --judge <name>`
+   (PowerShell the same). Shows one document at a time (progress `37/310`, query, information
+   need, title, date, lead up to 900 characters); type `0`, `1`, `2` and Enter, `o` opens the
+   article in the browser, `b` goes back, `q` quits, Enter keeps the grade of a document already
+   judged. Every grade is appended at once to `evaluation/testsets/manual/judgments/<name>.tsv`
+   (`qid, doc_id, grade, time`), so it can be stopped and resumed; the last grade of a pair wins.
+   Line-based `input()`, so it works in the macOS terminal and in PowerShell; stdout is
+   reconfigured to UTF-8 for the accents.
+2. **Pooling** `evaluation/pool.py`: `uv run python -m evaluation.pool` (Elasticsearch, full
+   indices, every configuration: F4 is pushed). Top 10 of `bm25-standard`, `bm25-italian`, `knn`,
+   `hybrid-rrf`, `hybrid-rrf-published`, merged, deduplicated, shuffled per query
+   (`random.Random("42-<qid>")`). Title, date, lead and URL come from `docs.jsonl`. Writes
+   `evaluation/testsets/manual/judging/<name>.tsv` (header `qid, query, doc_id, title, date, lead,
+   url`) and prints pool sizes, documents found by one configuration only, and judgments per
+   person (flag above 350). Which configuration found each document goes to
+   `results/runs/manual/pool_found_by.json`, not committed, so the judges stay blind.
+3. **Assignment** (proposed, to be confirmed by the group): queries in file order, 1-10 Gioia,
+   11-20 Daniel, 21-30 Fabio; the second judgment of queries 1-10 is split, 1-5 Daniel and 6-10
+   Fabio, so that each person has about 300 judgments (a single second judge for all of 1-10
+   would get about 450, over the brief's 350).
+4. **Guidelines draft** `evaluation/testsets/manual/GUIDELINES.md`: grades 2 / 1 / 0 as in the
+   brief, rules (judge the article not the snippet, each article on its own, time matters when the
+   need says so, non-news pages judged like any article, when in doubt the lower grade, no
+   talking before everyone has finished), illustrative examples on two queries that are not in
+   the test set.
+
+Tests: `uv run pytest -q tests/test_judging.py` (5 tests: assignment, pooling with a fake search,
+grades saved and resumed, back and regrade, Enter keeps a grade). Nothing changes for the others.
+Next: the 30 queries in `evaluation/testsets/manual/queries.tsv`, then an issue to Daniel and
+Fabio for the review (Tuesday 10:00) and the assignment.
+
 ### 16 Nov 2026 15:45, Gioia: G2 `fonti` test set
 
 Step G2 done: `evaluation/testsets/fonti/queries.tsv` (7,223 queries), `qrels.txt` (one relevant
