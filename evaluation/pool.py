@@ -1,4 +1,4 @@
-"""Pool the documents to judge for the `manual` test set (step G3).
+"""Pool the documents to judge for the `manual` test set.
 
     uv run python -m evaluation.pool
 

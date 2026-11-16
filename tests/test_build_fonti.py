@@ -1,4 +1,4 @@
-"""Tests of the `fonti` test set builder (step G2) on hand-made documents."""
+"""Tests of the `fonti` test set builder on hand-made documents."""
 
 import pytest
 

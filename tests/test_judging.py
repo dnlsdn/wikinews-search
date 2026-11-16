@@ -1,4 +1,4 @@
-"""Tests of the pooling and of the judging tool of the `manual` test set (step G3), without
+"""Tests of the pooling and of the judging tool of the `manual` test set, without
 Elasticsearch: a fake search function and scripted answers."""
 
 from evaluation.judge import first_unjudged, judge_loop, read_judgments

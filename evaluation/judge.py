@@ -1,4 +1,4 @@
-"""Terminal tool to judge the pooled documents of the `manual` test set (steps G3, G4).
+"""Terminal tool to judge the pooled documents of the `manual` test set.
 
     uv run python -m evaluation.judge --judge gioia
 

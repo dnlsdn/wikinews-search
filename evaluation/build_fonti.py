@@ -1,4 +1,4 @@
-"""Build the `fonti` test set (known-item search, step G2).
+"""Build the `fonti` test set (known-item search).
 
 Each Wikinews article cites external sources, each with its own headline. That headline, written
 by another newspaper about the same event, is the query; the article is the only relevant

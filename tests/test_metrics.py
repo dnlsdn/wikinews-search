@@ -1,4 +1,4 @@
-"""Unit tests of the evaluation metrics, file formats and significance tests (step G1).
+"""Unit tests of the evaluation metrics, file formats and significance tests.
 
 Every expected value is computed by hand in the comment next to it, so that a bug in the metric
 code shows up here and not in the results (docs/course.md, section 2).
