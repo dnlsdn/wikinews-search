@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05); next: E8 indices after Fabio's F4, review of Gioia's queries Tue 10:00, deck on Wednesday |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), E8 indices `int8`/`bbq` built (15:30, measurement waits for Fabio's configurations and Gioia's runner); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F3 done (16 Nov 15:15): BM25 `search()`, web API and full UI (filters, pagination, document view, compare mode) on real data; next: F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -47,7 +47,13 @@ Analysed on 16 Nov 2026 before writing the plan.
 
 ## Contract changes
 
-None yet.
+1. **16 Nov 2026 15:30, Daniel: vector structure variants for E8.** `wikisearch/config.py` has
+   `VECTOR_INDEX_TYPES` (`hnsw`, `int8_hnsw`, `bbq_hnsw`) and `index_name(analyzer,
+   vector_index="hnsw")`: `wikinews-italian-int8` and `wikinews-italian-bbq`. A configuration may
+   have the optional key `"vector_index"` (default `"hnsw"`); `tests/test_contracts.py` checks
+   it. Existing calls are unchanged. Fabio: pass the key to `index_name` in `search()` and add the
+   two `knn` configurations; Gioia: build the two indices locally before running them
+   (`docs/contracts.md` section 2, item 4). Issue `contract-change` opened.
 
 ## Messages
 
@@ -55,6 +61,57 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 15:30, Daniel: E8 indices (vector quantization), contract change
+
+Decided by Daniel: E8 now instead of Tuesday (the indices do not need F4; only the measurement
+does), and a new configuration key rather than new analyzer variants (the analyzer is text
+analysis, the vector structure is a separate knob).
+
+Built `wikinews-italian-int8` (`int8_hnsw`) and `wikinews-italian-bbq` (`bbq_hnsw`): same 12,213
+documents and vectors as `wikinews-italian`, only `index_options` differs, so E8 isolates the
+quantization. How to run (about 1 minute, +115 MB of disk, Elasticsearch running):
+
+    uv run python -m wikisearch.ingest.index --analyzers italian --vector-index int8_hnsw bbq_hnsw
+
+(`--repeat 3` for the timings; the default build is unchanged and builds only `hnsw` indices.)
+
+Numbers (Daniel's Mac, three builds each in `results/indexing.csv`; sizes from `_stats/store`,
+the split from `_disk_usage` and `_stats/dense_vector`, which reports the off-heap files):
+
+| index | build s (3 runs) | index size | float32 vectors | quantized vectors | HNSW graph |
+|---|---|---|---|---|---|
+| `wikinews-italian` (`hnsw`) | 14.0, 14.2, 13.3 | 54.9 MB | 18.76 MB | none | 0.41 MB |
+| `wikinews-italian-int8` | 24.0, 13.1, 16.5 | 59.8 MB | 18.76 MB | 4.89 MB (400 B/vector) | 0.41 MB |
+| `wikinews-italian-bbq` | 16.6, 14.5, 16.6 | 55.7 MB | 18.76 MB | 0.76 MB (62 B/vector) | 0.41 MB |
+
+What this means (for the slides and the oral):
+1. **Quantization makes the index bigger on disk, not smaller**: Elasticsearch keeps the float32
+   vectors and adds the quantized copy (+4.9 MB int8, +0.8 MB bbq). The saving is in the memory
+   the search needs: the graph walk reads only the quantized vectors and the graph, so the part
+   that must stay in RAM goes from 19.2 MB (hnsw) to 5.3 MB (int8, about 4x less) and 1.2 MB
+   (bbq, about 16x less). The float32 vectors are read only to rescore the final candidates.
+2. Defaults recorded from the mapping: `m` 16, `ef_construction` 100 for all three; `bbq_hnsw`
+   gets `rescore_vector.oversample: 3.0` (it fetches 3k candidates and rescores them with the
+   float32 vectors), `int8_hnsw` has no rescoring.
+3. At 12,213 documents everything fits in memory anyway: E8 shows the quality cost of a
+   structure that would matter at millions of vectors, and the slide must say so.
+
+Sanity check, not the E8 result (100 random documents as queries with their own vector, k=10,
+num_candidates=100, after a warm-up; script not committed): top-10 overlap with the `hnsw`
+index 0.987 for int8 (minimum 0.9) and 0.951 for bbq (minimum 0.2: one query lost most of its
+neighbours even with rescoring); the document itself first in 100/100 (int8) and 99/100 (bbq).
+Latency p50 about 6 ms for all three on this Mac. The official E8 numbers are Gioia's: MRR@10 and
+R@100 of the two new `knn` configurations on `fonti`, and latency.
+
+Contract change (section above, `docs/contracts.md` section 2 item 4): `VECTOR_INDEX_TYPES`,
+`index_name(analyzer, vector_index)`, optional configuration key `"vector_index"`. Tests: one
+new in `tests/test_index.py`, one check in `tests/test_contracts.py`. Issue `contract-change`
+opened for Fabio (configurations `knn-int8`, `knn-bbq` with the same `num_candidates` as `knn`)
+and Gioia (build the two indices before the official run).
+
+Next: review of Gioia's 30 queries (Tuesday 10:00, not pushed yet); the `italian` +
+`asciifolding` variant only if Daniel wants it; deck on Wednesday.
 
 ### 16 Nov 2026 15:15, Fabio: F3b web interface complete
 
