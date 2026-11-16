@@ -3,8 +3,8 @@
     uv run python -m evaluation.run            # official: every query of every test set
     uv run python -m evaluation.run --dev      # development: the 1000 dev queries of `fonti`
 
-For every test set and configuration: `search(text, config, k=100)` for each query, timed, and the
-run written to `results/runs/<set>/<config>.txt`. Then, from the runs:
+For every test set and configuration: `search(text, config, k=100)` for each query, and the run
+written to `results/runs/<set>/<config>.txt`. Then, from the runs:
 
 1. `results/metrics/<set>.csv`: one row per configuration (plus the `random` baseline), each mean
    with its 95% bootstrap interval (`<metric>_ci95_lo`, `<metric>_ci95_hi`); on `fonti` also per
@@ -12,7 +12,8 @@ run written to `results/runs/<set>/<config>.txt`. Then, from the runs:
 2. `results/metrics/<set>_per_query.csv`: the per-query scores the intervals and tests use.
 3. `results/metrics/significance.csv`: the pairs of `evaluation/experiments.py`, difference of the
    means and two-sided p-value of the paired randomization test.
-4. `results/metrics/latency.csv`: p50 and p95 of the query latency (after a warm-up).
+4. `results/metrics/latency.csv`: p50 and p95 of the query latency, from a separate pass on 500
+   `fonti` queries with the configurations in random order per query (`measure_latency`).
 5. `results/summary.md`: the tables, with the machine the latencies were measured on.
 
 `--dev` writes everything under `results/runs/dev/` (not committed). `--configs` reruns only some
@@ -45,6 +46,8 @@ from wikisearch.search.configs import CONFIGS
 
 K = 100
 WARMUP = 20
+LATENCY_QUERIES = 500  # timed queries of `fonti` per configuration (E6)
+LATENCY_SET = "fonti"
 SEED = 42
 N_RESAMPLES = 10000
 ALPHA = 0.05
@@ -99,22 +102,48 @@ def random_run(queries: dict, doc_ids: list[str], k: int = K) -> dict[str, list[
     return out
 
 
-def run_config(queries: dict, name: str, search, k: int = K, warmup: int = WARMUP):
-    """Search every query with one configuration. The first `warmup` queries are searched once
-    before timing and discarded (model loading, Elasticsearch caches). Returns the run and the
-    latency of each query in milliseconds."""
-    texts = [text for text, _ in queries.values()]
-    for text in texts[:warmup]:
-        search(text, name, k=k)
-    results, latencies = {}, []
+def run_config(queries: dict, name: str, search, k: int = K):
+    """Search every query with one configuration (not timed: see `measure_latency`)."""
+    results = {}
     for i, (qid, (text, _)) in enumerate(queries.items(), start=1):
-        t0 = time.perf_counter()
-        hits = search(text, name, k=k)
-        latencies.append((time.perf_counter() - t0) * 1000)
-        results[qid] = [(h.id, h.score) for h in hits]
+        results[qid] = [(h.id, h.score) for h in search(text, name, k=k)]
         if i % 500 == 0:
             print(f"    {name}: {i}/{len(queries)}", flush=True)
-    return results, latencies
+    return results
+
+
+def measure_latency(queries: dict, configs: list[str], search, n: int = LATENCY_QUERIES,
+                    warmup: int = WARMUP, k: int = K, before_each=None) -> dict[str, list[float]]:
+    """Latency in milliseconds of every configuration, measured in conditions that are the same
+    for all of them. Measuring while producing the runs is unfair: the configurations run one after
+    the other on the same queries, so the later ones find the caches warm (a first dev run timed
+    `hybrid-rrf`, which runs kNN and BM25, faster than `knn` alone).
+
+    So: `warmup + n` queries drawn at random (seed 42); the first `warmup` are searched once with
+    every configuration and discarded (model loading, Elasticsearch and disk caches); then for each
+    of the other `n` queries every configuration is timed, in a random order per query (seed 42 and
+    the qid), so that no configuration always comes first or last.
+
+    `before_each` is called before every timed search, untimed: the runner passes the clearing of
+    the query-embedding cache of `wikisearch.search.embed`, which would otherwise hold the vectors
+    computed while producing the runs and hide the cost of the model (a user query is always new)."""
+    qids = sorted(queries)
+    drawn = random.Random(SEED).sample(qids, min(len(qids), warmup + n))
+    warm, timed = drawn[:warmup], drawn[warmup:]
+    for qid in warm:
+        for name in configs:
+            search(queries[qid][0], name, k=k)
+    latencies: dict[str, list[float]] = {name: [] for name in configs}
+    for qid in timed:
+        order = list(configs)
+        random.Random(f"{SEED}-{qid}").shuffle(order)
+        for name in order:
+            if before_each is not None:
+                before_each()
+            t0 = time.perf_counter()
+            search(queries[qid][0], name, k=k)
+            latencies[name].append((time.perf_counter() - t0) * 1000)
+    return latencies
 
 
 # --- scores ------------------------------------------------------------------------------------
@@ -305,7 +334,12 @@ def write_summary(path: Path, info: dict, summaries_by_set: dict, sig_rows: list
         lines += [f"- {reading(r)}" for r in rows]
         lines.append("")
     if lat_rows:
-        lines += ["## E6: query latency (ms, after a warm-up of %d queries, k = %d)" % (WARMUP, K), "",
+        lines += ["## E6: query latency (ms, k = %d)" % K, "",
+                  f"{LATENCY_QUERIES} `{LATENCY_SET}` queries drawn with seed {SEED}, after a warm-up of "
+                  f"{WARMUP} other queries; for each query every configuration is timed, in a random "
+                  "order, so that all of them run with the same caches; the query-embedding cache is "
+                  "emptied before each timed search, so the vector configurations include the cost "
+                  "of embedding the query.", "",
                   "| set | configuration | queries | p50 | p95 | mean |", "|---|---|---|---|---|---|"]
         for r in lat_rows:
             lines.append(f"| {r['set']} | `{r['config']}` | {r['queries']} | {r['p50_ms']} | {r['p95_ms']} | {r['mean_ms']} |")
@@ -322,6 +356,8 @@ def main() -> None:
     parser.add_argument("--dev", action="store_true", help="the 1000 dev queries of fonti, outputs in results/runs/dev/")
     parser.add_argument("--sets", nargs="+", default=TEST_SETS, choices=TEST_SETS)
     parser.add_argument("--configs", nargs="+", help="rerun only these configurations (the others are reused from disk)")
+    parser.add_argument("--no-latency", action="store_true",
+                        help="skip the latency pass (latency.csv is then written empty): development only")
     parser.add_argument("--resamples", type=int, default=N_RESAMPLES, help=argparse.SUPPRESS)
     args = parser.parse_args()
 
@@ -348,23 +384,28 @@ def main() -> None:
         per_query_by_config = {}
         write_run(run_dir / f"{RANDOM}.txt", random_run(queries, doc_ids), RANDOM)
         per_query_by_config[RANDOM] = score_run(set_name, queries, qrels, read_run(run_dir / f"{RANDOM}.txt"))
+        built = [name for name in configs_for(set_name) if index_built(name)]
         for name in configs_for(set_name):
-            run_path, lat_path = run_dir / f"{name}.txt", run_dir / f"{name}.latency.json"
+            run_path = run_dir / f"{name}.txt"
+            if name not in built:
+                print(f"  {name}: index not built on this laptop, skipped")
+                continue
             if args.configs is None or name in args.configs:
-                if not index_built(name):
-                    print(f"  {name}: index not built on this laptop, skipped")
-                    continue
                 print(f"  {name}: searching", flush=True)
-                results, latencies = run_config(queries, name, search)
-                write_run(run_path, results, name)
-                lat_path.write_text(json.dumps(latencies), encoding="utf-8")
+                write_run(run_path, run_config(queries, name, search), name)
             elif run_path.exists():
                 print(f"  {name}: reused run from {datetime.fromtimestamp(run_path.stat().st_mtime):%d %b %H:%M}")
             else:
                 continue
             per_query_by_config[name] = score_run(set_name, queries, qrels, read_run(run_path))
-            if lat_path.exists():
-                lat_rows.append(latency_row(set_name, name, json.loads(lat_path.read_text(encoding="utf-8"))))
+
+        if set_name == LATENCY_SET and not args.no_latency:
+            print(f"  latency: {LATENCY_QUERIES} queries x {len(built)} configurations, "
+                  "configurations in random order per query", flush=True)
+            from wikisearch.search import embed
+
+            latencies = measure_latency(queries, built, search, before_each=embed.embed_query.cache_clear)
+            lat_rows += [latency_row(set_name, name, latencies[name]) for name in built]
 
         print(f"  {set_name}: confidence intervals and significance tests", flush=True)
         summaries = {name: summarize(set_name, pq, args.resamples) for name, pq in per_query_by_config.items()}

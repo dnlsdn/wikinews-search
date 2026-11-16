@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:40): runner `evaluation/run.py` works, dev run of every configuration done; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,35 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 21:50, Gioia: fair latency measurement in the runner (G5, work in progress)
+
+The latencies of the first dev run were wrong (log of 21:40, point 2): `hybrid-rrf` came out
+faster than `knn`. Two causes, both fixed in `evaluation/run.py`:
+1. **Order.** The configurations ran one after the other on the same queries, so the later ones
+   found warm caches. The runs (quality) are no longer timed; latency is a separate pass,
+   `measure_latency`: 520 `fonti` queries drawn with seed 42, the first 20 searched once with every
+   configuration and discarded (warm-up), then for each of the other 500 queries every
+   configuration is timed, in a random order per query (seed `42-<qid>`).
+2. **Query-embedding cache.** `wikisearch.search.embed.embed_query` has an `lru_cache` (2048
+   texts, Fabio's choice, right for the web app). The queries had already been embedded while
+   producing the runs, so the timed kNN searches skipped the model. The runner now empties that
+   cache before each timed search (calling `embed_query.cache_clear()`, no change to Fabio's
+   file): a user query is always new, so embedding it is part of the response time.
+
+Dev latencies after the fix (ms, p50 / p95, Apple M4 16 GB, other containers still running):
+`bm25-italian-title` 3.7 / 5.2, `bm25-italian-body` 11.1 / 18.0, `bm25-italian` 14.1 / 21.6,
+`bm25-italian-flat` 15.1 / 24.9, `bm25-italian-leak` 15.6 / 23.9, `bm25-standard` 18.8 / 27.5,
+`knn` 22.8 / 35.0, `hybrid-rrf` 38.1 / 53.1, `hybrid-rrf-published` 38.6 / 55.7. Now consistent:
+the hybrid costs about kNN plus BM25, and kNN is mostly the query embedding (about 17 ms) plus
+the graph search (about 6 ms, the value measured with the cache on). Quality numbers unchanged.
+
+How to run: `uv run python -m evaluation.run --dev` (about 3 minutes); `--no-latency` skips the
+pass while developing. Tests: `uv run pytest -q tests/test_run.py` (8 tests: the warm-up uses other
+queries, every configuration once per query, same random order every time, cache cleared before
+every timed search). Full suite 119 passed, 2 skipped. Nothing changes for the others. Next:
+pooling after the query review (Tuesday 10:00-12:00); before the official run, stop the other
+containers on the laptop.
 
 ### 16 Nov 2026 21:40, Gioia: dev run of every configuration, judgment merge script (G5, G4, work in progress)
 

@@ -45,16 +45,38 @@ def test_random_run_is_deterministic_per_query_and_has_no_repeats():
     assert run.random_run({"F2": QUERIES["F2"]}, ids, k=100)["F2"] == a["F2"]
 
 
-def test_run_config_warms_up_then_times_every_query():
+def test_run_config_searches_every_query_once():
     calls = []
-    results, latencies = run.run_config(QUERIES, "good", fake_search(calls), k=10, warmup=2)
-    assert len(calls) == 2 + len(QUERIES)  # 2 warm-up searches, discarded
-    assert len(latencies) == len(QUERIES) and all(t >= 0 for t in latencies)
+    results = run.run_config(QUERIES, "good", fake_search(calls), k=10)
+    assert len(calls) == len(QUERIES)
     assert results["F1"][0][0] == "d1"
 
 
+def test_latency_warm_up_on_other_queries_and_random_order():
+    calls = []
+
+    def search(text, config, k=10):
+        calls.append((text, config))
+        return []
+
+    lat = run.measure_latency(QUERIES, ["good", "bad", "other"], search, n=3, warmup=1)
+    assert all(len(v) == 3 and all(t >= 0 for t in v) for v in lat.values())
+    warm_text = calls[0][0]
+    assert calls[:3] == [(warm_text, c) for c in ["good", "bad", "other"]]  # warm-up, discarded
+    timed = calls[3:]
+    assert len(timed) == 9 and warm_text not in {t for t, _ in timed}  # timed on other queries
+    orders = [tuple(c for _, c in timed[i:i + 3]) for i in range(0, 9, 3)]
+    assert all(sorted(o) == ["bad", "good", "other"] for o in orders)  # every configuration once
+    calls.clear()
+    cleared = []
+    run.measure_latency(QUERIES, ["good", "bad", "other"], search, n=3, warmup=1,
+                        before_each=lambda: cleared.append(1))
+    assert [c for _, c in calls[3:]] == [c for o in orders for c in o]  # same order every time (seed)
+    assert len(cleared) == 9  # before every timed search, not before the warm-up
+
+
 def test_scores_buckets_and_random_floor(tmp_path):
-    good, _ = run.run_config(QUERIES, "good", fake_search(), k=10, warmup=0)
+    good = run.run_config(QUERIES, "good", fake_search(), k=10)
     write_run(tmp_path / "good.txt", good, "good")
     pq = run.score_run("fonti", QUERIES, QRELS, read_run(tmp_path / "good.txt"))
     assert pq["F1"]["MRR@10"] == 1.0 and pq["F1"]["MRR@10:low"] == 1.0
