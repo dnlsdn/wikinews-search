@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50): full indices with vectors, embeddings in `data/shared/`, data report in `results/data_report.md`; next: the D5 extras (E8 after F4), review of Gioia's queries Tue 10:00, then D7 slides |
-| Search and interface | Fabio | F1 done (16 Nov 14:40): BM25 `search()` with filters, highlights and published boost, CLI, web API on real data; next: F3b (full UI), then F4 (by Tue 11:00) |
+| Search and interface | Fabio | F1, F2 done (16 Nov 14:55): BM25 `search()` with filters, highlights and published boost, CLI, web API on real data; next: F3b (full UI), then F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
 How to get the dump (not in git): download
@@ -55,6 +55,14 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 14:55, Fabio: F2 ticked
+
+F2 (web API with FastAPI: search, document, facets, configs, highlighted snippets from
+Elasticsearch) has no work left: the endpoints were built in F3a and work on real data since F1
+(checked on the full indices: `/api/search` with pagination and filters, `/api/facets`,
+`/api/doc` without `embedding`). Ticked with Fabio's agreement. Nothing changes for the others.
+Next: F3b.
 
 ### 16 Nov 2026 14:50, Daniel: D6 data report
 
