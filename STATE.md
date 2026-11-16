@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00; G6 in progress (21:58): `evaluation/figures.py` draws the three figures (E3 buckets, E1/E2, E6), redrawn after the official run |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,40 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 21:58, Gioia: figures of the presentation (G6, work in progress)
+
+`evaluation/figures.py` draws the figures from the metric files of the runner (no search, a few
+seconds): `uv run python -m evaluation.figures` (official: `results/metrics/` to
+`results/figures/`) or `--dev` (dev run: `results/runs/dev/metrics/` to
+`results/runs/dev/figures/`, not committed). PowerShell the same. Done now so that on Tuesday
+evening, after the official run, the figures are one command away.
+
+1. `e3_buckets.png`, the key figure (E3): MRR@10 of BM25 (`bm25-italian`), kNN and `hybrid-rrf` on
+   all `fonti` queries and per overlap bucket, with the 95% bootstrap intervals; the values are
+   written only on the low-overlap group, the point of the figure.
+2. `e1_e2_bm25.png` (E1, E2): MRR@10 of the five BM25 variants with intervals, each annotated with
+   the difference from its baseline and the p-value of the randomization test.
+3. `e6_tradeoff.png` (E6): median latency against MRR@10, one point per configuration.
+
+Decisions, and why:
+1. `bm25-italian-leak` is not in the E6 figure: it indexes the sources, it measures leakage
+   (E4), it is not a configuration one could choose. `random` is left out too.
+2. A p-value of 0 from the test (10,000 permutations) is written `p < 0.0001`: the test cannot
+   resolve less than 1/10,000, so "p = 0" would be wrong.
+3. Text of the figures in English (repository rule; only `slides/` is in Italian). Colors: the
+   first three slots of a palette checked for colour-blind readers, one color where there is
+   one series.
+
+What the dev figures show (dev subset, not results): E3, the hybrid gains on the low-overlap
+queries (0.50 BM25, 0.56 kNN, 0.59 hybrid), all three about 0.99 on high overlap; E6, kNN
+(22.8 ms p50) and the hybrids (38 ms) cost more than BM25 (14 ms) once the query embedding is
+counted, and `bm25-italian-flat` is the best quality for its cost among the BM25 variants.
+
+Tests: `uv run pytest -q tests/test_figures.py` (3 tests: every figure drawn from tiny metric
+files, a figure without data skipped, p-value format). Full suite 122 passed, 2 skipped. Nothing
+changes for the others. Next: pooling after the query review (Tuesday 10:00-12:00); figures
+redrawn after the official run.
 
 ### 16 Nov 2026 21:50, Gioia: fair latency measurement in the runner (G5, work in progress)
 
