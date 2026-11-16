@@ -110,7 +110,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   and `wikinews-italian` with the mapping of section 2 and bulk-loads the corpus, measuring time
   and size. Accepts `--input` so the sample can be indexed too. Done when both indices hold all
   documents and the numbers are in `results/indexing.csv`.
-- [ ] **D4, Mon 16 night.** Embeddings: `wikisearch/ingest/embed.py` computes e5-small vectors for all
+- [x] **D4, Mon 16 night.** Embeddings: `wikisearch/ingest/embed.py` computes e5-small vectors for all
   documents into `data/shared/embeddings.npy` (committed, about 17 MB, so nobody else has to
   compute them) and the indexer loads them into `embedding`. Done when a `knn` query returns
   sensible neighbours for a few test articles.

@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1, D2, D3 done (16 Nov 13:55): full indices `wikinews-standard` and `wikinews-italian` (12,213 docs each) on Daniel's laptop; next: D4 embeddings |
+| Data and indexing | Daniel | D1-D4 done (16 Nov 14:02): full indices with vectors on Daniel's laptop, embeddings committed in `data/shared/`; next: D5 (Tuesday morning) |
 | Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,44 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 14:02, Daniel: D4 done, shared embeddings and indices with vectors
+
+`wikisearch/ingest/embed.py` computes the e5-small vectors of all documents, committed in
+`data/shared/embeddings.npy` (12,213 x 384 float32, 18.8 MB) and `data/shared/embeddings_ids.json`.
+**Fabio and Gioia: pull, then reindex** (the indexer loads the vectors by itself when the files
+exist): `uv run python -m wikisearch.ingest.index`. Do not recompute the embeddings. Fabio can
+start F4.
+
+How to run (only if the corpus changes): `uv run python -m wikisearch.ingest.embed` (downloads
+the model once, about 470 MB), then the indexer.
+
+1. Text embedded: `"passage: " + title + ". " + lead` (title alone if the lead is empty),
+   `normalize_embeddings=True`, batch 32, CPU. 121 s for 12,213 documents (about 100 docs/s),
+   peak memory 1 GB. Elasticsearch was stopped during the job (8 GB Mac).
+2. Indices with vectors (`results/indexing.csv`, three builds each): `wikinews-standard` 19.0,
+   13.0, 12.7 s, 57.4 MB; `wikinews-italian` 14.0, 14.2, 13.3 s, 54.9 MB. Against the indices
+   without vectors: about 3x the time (building the HNSW graph) and +19 MB (the raw float32
+   vectors are 18.8 MB; `hnsw` keeps them unquantized).
+3. Check (done when): nearest neighbours with `knn` (k=6, num_candidates=100) on
+   `wikinews-italian` are sensible.
+   - "Strage di Marzabotto: 10 ergastoli e 7 assoluzioni" -> "Strage di Nassiriya: tre rinviati
+     a giudizio", "Omicidio Biagi: 5 ergastoli", "Strage di Erba: ...".
+   - "Terremoto nel salernitano" -> "Terremoto in Sicilia", "Terremoto nelle Marche: tanta paura
+     ma nessun danno", "Terremoto a Palermo, nessun danno rilevante".
+   - "Contestata estrazione di Lotto e Superenalotto" -> other SuperEnalotto pages.
+   - Query "disastro in una miniera" (embedded as `"query: " + text`) -> "Ucraina: decine di
+     vittime in una esplosione in miniera", "Cina: esplosione in miniera, 11 morti", "Cina: 105
+     vittime in una esplosione in miniera": none contains "disastro", a paraphrase BM25 would
+     miss (useful for the E3 slide and the demo).
+   - Query "elezione del presidente degli Stati Uniti" -> Election Day 2008, US elections 2020,
+     "Donald Trump è il 47º presidente degli Stati Uniti d'America".
+4. Note for whoever reads scores: e5 cosine scores are compressed (0.91-0.96 in the examples
+   above), so the absolute score says little; only the ranking matters. This is one more reason
+   to fuse rankings with RRF rather than scores in the hybrid configuration.
+
+Next (Tuesday morning): D5. `sources_text` is already indexed (D3), so D5 is only the optional
+extra variants; then D6 data report.
 
 ### 16 Nov 2026 13:55, Daniel: D3 done, full indices
 
