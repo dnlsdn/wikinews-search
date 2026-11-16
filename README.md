@@ -54,3 +54,58 @@ If it does not answer:
 
 Sections to be completed as the parts are implemented: parsing and indexing, running the web app,
 reproducing the experiments.
+
+### Search and web app
+
+Needs Elasticsearch running and the indices built (parsing and indexing above).
+
+```bash
+uv run uvicorn wikisearch.web.app:app
+```
+
+Then open http://localhost:8000. The first query of a vector configuration (`knn`, `hybrid-rrf`,
+...) loads the embedding model, `intfloat/multilingual-e5-small`: about 25 s, and 471 MB of
+download the very first time. Every later query takes well under a second.
+
+What the interface does:
+
+1. **Search** with a configuration chosen next to the search box. Each result shows title, date,
+   a snippet with the query words highlighted, categories, source agencies and a "not published"
+   label for pages that are not news articles (index pages, tables, drafts).
+2. **Filters** in the left column: date range, categories and agencies (with counts for the
+   current query), "published only". Every change reruns the search.
+3. **Compare** two configurations side by side on the same query: tick "Compare" and pick the
+   second one.
+4. **Document view**: click a title for the full text, sources, linked Wikipedia entities and a
+   link to the original Wikinews page.
+5. The query, configurations and filters are kept in the URL, so a search can be shared as a
+   link, e.g. http://localhost:8000/?q=terremoto+in+Abruzzo&config=bm25-italian&compare=1&config2=knn.
+   The links of the live demo are in `docs/demo.md`.
+
+Configurations (`wikisearch/search/configs.py`; each one is a variant of the experiments in
+`PLAN.md`):
+
+| configuration | what it does |
+|---|---|
+| `bm25-standard` | BM25 on title (weight 3), lead (2) and body, standard analyzer |
+| `bm25-italian` | the same with the Italian analyzer (elision, stop words, light stemming) |
+| `bm25-italian-title`, `-body`, `-flat` | title only, body only, three fields with equal weights |
+| `bm25-italian-leak` | also searches the titles of the cited sources (only to measure leakage) |
+| `knn` | nearest neighbours of the query embedding (e5-small, 384 dimensions, HNSW) |
+| `knn-int8`, `knn-bbq` | the same on quantized vector indices (8-bit, binary); they need their own indices: `uv run python -m wikisearch.ingest.index --analyzers italian --vector-index int8_hnsw bbq_hnsw` |
+| `hybrid-rrf` (default) | BM25 and kNN, 100 hits each, fused with reciprocal rank fusion (k = 60) |
+| `hybrid-rrf-published` | the same, with published pages boosted by 1.5 |
+
+From the command line, for quick checks:
+
+```bash
+uv run python -m wikisearch.search "terremoto abruzzo" --config bm25-italian
+```
+
+Without Elasticsearch, the web app can run on three fake results (used by the tests and to work
+on the interface): `WIKISEARCH_FAKE=1 uv run uvicorn wikisearch.web.app:app` (PowerShell:
+`$env:WIKISEARCH_FAKE=1; uv run uvicorn wikisearch.web.app:app`, then
+`Remove-Item Env:WIKISEARCH_FAKE`).
+
+The API used by the interface (`docs/contracts.md`, section 4): `/api/search`, `/api/doc/{id}`,
+`/api/facets`, `/api/configs`.
