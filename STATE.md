@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` added (16:35, issue #6); F5 work in progress (16 Nov 16:55): demo script `docs/demo.md` and screenshots `results/demo/` pushed, rehearsal on Daniel's laptop missing; next: F6 slides, then the rehearsal |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; next: G3 (30 manual queries, guidelines, pool, judging tool) |
 
 How to get the dump (not in git): download
@@ -61,6 +61,34 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 17:05, Fabio: F6 README usage, slide outline (work in progress)
+
+F6 in progress. Done: the "Search and web app" subsection of `README.md` (start, what the
+interface does, the table of the configurations, command line, fake mode, API). Commands checked
+on Fabio's laptop.
+
+Slides, decided by Fabio:
+1. **Outline**: four slides and the demo, in about 6 minutes (the demo takes about 3.5):
+   1. "Una ricerca, molte configurazioni": one function `search(query, config)` used by the web
+      app and the evaluation; every design choice is a named configuration, i.e. a knob of the
+      ablation.
+   2. "BM25: campi e pesi" (E2): title^3 + lead^2 + body against title only, body only, equal
+      weights.
+   3. "Lessicale, semantica, ibrida" (E3): BM25, kNN, hybrid; why RRF and not a sum of scores;
+      results split by query-title overlap; latencies.
+   4. "Filtri, faccette, pagine non pubblicate" (E5): filters as filter clauses (no effect on
+      scores, also inside the kNN search), lexical facets, the published boost.
+   5. Demo: the five queries of `docs/demo.md`.
+2. **When**: `slides/fabio.md` is written on Tuesday evening, after the official run (code
+   freeze 20:00, slides due 22:00), with the final numbers of Gioia's G5, not with placeholders
+   now. Gioia: Fabio's slides need MRR@10 and R@100 on `fonti` for the E2 and E3 configurations
+   (E3 also by overlap bucket), nDCG@10 on `manual` for E5, with confidence intervals and the
+   significance tests, as soon as the official run is done.
+
+Nothing changes for the others; no code change, 107 tests passed. Next: rehearsal of the demo
+(issue #8), the review of Gioia's queries (Tuesday 10:00), judging (Tuesday 12:00-15:00), then
+`slides/fabio.md` on Tuesday evening.
 
 ### 16 Nov 2026 16:55, Fabio: F5 demo script and screenshots (work in progress)
 
