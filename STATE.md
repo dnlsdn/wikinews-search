@@ -72,7 +72,7 @@ Step G1 done: the evaluation can compute every planned metric and test, without 
    per-query differences, p = count / n, so p = 0 must be reported as p < 1/n = 0.0001) and
    `bootstrap_ci` (percentile interval of the mean). Both seeded (42) and computed in chunks of
    500 draws: on 7,300 queries x 10,000 draws they take 0.3 s and 0.2 s and stay under 30 MB.
-4. `tests/test_metrics.py`: 23 tests, every expected value computed by hand in a comment
+4. `tests/test_metrics.py`: 25 tests, every expected value computed by hand in a comment
    (running example ranked [a, b, c, d], judged {b: 1, d: 2}: P@2 = 0.5, RR = 0.5, AP = 0.5,
    nDCG@4 = 0.52961), edge cases (no relevant retrieved, relevant beyond k, empty run, grade 0,
    repeated doc), a two-query randomization test whose exact p is 0.5.
