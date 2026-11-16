@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; review of the queries by Tue 10:00 still open (issue #9); G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,28 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 22:08, Gioia: `manual` pool done before the review (G3, work in progress)
+
+Change of plan, decided by Gioia: the pool is built tonight, before the review of the queries by
+Daniel and Fabio (planned Tuesday 10:00), so that Gioia can judge her part early and the official
+run has more margin. The review still counts (issue #9, commented): a query changed in the review
+is pooled again alone (the shuffle uses the seed `42-<qid>`, the other queries stay identical) and
+judged again; since Gioia has seen its pooled documents, such a change is logged as a limit.
+
+How to run: `uv run python -m evaluation.pool` (Elasticsearch, the five pooled configurations).
+Numbers: 30 queries, **573 pooled documents**, 11 to 27 per query (mean 19.1). Documents found by
+one configuration only: `knn` 95, `bm25-standard` 51, `bm25-italian` 29, `hybrid-rrf-published` 8,
+`hybrid-rrf` 4: without the vector configuration the pool would have missed 95 documents, which
+is why the brief waited for F4. Judgments per person: Gioia 178 (M01-M10), Daniel 287 (M11-M20,
+M01-M05), Fabio 286 (M21-M30, M06-M10); all below the 350 cap, nothing cut.
+
+Files pushed: `evaluation/testsets/manual/judging/{gioia,daniel,fabio}.tsv` (blind: no
+configuration names; which configuration found what is in `results/runs/manual/pool_found_by.json`,
+not committed). For the others: `git pull`, then `uv run python -m evaluation.judge --judge <name>`,
+Tuesday 12:00-15:00 or earlier, and push `judgments/<name>.tsv`. Tests: 124 passed, 2 skipped.
+Next: Gioia judges M01-M10; G3 is ticked once each person has judged two documents as a test (the
+brief's "done when").
 
 ### 16 Nov 2026 22:03, Gioia: stricter language rule for the `fonti` queries (G2 fix)
 
