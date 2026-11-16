@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30): BM25, `knn`, `hybrid-rrf`, `hybrid-rrf-published` in `search()`, web API and full UI on real data; next: E8 configurations (issue #6, waiting for Fabio's decision), then F5 demo (Tue afternoon) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; next: G3 (30 manual queries, guidelines, pool, judging tool) |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,71 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 15:45, Gioia: G2 `fonti` test set
+
+Step G2 done: `evaluation/testsets/fonti/queries.tsv` (7,223 queries), `qrels.txt` (one relevant
+document per query, grade 1) and `queries_dev.tsv` (fixed subset of 1000, `random.Random(42)`),
+built from the full `docs.jsonl`. Committed (1.4 MB).
+
+How to run (needs `data/processed/docs.jsonl`, about 3 s): `uv run python -m evaluation.build_fonti`
+(`--show-language 50` also prints 50 titles dropped and 50 kept by the English rule;
+`--input data/sample/docs.sample.jsonl --out <dir>` for the sample, 184 queries). Tests:
+`uv run pytest -q tests/test_build_fonti.py` (5 tests, hand-made documents, funnel counted by hand).
+Before this, Gioia's local data was rebuilt (`parse --no-sample`, `index --no-csv`): same counts
+and sizes as Daniel's (12,213 documents, 57.4 MB and 54.9 MB).
+
+Funnel (source titles; filters in this order, each count is what is left):
+
+| step | left |
+|---|---|
+| candidates (every `sources[i]`) | 17,192 |
+| at least 4 words | 15,002 |
+| not foreign (`{{fonteestera}}`) | 14,377 |
+| not English | 13,842 |
+| not ambiguous (same normalised title for 2+ documents) | 13,212 |
+| article published | 12,851 |
+| **one query per document** (first valid source) | **7,223** |
+
+Buckets (Jaccard overlap of query and article title, Italian stop words removed): **low 2,787**
+(< 0.2), **mid 3,580** (0.2-0.5), **high 856** (> 0.5); in the dev subset 400 / 490 / 110. 50 queries
+are identical to the article title. Close to the 16 Nov simulation (7,318; 2,969 / 3,549 / 800).
+
+Leakage check (300 random queries, normalised, verbatim in title + lead + body): **5 / 300 (1.7%)**,
+below the 4% of the simulation. The five are natural quotes, not leaked sources: a quoted
+sentence ("Ha offeso le mie donne"), an exhibition and a book title, "L'Italia vince la Coppa
+Davis". No issue for Daniel.
+
+Decisions, and why:
+1. Ambiguity is counted over **all** documents, published or not (decided by Gioia): a
+   non-published page is in the index too, so a headline shared with one would have a second
+   plausible answer.
+2. Language rule exactly as in the brief (decided by Gioia, after the eye check): English when a
+   title has one of `the of for and with to is` and none of a list of Italian function words.
+   Eye check: 50 / 50 dropped titles are English (one, "Sex Crimes and Vatican (sottotitolato)",
+   is an English video title); **3 / 50 kept titles are not Italian** (one English kept because
+   "I" is also the Italian article "i", one English headline without function words, one German).
+   On a sample of 60 final queries without any Italian function word, about 14 were not Italian:
+   **about 4-5% of the `fonti` queries are not in Italian** (English agency headlines, a few in
+   Cyrillic, Portuguese, Serbian). A stricter rule (drop "i", add about 20 English function words,
+   drop non-Latin scripts) would have removed only 56 of them; a real language detector would be
+   a new dependency. Kept as a **known limit** for the slides: these queries are harder for the
+   `italian` analyzer and favour the multilingual embeddings a little.
+3. Normalisation (for ambiguity and the leakage check): lowercase, every non-word character is a
+   separator. Titles are put on one line (tabs and newlines become spaces) for the TSV.
+4. Overlap stop words: the Italian function words above plus elision fragments (`l`, `d`,
+   `dell`, `all`, ...) and a few frequent words; both sets empty gives 0.
+
+Noticed, for the reading of the results: 498 queries point to an article in a series of 5+
+near-identical pages (`series_key`: lottery draws, match reports, e.g. "Lotto: Estrazioni del
+27-11-2007"). The right page differs from its neighbours only by a date or a number, so these are
+hard known-item queries for every configuration; worth a look in the per-query results of G5.
+
+Noted from Fabio's F4 entry: every configuration runs now, so the G3 pool can use all five
+configurations. The first knn query downloads the e5-small model (471 MB) on Gioia's laptop.
+
+Nothing changes for the others. Next: G3 (Gioia writes the 30 manual queries, then guidelines,
+pooling and judging tool; queries reviewed by Daniel and Fabio Tuesday 10:00).
 
 ### 16 Nov 2026 16:30, Fabio: F4 vector and hybrid search
 

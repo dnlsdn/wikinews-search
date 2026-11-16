@@ -147,7 +147,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 - [x] **G1, Mon 16 now.** `evaluation/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
   unit tests on hand-computed examples (`tests/`). `evaluation/significance.py`: paired randomization
   test.
-- [ ] **G2, Mon 16 evening.** `fonti` test set (`evaluation/build_fonti.py`): one query per source
+- [x] **G2, Mon 16 evening.** `fonti` test set (`evaluation/build_fonti.py`): one query per source
   title, relevant document = the article. Drop titles in foreign languages, titles under 4 words,
   generic titles that occur for many articles (e.g. "Risultati Serie A"), duplicates. Store the
   word overlap between query and article title in `meta` (to split results into easy and
