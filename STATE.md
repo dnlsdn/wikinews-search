@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50): full indices with vectors, embeddings in `data/shared/`, data report in `results/data_report.md`; next: the D5 extras (E8 after F4), review of Gioia's queries Tue 10:00, then D7 slides |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05); next: E8 indices after Fabio's F4, review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1, F2 done (16 Nov 14:55): BM25 `search()` with filters, highlights and published boost, CLI, web API on real data; next: F3b (full UI), then F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,28 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 15:05, Daniel: D7 first draft of Daniel's slides
+
+`slides/daniel.md`: seven slides in Italian (corpus; data hidden in templates; categories and
+agencies; pages that are not news; leakage; the two indices; embeddings), with the structure of
+`PLAN.md`. Every number comes from `results/data_report.md` and `results/indexing.csv`. Figures:
+none yet (tables carry the content). D7 stays unticked: the deck, the cover and the publication
+come on Wednesday.
+
+Checked while writing (on `wikinews-italian`, Elasticsearch 9.5.0):
+1. `_analyze`: "l'Italia" -> `ital`, "elezioni" and "elezione" -> `elezion`.
+2. A `dense_vector` with 384 dimensions and no `index_options` gets `bbq_hnsw` (binary
+   quantization, rescore oversample 3) by default: this is why the contract sets `hnsw`
+   explicitly, and the E8 question.
+3. **Correction to the D4 entry**: "disastro in una miniera" is not a query BM25 would miss.
+   `bm25-italian` returns the same mine explosions in its top 5 through "miniera"; the knn result
+   only shows that the vectors match without the word "disastro". For a BM25 failure, use queries
+   that share no word with the article (the low-overlap bucket of `fonti`, E3).
+4. e5-small truncates at 512 tokens (`max_seq_length`), one reason to embed title and lead only.
+
+Nothing changes for the others. Next: E8 indices once Fabio's F4 knn configuration exists,
+review of Gioia's 30 queries (Tuesday 10:00).
 
 ### 16 Nov 2026 14:55, Fabio: F2 ticked
 
