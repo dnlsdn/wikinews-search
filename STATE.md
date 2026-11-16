@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:15): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed, review by Daniel and Fabio Tue 10:00 (issue #9), pooling Tue 12:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -62,7 +62,7 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
-### 16 Nov 2026 22:15, Gioia: stricter language rule for the `fonti` queries (G2 fix)
+### 16 Nov 2026 22:03, Gioia: stricter language rule for the `fonti` queries (G2 fix)
 
 Bug found in G2: the language rule dropped a source title only when it had one of `the, of, for,
 and, with, to, is` and no Italian function word. An eye check of 100 final queries without Italian
