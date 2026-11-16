@@ -61,6 +61,9 @@ Formats are in `docs/contracts.md` section 5.
    two-sided, on per-query scores of two configurations over the same queries (randomly swap the
    two scores of each query, count how often the absolute mean difference is at least the
    observed one). Unit test: identical lists give p = 1; a clearly better list gives p < 0.05.
+   Also `bootstrap_ci(scores, n=10000, seed=42, alpha=0.05) -> (low, high)` for the mean of one
+   configuration. The professor insists on statistical robustness (`docs/course.md`, section 2):
+   every mean on the slides gets its interval.
 5. Done when `uv run pytest -q` passes.
 
 ## Step G2: the `fonti` test set (known-item search)
@@ -88,8 +91,12 @@ File: `evaluation/build_fonti.py`, output `evaluation/testsets/fonti/queries.tsv
    Jaccard similarity between the word sets of query and document title, lowercased, Italian stop
    words removed (use a short fixed list in the script), and `bucket` is `low` (< 0.2), `mid`
    (0.2-0.5) or `high` (> 0.5). Low overlap = paraphrase: that is where semantic search should help.
-5. Random sample of **1000 queries** with `random.Random(42)`; ids `F0001`... Print the funnel
-   (candidates, after each filter, final) and the bucket sizes: they go on the slides.
+5. Write **all** the queries that pass the filters (ids `F0001`...), and also a fixed development
+   subset of 1000 (`random.Random(42)`, file `queries_dev.tsv`) for fast runs while the system
+   changes. The official run uses all of them (no sampling choice to defend). Print the funnel
+   (candidates, after each filter, final) and the bucket sizes: they go on the slides. The
+   course says random terms from the documents are bad test queries (`docs/course.md`,
+   section 3): these are headlines written by other newspapers, which is the argument for them.
 6. Leakage check: the contract says `body` does not contain the sources. On 300 random queries
    count how many appear verbatim (normalised) in `title + lead + body`. A simulation on the raw
    dump (16 Nov) found about 4% even before the "Fonti" section, because some articles quote or
@@ -113,7 +120,9 @@ of the whole first page, with graded judgments.
    3. `time`: a subject bound to a period, e.g. "elezioni politiche 2008";
    4. `vague`: a paraphrase or description without the key words, e.g. "incidente in una miniera
       di carbone".
-   Write them in `evaluation/testsets/manual/queries.tsv` with `meta = {"type": ...}`, and show them to
+   Each query has an **information need**: one sentence saying what the user wants (the course,
+   slide 181 of id-02: relevance is judged against the need, not the query words). Write them
+   in `evaluation/testsets/manual/queries.tsv` with `meta = {"type": ..., "need": ...}`, and show them to
    the group (Daniel and Fabio can propose changes) before pooling.
 2. `evaluation/testsets/manual/GUIDELINES.md`: grade 2 = the article is mainly about what the query
    asks; 1 = it is related or mentions it substantially; 0 = not relevant. Two or three examples
@@ -137,7 +146,7 @@ of the whole first page, with graded judgments.
    not in the pool.
 5. Judging tool, `evaluation/judge.py` (no spreadsheets: Excel with Italian settings breaks CSV
    separators and accents). `uv run python -m evaluation.judge --judge <name>` shows one document
-   at a time (query, title, date, lead), reads a key (`0`, `1`, `2`; `o` opens the URL in the
+   at a time (query, information need, title, date, lead), reads a key (`0`, `1`, `2`; `o` opens the URL in the
    browser with `webbrowser`; `b` goes back; `q` quits) and **appends each grade immediately** to
    `evaluation/testsets/manual/judgments/<name>.tsv`, so it can be stopped and resumed. It prints
    progress (`37/310`). Must work in the macOS terminal and in Windows PowerShell (read a whole
@@ -164,7 +173,10 @@ reproduces every number.
    `search(text, config, k=100)` for each query, measure the time of each call, write the run to
    `results/runs/<set>/<config>.txt`.
 2. Metrics: `fonti`: MRR@10, R@10, R@100, overall and per `bucket`; `manual`: P@10, nDCG@10, AP
-   (MAP), MRR@10. Write `results/metrics/<set>.csv` (one row per configuration) and the
+   (MAP), MRR@10. Each mean with its 95% bootstrap interval.
+   Add a `random` baseline computed here in the runner (not in `configs.py`): for each query a
+   random ranking of the documents (seed 42). It must score near zero: if not, the metric code
+   has a bug. It is also the floor the professor asks to compare against. Write `results/metrics/<set>.csv` (one row per configuration) and the
    per-query scores `results/metrics/<set>_per_query.csv` (needed for significance).
 3. `experiments.py` lists the comparisons of `PLAN.md` as pairs (baseline, variant):
    E1 `bm25-standard` vs `bm25-italian`; E2 `bm25-italian` vs `bm25-italian-title`,
@@ -177,7 +189,8 @@ reproduces every number.
    indexing time and index size come from Daniel's `results/indexing.csv`.
 5. Warm up before timing (run 20 queries and discard them), and run the timing with nothing else
    heavy open.
-6. **Official run** (Wednesday, by 20:00): `git pull`, rebuild the data and the indices
+6. During development use `--dev` (the 1000-query subset of `fonti`). **Official run**
+   (Wednesday, by 20:00), on all the queries: `git pull`, rebuild the data and the indices
    (`python -m wikisearch.ingest.parse`, then `python -m wikisearch.ingest.index`), run
    `python -m evaluation.run`, commit `results/metrics/`, `results/summary.md` and the figures.
    Write in the log the machine used (model, RAM) next to the latencies. Runs (`results/runs/`)

@@ -18,7 +18,10 @@ put in the log. The plan is in `PLAN.md`; the interfaces in `docs/contracts.md`.
    the Claude Code sessions use it to send each other messages as GitHub issues.
 3. `git clone https://github.com/dnlsdn/wikinews-search.git`
 4. Install `uv` (https://docs.astral.sh/uv/): the session briefing at startup runs with it.
-5. Open Claude Code **inside** the `wikinews-search` folder and accept when it asks whether to
+5. Optional: copy your course slides (Lucene and Elasticsearch, id-02, homework 4) into the
+   `course/` folder of the clone. They stay on your laptop (ignored by git) and your Claude can
+   read the originals; the summary that matters is in `docs/course.md` anyway.
+6. Open Claude Code **inside** the `wikinews-search` folder and accept when it asks whether to
    trust the folder: that enables `CLAUDE.md` and the startup hook that prints the session
    briefing.
 
@@ -36,8 +39,8 @@ the repository is our only shared memory.
 
 1. Check that the session briefing is in your context (printed at startup by
    scripts/briefing.py); if not, run `uv run python scripts/briefing.py`. Run `git pull --rebase`.
-2. Read, in this order and completely: CLAUDE.md, STATE.md, PLAN.md, docs/contracts.md,
-   docs/briefs/<name>.md.
+2. Read, in this order and completely: CLAUDE.md, STATE.md, PLAN.md, docs/course.md,
+   docs/contracts.md, docs/briefs/<name>.md.
 3. Read every open GitHub issue addressed to me (`gh issue list --label for:<name>`).
 4. Tell me in a few lines: the state of the project, what the others have already pushed, the
    issues for me, my next step according to my brief, and whether that step is blocked by

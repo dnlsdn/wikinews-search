@@ -5,6 +5,8 @@ dump, a test strategy that compares design choices (ablation study), a 20 minute
 a live demo. **Deadline: Thursday 19 November 2026, 18:00** (presentation uploaded through the course
 form). Presentations in class on Friday 20.
 
+What the course expects, in detail, with references to the slides: `docs/course.md`. Read it.
+
 What the professor asked for, in his words: the technical and methodological challenges, the
 solutions (no code on the slides), the test strategy (which datasets, which metrics), the
 experimental results and how they support the design choices, a live demo. Code and install
@@ -69,10 +71,13 @@ the briefing.
 | E4 | How much does leakage inflate results? | with and without the sources field | Daniel (field), Gioia (analysis) | MRR@10 on `fonti` |
 | E5 | Should published pages rank higher? | no boost vs boost on `published` | Fabio | nDCG@10 on `manual` |
 | E6 | What does each choice cost? | all of the above | Gioia | indexing time, index size, query latency p50/p95 |
+| E8 (stretch) | What does vector quantization cost in quality? | `dense_vector` with `hnsw` vs `int8_hnsw` vs `bbq_hnsw` (course slides on HNSW and quantization) | Daniel | MRR@10 of `knn` on `fonti`, index size, latency |
 | E7 (stretch) | Do near-duplicates hurt the result page? | collapse on `series_key` off/on | Fabio | distinct series in the top 10 of the `manual` queries |
 
-Statistical significance: paired randomization test between configurations (as in homework 3),
-reported with every comparison on the slides.
+Statistical robustness, which the professor insists on (`docs/course.md`, section 2): a random
+ranking as a floor; paired randomization test between configurations and 95% bootstrap
+confidence intervals, reported with every comparison on the slides; the official `fonti` run
+uses all the queries, not a sample.
 
 ## Steps
 

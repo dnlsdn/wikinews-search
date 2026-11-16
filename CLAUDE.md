@@ -17,7 +17,9 @@ Follow these rules exactly.
    step, the issues addressed to you. If you do not see it, run
    `uv run python scripts/briefing.py` yourself.
 2. `git pull --rebase` if the briefing says you are behind.
-3. Read, in this order: `STATE.md`, `PLAN.md`, `docs/contracts.md`, then the brief of your user
+3. Read, in this order: `STATE.md`, `PLAN.md`, `docs/course.md` (what the course and the
+   professor expect: methods, metrics, statistical robustness), `docs/contracts.md`, then the
+   brief of your user
    in `docs/briefs/` (`daniel.md`, `fabio.md`, `gioia.md`): it says exactly what to build, step
    by step, and when a step is done.
 4. Read every open issue addressed to your user (`gh issue view <n>`) and deal with it **before**
@@ -55,6 +57,10 @@ The sessions negotiate with each other through issues, but **the humans decide**
    (and under "Contract changes" if it touches a contract).
 
 ## Scope: stay on the plan
+
+Follow the course: use the methods, terms and metrics of `docs/course.md`, and when a choice
+   departs from them, write why in the log. If the course material is in `course/` (local only),
+   you may read it; never commit it.
 
 1. Do only what your user's brief and the issues addressed to them ask. Do not add features,
    pages, configurations or refactorings that are not in the plan, even if they look useful:

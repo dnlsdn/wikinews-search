@@ -56,6 +56,24 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026, Daniel: aligned with the course
+
+Added `docs/course.md`: what the course and the professor expect, in our words, with references
+to the slides (assignment, what he values in experiments, IR evaluation from id-02 slides
+173-189, text analysis, Elasticsearch, presentations). Every session reads it after `PLAN.md`.
+The slides are **not** committed (they are the professor's and the repository becomes public):
+each member may copy them into `course/`, which git ignores.
+
+Changes that follow from the course:
+1. Statistical robustness: a random ranking as a floor (computed by the runner), 95% bootstrap
+   intervals next to every mean, the official `fonti` run on all the queries (about 7,000) with a
+   1000-query subset only for development.
+2. Each `manual` query has a one-sentence information need (`meta.need`); judges grade against
+   it, as the course says (id-02, slide 181).
+3. `embedding` uses `index_options: hnsw` explicitly (recent Elasticsearch versions default to a
+   quantized structure at 384 dimensions); quantization becomes the stretch experiment E8, from
+   the slides on HNSW and quantization.
+
 ### 16 Nov 2026, Daniel: the humans stay in control
 
 Added to `CLAUDE.md` two sections. "Working with your user": explain before and after every step

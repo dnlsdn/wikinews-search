@@ -80,9 +80,16 @@ Fields exactly as in `docs/contracts.md` section 1.
 
 ## Step D5: leakage field and extra variants
 
+Note for D3/D4: set `index_options: {"type": "hnsw"}` on `embedding` explicitly (contract
+section 2), otherwise Elasticsearch may choose a quantized structure by default.
+
+
 1. `sources_text` (titles of the sources joined) indexed as `text` with the variant's analyzer,
    used only by `bm25-italian-leak`.
-2. Optional, only if time allows: a third analyzer variant (e.g. `italian` plus `asciifolding`
+2. Stretch E8, only if time allows: the same vectors indexed with `int8_hnsw` and `bbq_hnsw`
+   in extra indices (e.g. `wikinews-italian-int8`), with sizes in `results/indexing.csv`; open an
+   issue to Fabio and Gioia to add the matching `knn` configurations.
+3. Optional, only if time allows: a third analyzer variant (e.g. `italian` plus `asciifolding`
    for accents) as `wikinews-italian-folding`, added to `ANALYZER_VARIANTS` with a "Contract
    changes" entry.
 

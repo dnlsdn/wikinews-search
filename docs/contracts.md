@@ -46,7 +46,10 @@ Produced by `wikisearch/ingest/index.py` (owner: Daniel).
    Filter fields: `date` (`date`), `categories`, `agencies`, `series_key` (`keyword`),
    `published` (`boolean`). `sources` is stored (`enabled: false` object) plus a searchable
    `sources_text` field used only by the leakage ablation.
-3. Vector field `embedding`: `dense_vector`, 384 dimensions, cosine, HNSW. Model:
+3. Vector field `embedding`: `dense_vector`, 384 dimensions, cosine,
+   `index_options: {"type": "hnsw"}` **set explicitly** (recent Elasticsearch versions pick a
+   quantized structure by default for 384 dimensions; quantization is experiment E8, not the
+   default). Model:
    `intfloat/multilingual-e5-small`, text embedded = `"passage: " + title + ". " + lead`.
    The document vectors are computed once and committed in `data/shared/embeddings.npy`
    (float32, rows in the order of `data/shared/embeddings_ids.json`), so every laptop indexes the
@@ -100,4 +103,5 @@ Test sets:
 1. `fonti`: known-item search. Query = title of an external source of the article, relevant
    document = the article. Built from `docs.jsonl`.
 2. `manual`: 30 queries written by the group, judged by the group on the pooled top 10 of the
-   five configurations compared in E1, E3 and E5.
+   five configurations compared in E1, E3 and E5. `meta` has `type` and `need`, the information
+   need in one sentence: judges grade against the need, not the query words.
