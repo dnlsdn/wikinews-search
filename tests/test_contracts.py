@@ -27,6 +27,7 @@ def test_configs_are_well_formed():
     assert DEFAULT_CONFIG in CONFIGS
     for name, cfg in CONFIGS.items():
         assert cfg["analyzer"] in config.ANALYZER_VARIANTS, name
+        assert cfg.get("vector_index", "hnsw") in config.VECTOR_INDEX_TYPES, name
         assert cfg["mode"] in {"bm25", "knn", "hybrid"}, name
         if cfg["mode"] in {"bm25", "hybrid"}:
             assert cfg["fields"], name

@@ -56,6 +56,13 @@ Produced by `wikisearch/ingest/index.py` (owner: Daniel).
    same vectors.
    Queries are embedded as `"query: " + text` with the same model. The model name lives in
    `wikisearch/config.py` (`EMBEDDING_MODEL`): both ingestion and search read it from there.
+4. Vector structure variants for E8 (`config.VECTOR_INDEX_TYPES`): `wikinews-italian-int8`
+   (`int8_hnsw`) and `wikinews-italian-bbq` (`bbq_hnsw`) hold the same documents and vectors as
+   `wikinews-italian`, only `index_options` differs. The name is
+   `config.index_name(analyzer, vector_index)` (the second argument defaults to `hnsw`, the main
+   indices). A configuration selects one with the optional key `"vector_index"` (default
+   `"hnsw"`). Built only on request:
+   `uv run python -m wikisearch.ingest.index --analyzers italian --vector-index int8_hnsw bbq_hnsw`.
 
 ## 3. Search function (`wikisearch/search`)
 

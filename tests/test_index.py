@@ -31,6 +31,17 @@ def test_mapping_follows_the_contract():
     assert indexer.mapping("standard")["mappings"]["properties"]["body"]["analyzer"] == "standard"
 
 
+def test_vector_index_variants_for_e8():
+    assert config.index_name("italian") == "wikinews-italian"
+    assert config.index_name("italian", "hnsw") == "wikinews-italian"
+    assert config.index_name("italian", "int8_hnsw") == "wikinews-italian-int8"
+    assert config.index_name("italian", "bbq_hnsw") == "wikinews-italian-bbq"
+    for vector_index in config.VECTOR_INDEX_TYPES:
+        props = indexer.mapping("italian", vector_index)["mappings"]["properties"]
+        assert props["embedding"]["index_options"] == {"type": vector_index}
+        assert props["body"]["analyzer"] == "italian"  # only the vector structure changes
+
+
 def test_sources_text_joins_the_source_titles_and_body_is_untouched():
     doc = {"id": "1", "body": "testo", "sources": [{"title": "Primo titolo"}, {"title": ""}, {"title": "Secondo"}]}
     source = indexer.to_source(doc)

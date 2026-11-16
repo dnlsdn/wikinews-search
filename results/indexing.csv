@@ -11,3 +11,9 @@ timestamp,index,analyzer,input,documents,embeddings,seconds,size_bytes
 2026-11-16T13:59:21,wikinews-italian,italian,data/processed/docs.jsonl,12213,True,14.2,54946276
 2026-11-16T13:59:34,wikinews-standard,standard,data/processed/docs.jsonl,12213,True,12.74,57356004
 2026-11-16T13:59:48,wikinews-italian,italian,data/processed/docs.jsonl,12213,True,13.31,54946276
+2026-11-16T15:16:28,wikinews-italian-int8,italian,data/processed/docs.jsonl,12213,True,24.01,59833576
+2026-11-16T15:16:45,wikinews-italian-bbq,italian,data/processed/docs.jsonl,12213,True,16.63,55705576
+2026-11-16T15:16:58,wikinews-italian-int8,italian,data/processed/docs.jsonl,12213,True,13.07,59833576
+2026-11-16T15:17:13,wikinews-italian-bbq,italian,data/processed/docs.jsonl,12213,True,14.46,55705576
+2026-11-16T15:17:29,wikinews-italian-int8,italian,data/processed/docs.jsonl,12213,True,16.45,59833576
+2026-11-16T15:17:46,wikinews-italian-bbq,italian,data/processed/docs.jsonl,12213,True,16.63,55705576

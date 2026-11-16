@@ -8,6 +8,8 @@ Run:
     uv run python -m wikisearch.ingest.index                      # full corpus, all variants
     uv run python -m wikisearch.ingest.index --input data/sample/docs.sample.jsonl
     uv run python -m wikisearch.ingest.index --repeat 3           # timings for E6
+    uv run python -m wikisearch.ingest.index --analyzers italian --vector-index int8_hnsw bbq_hnsw
+                                                                  # extra indices for E8
 
 Every build appends one row per index to `results/indexing.csv` (time, documents, size).
 """
@@ -104,11 +106,12 @@ def to_source(doc: dict, embedding: list[float] | None = None) -> dict:
     return source
 
 
-def build_index(name: str, analyzer: str, docs: list[dict], vectors: dict | None) -> dict:
+def build_index(name: str, analyzer: str, docs: list[dict], vectors: dict | None,
+                vector_index: str = "hnsw") -> dict:
     """Delete and recreate one index, bulk-load the documents, return the measurements."""
     es = client()
     es.indices.delete(index=name, ignore_unavailable=True)
-    body = mapping(analyzer)
+    body = mapping(analyzer, vector_index)
     es.indices.create(index=name, settings=body["settings"], mappings=body["mappings"])
     es.indices.put_settings(index=name, settings={"index": {"refresh_interval": "-1"}})
 
@@ -152,6 +155,10 @@ def main() -> None:
     parser.add_argument("--input", type=Path, default=config.DOCS_JSONL)
     parser.add_argument("--analyzers", nargs="+", default=config.ANALYZER_VARIANTS,
                         choices=config.ANALYZER_VARIANTS)
+    parser.add_argument("--vector-index", nargs="+", default=["hnsw"],
+                        choices=list(config.VECTOR_INDEX_TYPES),
+                        help="structure of the embedding field; other than hnsw builds the extra E8 "
+                             "indices, e.g. --analyzers italian --vector-index int8_hnsw bbq_hnsw")
     parser.add_argument("--no-embeddings", action="store_true",
                         help="index without vectors even if data/shared/embeddings.npy exists")
     parser.add_argument("--repeat", type=int, default=1, help="build each index this many times (timings)")
@@ -163,14 +170,18 @@ def main() -> None:
     if not args.no_embeddings and config.EMBEDDINGS_NPY.exists():
         vectors = load_embeddings([d["id"] for d in docs])
     print(f"{len(docs)} documents from {args.input}, embeddings: {'yes' if vectors else 'no'}")
+    if vectors is None and args.vector_index != ["hnsw"]:
+        parser.error("--vector-index other than hnsw needs the embeddings (E8 compares vector structures)")
 
     rows = []
     for run in range(args.repeat):
         for analyzer in args.analyzers:
-            row = build_index(config.index_name(analyzer), analyzer, docs, vectors)
-            rows.append(row)
-            print(f"run {run + 1}/{args.repeat} {row['index']}: {row['documents']} docs in "
-                  f"{row['seconds']} s, {row['size_bytes'] / 1e6:.1f} MB")
+            for vector_index in args.vector_index:
+                row = build_index(config.index_name(analyzer, vector_index), analyzer, docs, vectors,
+                                  vector_index)
+                rows.append(row)
+                print(f"run {run + 1}/{args.repeat} {row['index']}: {row['documents']} docs in "
+                      f"{row['seconds']} s, {row['size_bytes'] / 1e6:.1f} MB")
     if not args.no_csv:
         append_csv(rows, args.input)
         print(f"appended {len(rows)} rows to {INDEXING_CSV}")
