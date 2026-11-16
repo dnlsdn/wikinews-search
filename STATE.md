@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | not started: next step D1 |
 | Search and interface | Fabio | not started: next step F3a (web skeleton with fake search), then F1 once D2-D3 are pushed |
-| Evaluation | Gioia | not started: next step G1 (does not need the corpus), then writing the 30 queries of G3 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -55,6 +55,32 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 12:30, Gioia: G1 metrics, TREC files, significance
+
+Step G1 done: the evaluation can compute every planned metric and test, without any corpus.
+
+1. `evaluation/trec.py`: `read_queries`, `read_qrels`, `read_run` (sorted by numeric rank),
+   `write_run` (ranks from 1 in the given order), formats of `docs/contracts.md` section 5.
+2. `evaluation/metrics.py`: `precision_at_k`, `recall_at_k`, `reciprocal_rank` (k=10, mean =
+   MRR@10), `average_precision` (mean = MAP), `ndcg_at_k`, and `evaluate(qrels, run, metrics)`
+   with metric names `P@k`, `R@k`, `MRR@k`, `nDCG@k`, `AP`. Relevant = grade >= 1; unjudged =
+   not relevant; queries with no relevant judgment are skipped, judged queries missing from the
+   run score 0. Decision not in the brief: a doc id repeated in a run counts only at its first
+   rank, so a bug in a run cannot score the same relevant document twice.
+3. `evaluation/significance.py`: `paired_randomization_test` (two-sided, sign flips of the
+   per-query differences, p = count / n, so p = 0 must be reported as p < 1/n = 0.0001) and
+   `bootstrap_ci` (percentile interval of the mean). Both seeded (42) and computed in chunks of
+   500 draws: on 7,300 queries x 10,000 draws they take 0.3 s and 0.2 s and stay under 30 MB.
+4. `tests/test_metrics.py`: 23 tests, every expected value computed by hand in a comment
+   (running example ranked [a, b, c, d], judged {b: 1, d: 2}: P@2 = 0.5, RR = 0.5, AP = 0.5,
+   nDCG@4 = 0.52961), edge cases (no relevant retrieved, relevant beyond k, empty run, grade 0,
+   repeated doc), a two-query randomization test whose exact p is 0.5.
+
+How to run: `uv run pytest -q tests/test_metrics.py`. Nothing changes for the others.
+Environment (Step 0): Docker, uv, git, gh ready; Elasticsearch not started yet and dump not
+downloaded yet. Next: G3 query writing (30 `manual` queries with information needs) and G2 as
+soon as Daniel's sample is pushed.
 
 ### 16 Nov 2026, Daniel: prompt for sessions outside the repository
 

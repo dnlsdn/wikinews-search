@@ -144,7 +144,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 
 ### Gioia: evaluation
 
-- [ ] **G1, Mon 16 now.** `evaluation/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
+- [x] **G1, Mon 16 now.** `evaluation/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
   unit tests on hand-computed examples (`tests/`). `evaluation/significance.py`: paired randomization
   test.
 - [ ] **G2, Mon 16 evening.** `fonti` test set (`evaluation/build_fonti.py`): one query per source
