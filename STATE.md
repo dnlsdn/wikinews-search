@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1, D2 done (16 Nov 13:55); D3 in progress (14:10): indexer works on the sample, full corpus next |
+| Data and indexing | Daniel | D1, D2, D3 done (16 Nov 13:55): full indices `wikinews-standard` and `wikinews-italian` (12,213 docs each) on Daniel's laptop; next: D4 embeddings |
 | Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -56,7 +56,37 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
-### 16 Nov 2026 14:10, Daniel: D3 indexer, work in progress (sample indexed)
+### 16 Nov 2026 13:55, Daniel: D3 done, full indices
+
+Both indices hold all 12,213 documents of `data/processed/docs.jsonl`. **Fabio and Gioia: build
+them on your laptop** (Elasticsearch running, dump in `data/raw/`):
+
+    uv run python -m wikisearch.ingest.parse --no-sample
+    uv run python -m wikisearch.ingest.index
+
+(about 15 s plus 10 s; `--no-sample` avoids rewriting the committed sample, which would be
+identical anyway).
+
+Numbers (`results/indexing.csv`, three builds each, without embeddings, Daniel's Mac M-series,
+8 GB, Elasticsearch heap 1 GB):
+
+| index | seconds (3 builds) | size |
+|---|---|---|
+| `wikinews-standard` | 4.69, 3.89, 3.92 | 38.2 MB |
+| `wikinews-italian` | 3.84, 3.87, 3.82 | 35.7 MB |
+
+The `italian` index is 6% smaller: stop words removed and stems merge word forms, so fewer
+distinct terms and postings. The first build is slower (JVM warm-up), which is why the brief asks
+for three runs.
+
+Fix made while measuring: Elasticsearch caches the store size for 10 s
+(`index.store.stats_refresh_interval`), so the first measurement read 5.8 MB instead of 38 MB.
+The indices are now created with `store.stats_refresh_interval: 0s`, and the CSV was regenerated
+with correct rows only. Each row now has its own timestamp.
+
+Next: D4 embeddings (e5-small on the titles and leads, then reindex with vectors).
+
+### 16 Nov 2026 13:50, Daniel: D3 indexer, work in progress (sample indexed)
 
 `wikisearch/ingest/index.py` builds `wikinews-standard` and `wikinews-italian` with the mapping of
 contract section 2 and bulk-loads the documents. **Fabio can start F1 now** on the sample:
@@ -88,7 +118,7 @@ Details:
 
 Next: full corpus, three builds per variant for the timings, then D3 is done.
 
-### 16 Nov 2026 13:55, Daniel: D1 Elasticsearch running
+### 16 Nov 2026 13:48, Daniel: D1 Elasticsearch running
 
 Step D1 done: `docker compose up -d` starts Elasticsearch 9.5.0 on Daniel's Mac (Docker Desktop
 VM with 4 GB, container at about 1.5 GB of 2 GB); `curl localhost:9200` answers. The README
@@ -103,7 +133,7 @@ Keep at least 5 GB free before indexing.
 
 Next: D3 indexer.
 
-### 16 Nov 2026 13:50, Daniel: D2 parser and sample
+### 16 Nov 2026 13:40, Daniel: D2 parser and sample
 
 Step D2 done: `wikisearch/ingest/parse.py` turns the dump into `data/processed/docs.jsonl`
 (contract section 1) and writes the committed sample `data/sample/docs.sample.jsonl` (300 docs).

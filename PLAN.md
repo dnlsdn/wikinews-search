@@ -106,7 +106,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   Commit `data/sample/docs.sample.jsonl` (about 300 pages, mixed: news, sport tables, lottery,
   specials). Done when the sample is pushed and the parser reports coverage numbers (pages, dated
   pages, pages with sources).
-- [ ] **D3, Mon 16 by 19:00.** Indexer `wikisearch/ingest/index.py`: creates `wikinews-standard`
+- [x] **D3, Mon 16 by 19:00.** Indexer `wikisearch/ingest/index.py`: creates `wikinews-standard`
   and `wikinews-italian` with the mapping of section 2 and bulk-loads the corpus, measuring time
   and size. Accepts `--input` so the sample can be indexed too. Done when both indices hold all
   documents and the numbers are in `results/indexing.csv`.
