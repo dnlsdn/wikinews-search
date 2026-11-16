@@ -53,6 +53,14 @@ reported with every comparison on the slides.
 
 ## Steps
 
+Summary of the steps. The detailed instructions (files, functions, checks, what to do while
+waiting for someone else) are in the personal briefs: `docs/briefs/daniel.md`,
+`docs/briefs/fabio.md`, `docs/briefs/gioia.md`. Prompts to start a Claude Code session are in
+`docs/briefs/README.md`.
+
+Everyone runs Elasticsearch and builds the indices on their own laptop with Daniel's scripts
+(the dump and the indices are not in git).
+
 Tick a box only when the "done when" is true, and log it in `STATE.md`.
 
 ### Daniel: data and indexing

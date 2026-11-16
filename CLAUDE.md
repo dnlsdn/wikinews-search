@@ -8,9 +8,12 @@ rules exactly.
 
 1. `git pull --rebase`.
 2. Read, in this order: `STATE.md` (current state, last log entries, open requests),
-   `PLAN.md` (who owns what, the steps, the deadline), `docs/contracts.md` (the interfaces).
+   `PLAN.md` (who owns what, the steps, the deadline), `docs/contracts.md` (the interfaces),
+   then the brief of your user in `docs/briefs/` (`daniel.md`, `fabio.md`, `gioia.md`): it says
+   exactly what to build, step by step, and when a step is done.
 3. Ask your user which person they are if it is not obvious, and work on **that person's next
-   unticked step** in `PLAN.md`, unless the user asks otherwise.
+   unticked step**, unless the user asks otherwise. If the step depends on something not pushed
+   yet, the brief says what to do meanwhile.
 
 ## While working
 

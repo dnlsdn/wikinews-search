@@ -9,8 +9,8 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | not started: next step D1 |
-| Search and interface | Fabio | not started: next step F1 (on the sample, once D2 is pushed) |
-| Evaluation | Gioia | not started: next step G1 (does not need the corpus) |
+| Search and interface | Fabio | not started: next step F3a (web skeleton with fake search), then F1 once D2-D3 are pushed |
+| Evaluation | Gioia | not started: next step G1 (does not need the corpus), then writing the 40 queries of G3 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -54,6 +54,20 @@ None yet.
 None yet.
 
 ## Log
+
+### 16 Nov 2026, Daniel: personal briefs and session prompts
+
+Added `docs/briefs/` with one detailed brief per person (exact files, functions, checks, "done
+when", order of work while waiting for the others) and the prompts to paste into Claude Code at
+the first and at every following session (`docs/briefs/README.md`). `CLAUDE.md` now points every
+session to its brief. Contract detail added before anyone started: `sources[i].foreign`
+(true for `{{fonteestera}}`), needed by Gioia's test set.
+
+How to start: clone, open Claude Code in the repository, paste the first-session prompt from
+`docs/briefs/README.md` with your name.
+
+Next: Daniel D1-D3; Fabio step 0, then F3a (web skeleton with fake search) until the sample is
+pushed; Gioia step 0, then G1 and the 40 queries of G3.
 
 ### 16 Nov 2026, Daniel: repository set up
 

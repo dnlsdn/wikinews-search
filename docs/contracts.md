@@ -20,7 +20,7 @@ before the full corpus is ready.
 | `lead` | string | first paragraph of plain text, without the date line |
 | `body` | string | full plain text of the article **without the "Fonti" section** and without the date line (see "Leakage" below) |
 | `categories` | list of strings | topical and geographic categories, prefix `Categoria:` removed. Maintenance categories (e.g. `Pubblicati`, `Articoli archiviati`, `Articoli da controllare per l'archiviazione`) and daily date categories are removed |
-| `sources` | list of objects | `{agency, title, url, date}` from the `{{fonte}}` templates. `agency` is normalized (e.g. `Ansa` -> `ANSA`) |
+| `sources` | list of objects | `{agency, title, url, date, foreign}` from the `{{fonte}}` and `{{fonteestera}}` templates. `agency` is normalized (e.g. `Ansa` -> `ANSA`); `foreign` is true for `{{fonteestera}}` (source in another language) |
 | `agencies` | list of strings | the normalized `agency` values, for filtering |
 | `entities` | list of strings | titles of the Wikipedia pages linked in the text (`[[w:...]]`) |
 | `wikidata_id` | string or null | `main_entity.identifier` |
