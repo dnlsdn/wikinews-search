@@ -114,7 +114,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   documents into `data/shared/embeddings.npy` (committed, about 17 MB, so nobody else has to
   compute them) and the indexer loads them into `embedding`. Done when a `knn` query returns
   sensible neighbours for a few test articles.
-- [ ] **D5, Tue 17 morning.** `sources_text` field for E4, any further analyzer variant worth testing.
+- [x] **D5, Tue 17 morning.** `sources_text` field for E4, any further analyzer variant worth testing.
 - [x] **D6, Tue 17 afternoon.** Data report for the slides: counts, cleaning decisions with numbers,
   examples of hard pages (`results/data_report.md`).
 - [ ] **D7, Tue 17 evening - Wed 18 morning.** Own slides (challenges of the data, indexing choices) in

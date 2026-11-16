@@ -102,7 +102,10 @@ Figura: nessuna
 Note del relatore: `italian` aggiunge elisione, stop word italiane e uno stemmer leggero:
 "l'Italia" diventa `ital`, "elezioni" ed "elezione" diventano entrambi `elezion`. L'indice viene il 6% più piccolo,
 perché ci sono meno termini distinti. Lo stemmer leggero però non unisce tutto: "scagiona" e
-"scagionato" restano diversi. Titolo, lead e corpo sono campi di testo; categorie, agenzie e serie
+"scagionato" restano diversi. Gli accenti: lo stemmer li toglie già nelle parole lunghe ("perché"
+e "perche" diventano `perc`), non in quelle corte ("città" e "citta" restano diverse) né nei nomi
+come "Erdoğan". Una variante con `asciifolding` non è stata costruita: nei due test set le query
+hanno gli accenti, quindi non avrebbe misurato nulla. Titolo, lead e corpo sono campi di testo; categorie, agenzie e serie
 sono `keyword`, per filtri e faccette. Mapping rigido: un campo non previsto è un errore. Un nodo,
 uno shard, 1 GB di heap su un portatile con 8 GB. Ogni costruzione è ripetuta tre volte perché la
 prima è più lenta.

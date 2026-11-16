@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), E8 indices `int8`/`bbq` built (15:30, measurement waits for Fabio's configurations and Gioia's runner); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F3 done (16 Nov 15:15): BM25 `search()`, web API and full UI (filters, pagination, document view, compare mode) on real data; next: F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -61,6 +61,33 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 15:45, Daniel: D5 done, no asciifolding variant
+
+Checked whether the optional `italian` + `asciifolding` variant (D5 item 3) is worth a contract
+change. Decision (Daniel left it to the evidence): **not built**, D5 ticked (`sources_text` in
+D3, E8 indices at 15:30).
+
+Evidence (`_analyze` on `wikinews-italian`, and every non-ASCII word of the corpus and of the
+source titles passed through the `italian` analyzer; script not committed):
+1. The light Italian stemmer already folds Latin-1 accents on words it stems: "perché" and
+   "perche" -> `perc`, "università" and "universita" -> `universit`, "Müller" and "Muller" ->
+   `muller`. It leaves short words and other diacritics alone: "città" != "citta", "però" !=
+   "pero", "Erdoğan" != "Erdogan", "Gdańsk" != "Gdansk".
+2. Corpus: 2,165 distinct words keep an accent after the analyzer, in 7,742 documents; the
+   frequent ones are short Italian words (già, così, città, però, può, età), then names
+   (José, Petković, Forlì) and ordinals (1ª, 1º).
+3. `fonti` queries: 270 of 15,905 published non-foreign source titles write an accent as an
+   apostrophe (newspaper capitals: "SARA' DISTRUTTO", "E' una scelta", "Senato da' fiducia"); in
+   most of them the word is a stop word anyway (è, sarà, dà, sì).
+4. So the variant would help users who type without accents ("citta", "forli"), but neither
+   test set has such queries (headlines and our own queries carry accents): it would cost a third
+   index on every laptop, a configuration for Fabio and a run for Gioia for a result we expect to
+   be null. Recorded as a known limit; one sentence added to the speaker notes of slide 6 in
+   `slides/daniel.md`.
+
+Nothing changes for the others. Next: review of Gioia's 30 queries (Tuesday 10:00); deck on
+Wednesday.
 
 ### 16 Nov 2026 15:30, Daniel: E8 indices (vector quantization), contract change
 
