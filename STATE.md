@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 done (16 Nov 14:02): full indices with vectors on Daniel's laptop, embeddings committed in `data/shared/`; next: D6 data report, then the D5 extras (E8 after F4) |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50): full indices with vectors, embeddings in `data/shared/`, data report in `results/data_report.md`; next: the D5 extras (E8 after F4), review of Gioia's queries Tue 10:00, then D7 slides |
 | Search and interface | Fabio | F1 done (16 Nov 14:40): BM25 `search()` with filters, highlights and published boost, CLI, web API on real data; next: F3b (full UI), then F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,48 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 14:50, Daniel: D6 data report
+
+Step D6 done: `results/data_report.md`, the challenges of the data with numbers and one real page
+each, the indices, the known limits. It is the base of Daniel's slides. It is **generated**, not
+written by hand: `uv run python -m wikisearch.ingest.report` (about 12 s, 0.8 GB, needs the dump)
+recomputes every number from the dump with the parser's own functions, so rerun it whenever the
+parser changes. Examples are fixed page ids; the script stops if one disappears.
+
+Sections: corpus at a glance; 2.1 duplicates; 2.2 date in a template (`{{data}}` 10,918,
+`{{luogodata}}` 769, category 40, none 486); 2.3 the dump's abstract is unusable (11,632 start with
+the date line, so `lead` comes from the HTML); 2.4 categories (5,963 -> 1,753, dropping 4,188 daily
+and 22 maintenance categories); 2.5 agencies (2,965 spellings -> 2,304 names; filtering on the
+plain "la Repubblica" would miss 28% of its sources); 2.6 near-duplicate series (76 patterns with
+5+ pages, 2,742 documents, 22%); 2.7 non-published pages (1,181: specials, TV schedules, tables,
+rugby round reports, drafts); 2.8 tables (36% of the text, 366 documents are only tables); 2.9
+leakage; 3 indices (means of the last three builds); 4 known limits.
+
+Found while checking the numbers (worth knowing for the slides and the oral):
+1. Leakage example (id 31695): query "Il Dna lo scagiona, ma ha già scontato 24 anni" shares only
+   `anni` with the article title, and the `italian` light stemmer does **not** merge "scagiona"
+   (`scagion`) and "scagionato" (`scagionat`), checked with `_analyze`. With Fabio's F1:
+   `bm25-italian-title` does not find the article in the top 100, `bm25-italian` ranks it 1st
+   through the body ("DNA", "24 anni"), `bm25-italian-leak` also 1st with the score from 37 to 63.
+2. Sources outside the "Fonti" section: 381 pages (mostly under "Collegamenti esterni"); even
+   dropping every section the parser drops by heading would leave sources in 19 pages (no heading,
+   inline before "Fonti", "Riferimenti", "Aggiornamenti"). This is why the parser removes every
+   source template, wherever it is. (The 631 of the D2 entry counted something else; the report's
+   numbers are the ones to use.)
+3. Agency normalisation, two small flaws left as known limits (not worth a reparse): the leading
+   article is removed even without a space (needed for `ilpost.it`), which wrongly merges `VG`
+   with `IVG` and `post.com` with Il Post (one or two sources each); 9 names in Cyrillic or `-`
+   (18 sources) get an empty key and stay as written. Because of the second one,
+   `distinct_agencies` in `parse_report.json` (2,295) is 9 short of the real 2,304.
+
+Parser change (no effect on the output: `docs.jsonl` regenerated and compared byte by byte,
+identical): `html_blocks` also returns the characters of table text, and `read_latest` can count
+the lines of each id; both only feed the report. Two tests added in `tests/test_parse.py` for the
+"is this source inside a Fonti section" logic. Nothing changes for the others.
+
+Next: the D5 extras (E8 once Fabio's F4 knn configuration exists), the review of Gioia's 30
+queries (Tuesday 10:00), then D7 slides.
 
 ### 16 Nov 2026 14:40, Fabio: F1 BM25 search
 
