@@ -1,0 +1,30 @@
+M01	influenza aviaria	{"type": "topical", "need": "Spread of H5N1 bird flu: cases in birds or humans, measures taken, anywhere."}
+M02	Silvio Berlusconi	{"type": "entity", "need": "News where Berlusconi is the main subject: politics, trials, statements."}
+M03	elezioni politiche 2006	{"type": "time", "need": "The Italian general election of April 2006: campaign, results, contested count."}
+M04	morte di un celebre tenore italiano	{"type": "vague", "need": "The death of Luciano Pavarotti (2007) and the reactions."}
+M05	uragano Katrina	{"type": "topical", "need": "Hurricane Katrina (2005) and its consequences in New Orleans and the US South."}
+M06	Valentino Rossi	{"type": "entity", "need": "The rider's races, championships and results."}
+M07	Mondiali di calcio 2006	{"type": "time", "need": "Matches and results of the 2006 World Cup in Germany."}
+M08	nave da crociera naufragata davanti a un'isola toscana	{"type": "vague", "need": "The Costa Concordia shipwreck at Giglio (2012): victims, rescue, trial."}
+M09	emergenza rifiuti in Campania	{"type": "topical", "need": "The waste crisis in Naples and Campania: rubbish in the streets, landfills, protests, government measures."}
+M10	Juventus	{"type": "entity", "need": "The club: matches, transfers, sporting penalties."}
+M11	elezioni presidenziali americane 2008	{"type": "time", "need": "The 2008 US presidential race: primaries, Obama-McCain campaign, result."}
+M12	aereo di linea precipitato con molte vittime	{"type": "vague", "need": "Crashes of passenger airliners with many deaths, anywhere."}
+M13	scandalo Calciopoli	{"type": "topical", "need": "The 2006 Italian football scandal: wiretaps, trials, penalties for the clubs."}
+M14	Nicolas Sarkozy	{"type": "entity", "need": "News where Sarkozy is the main subject: election, presidency, statements."}
+M15	Olimpiadi di Pechino 2008	{"type": "time", "need": "The 2008 Beijing Olympics: competitions, medals, torch relay protests."}
+M16	scoperta di un pianeta simile alla Terra	{"type": "vague", "need": "Discoveries of Earth-like planets outside the solar system."}
+M17	riscaldamento globale	{"type": "topical", "need": "Climate change: scientific reports, international agreements (Kyoto), effects."}
+M18	Rita Levi-Montalcini	{"type": "entity", "need": "The scientist: her activity as a senator, statements, death (2012)."}
+M19	referendum costituzionale 2006	{"type": "time", "need": "The June 2006 Italian referendum on the constitutional reform: campaign and result."}
+M20	proteste contro la ferrovia veloce in Piemonte	{"type": "vague", "need": "Protests against the Turin-Lyon high-speed railway in Val di Susa."}
+M21	missioni dello Space Shuttle	{"type": "topical", "need": "Launches and missions of the Space Shuttle."}
+M22	Darfur	{"type": "entity", "need": "The conflict and humanitarian crisis in Darfur."}
+M23	crisi finanziaria del 2008	{"type": "time", "need": "The 2008 financial crisis: bank failures, bailouts, stock market falls."}
+M24	il governo cade dopo un voto al Senato	{"type": "vague", "need": "Italian governments falling after a confidence vote in the Senate (e.g. Prodi 2008)."}
+M25	Festival di Sanremo	{"type": "topical", "need": "Any edition of the Sanremo song festival: participants, winners, controversies."}
+M26	Papa Francesco	{"type": "entity", "need": "Pope Francis (2013 onwards): election, travels, statements."}
+M27	pandemia di COVID-19 in Italia nel 2020	{"type": "time", "need": "COVID-19 in Italy in 2020: cases, lockdown, government measures."}
+M28	morti negli scontri tra tifosi e polizia	{"type": "vague", "need": "Deaths in football-related violence between fans and police (e.g. Catania 2007)."}
+M29	Fiat	{"type": "entity", "need": "The car maker: results, plants, strikes, alliances."}
+M30	incidente alla centrale atomica giapponese	{"type": "vague", "need": "The Fukushima nuclear accident (2011) and its consequences."}

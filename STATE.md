@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; next: G3 (30 manual queries, guidelines, pool, judging tool) |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; G3 in progress (16 Nov 21:30): judging tool, pooling script, guidelines and the 30 `manual` queries pushed; next: review of the queries by Daniel and Fabio (Tue 10:00), then pooling (Tue 12:00) |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,36 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 21:30, Gioia: the 30 `manual` queries (G3, work in progress)
+
+The 30 queries of the `manual` test set are in `evaluation/testsets/manual/queries.tsv`
+(`qid<TAB>text<TAB>meta`, `meta = {"type", "need"}`, ids `M01`-`M30`). Written before looking at
+any result: drafted by Claude without querying the index, approved by Gioia as they are. Nothing
+is pooled yet: the pool waits for the review by Daniel and Fabio (Tuesday 10:00, issue opened).
+
+1. **Types**: 7 `topical`, 8 `entity`, 7 `time`, 8 `vague` (8 vague because paraphrases are where
+   E3 expects the vectors to help). The types alternate in the file (topical, entity, time,
+   vague, ...), so queries 1-10, the doubly judged ones, contain all four types (3, 3, 2, 2).
+2. **Years and topics**: most queries are on 2005-2008, the bulk of the corpus; five reach later
+   years (Costa Concordia 2012, Rita Levi-Montalcini's death 2012, Papa Francesco 2013+,
+   Fukushima 2011, COVID-19 2020), which may have few relevant articles. Topics: politics, sport,
+   science, disasters, culture, economy.
+3. **Excluded on purpose**: the demo queries of `docs/demo.md` (chosen by looking at results) and
+   the two examples of `GUIDELINES.md` ("terremoto in Abruzzo", coal mine accidents), so that the
+   judges have not seen graded examples on a test query.
+4. **Needs** are in English (repository rule); judges grade against the need, not the words.
+5. Two `vague` queries still share one word with their target ("Senato" in M24, "ferrovia" in
+   M20): a paraphrase with no word at all in common was too artificial.
+
+Assignment (as proposed at 15:50, to be confirmed in the issue): Gioia M01-M10, Daniel M11-M20
+and M01-M05, Fabio M21-M30 and M06-M10. With 20-25 documents per query Daniel and Fabio get
+300-375 judgments, Gioia 200-250: if `pool.py` reports more than 350 for someone, the doubly
+judged queries are cut first, as the brief says.
+
+How to check: `uv run pytest -q` (the contract test reads every `queries.tsv`): 106 passed,
+2 skipped (the E8 indices are not built on Gioia's laptop). Nothing changes for the others
+except the review. Next: pooling after the review (Tuesday by 12:00), then judging 12:00-15:00.
 
 ### 16 Nov 2026 18:15, Daniel: demo links checked on Daniel's laptop (issue #8), issue #6 closed
 
