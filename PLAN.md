@@ -41,7 +41,7 @@ described there), `STATE.md` (everyone appends), `PLAN.md` (everyone ticks their
 | # | Question | Variants | Knob owner | Metrics |
 |---|---|---|---|---|
 | E1 | Does Italian text analysis help? | standard vs italian analyzer | Daniel | MRR@10, R@100 on `fonti`; nDCG@10 on `manual` |
-| E2 | Which fields to search, with which weights? | title only, body only, title+lead+body, title^3+lead^2+body | Fabio | same |
+| E2 | Which fields to search, with which weights? | title only, body only, title+lead+body, title^3+lead^2+body | Fabio | MRR@10, R@100 on `fonti` |
 | E3 | Lexical, semantic or both? | BM25, kNN (e5-small), hybrid with RRF | Fabio (query), Daniel (embeddings) | same, plus results split by query-title overlap (low overlap = paraphrase) |
 | E4 | How much does leakage inflate results? | with and without the sources field | Daniel (field), Gioia (analysis) | MRR@10 on `fonti` |
 | E5 | Should published pages rank higher? | no boost vs boost on `published` | Fabio | nDCG@10 on `manual` |
@@ -117,13 +117,13 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   word overlap between query and article title in `meta` (to split results into easy and
   paraphrase queries). Keep a fixed random sample of 1000 queries (seed in the script). Start on
   the sample, rerun on the full corpus.
-- [ ] **G3, Tue 17.** `manual` test set: 40 queries in four types (10 each): topical ("terremoto in
+- [ ] **G3, Tue 17.** `manual` test set: 30 queries in four types: topical ("terremoto in
   Abruzzo"), entity ("Romano Prodi"), time-bound ("elezioni 2008"), vague or paraphrased
-  ("disastro in una miniera"). Pooling: top 10 of every configuration, merged and shuffled, in a
-  judging file or small page; grades 0 (not relevant), 1 (partly), 2 (relevant), with written
-  guidelines in `eval/testsets/manual/GUIDELINES.md`.
-- [ ] **G4, Wed 18 morning.** Judgments: all three judge (about one hour each, split the queries;
-  20 queries judged by two people to measure agreement).
+  ("disastro in una miniera"). Pooling: top 10 of the five configurations of E1, E3 and E5,
+  merged and shuffled, in one CSV per judge; grades 0 (not relevant), 1 (partly), 2 (relevant),
+  with written guidelines in `eval/testsets/manual/GUIDELINES.md`.
+- [ ] **G4, Wed 18 morning.** Judgments: all three judge (about one hour each, about 300
+  judgments per person; 10 queries judged by two people to measure agreement).
 - [ ] **G5, Wed 18.** `eval/run.py`: runs every configuration on every test set, writes runs,
   metrics CSV, significance tests and latency; one command reproduces all numbers.
 - [ ] **G6, Wed 18 - Thu 19.** Tables and plots for the slides (`results/figures/`), reading of
@@ -135,7 +135,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 |---|---|
 | Mon 16 evening | Elasticsearch up, sample and full corpus indexed, metrics module ready |
 | Tue 17 evening | all configurations searchable, web UI usable, both test sets built, pool ready |
-| Wed 18, 13:00 | judgments done |
+| Wed 18, 13:00 | judgments done (each person blocks about one hour in the morning) |
 | Wed 18, 20:00 | **code freeze**: all experiments run, numbers final |
 | Thu 19, 12:00 | deck complete; rehearsal with timing (about 7 minutes each) |
 | Thu 19, 16:00 | README final, repository made public, PDF and pptx uploaded (2 hours of margin) |

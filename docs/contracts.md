@@ -95,5 +95,5 @@ Test sets:
 
 1. `fonti`: known-item search. Query = title of an external source of the article, relevant
    document = the article. Built from `docs.jsonl`.
-2. `manual`: 40 queries written by the group, judged by the group on the pooled top 10 of all
-   configurations.
+2. `manual`: 30 queries written by the group, judged by the group on the pooled top 10 of the
+   five configurations compared in E1, E3 and E5.

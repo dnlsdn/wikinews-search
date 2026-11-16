@@ -71,9 +71,13 @@ File: `eval/build_fonti.py`, output `eval/testsets/fonti/queries.tsv` and `qrels
 1. Read `docs.jsonl` (start with the sample, rerun on the full file). For each document, its
    `sources` list gives candidate queries (`sources[i].title`).
 2. Drop a candidate if: the title is empty or has fewer than 4 words; the source is foreign
-   (`sources[i].foreign`); the same normalised title (lowercase, punctuation removed) appears for
-   more than one document (ambiguous, e.g. "Risultati Serie A"); the document is not
-   `published` (we test news search).
+   (`sources[i].foreign`); the title is not in Italian even though the template says nothing
+   (some `{{fonte}}` titles are in English, e.g. "Moldova: Direct assignment for Rotterdam"):
+   drop titles that contain common English function words (`the`, `of`, `for`, `and`, `with`,
+   `to`, `is`) and no Italian ones (`il`, `la`, `di`, `del`, `che`, `per`, `con`, `non`, ...),
+   and check the rule by eye on 50 dropped and 50 kept titles; the same normalised title
+   (lowercase, punctuation removed) appears for more than one document (ambiguous, e.g.
+   "Risultati Serie A"); the document is not `published` (we test news search).
 3. Keep **one query per document** (the first valid source), so that articles with many sources
    do not weigh more.
 4. `meta` of each query: `{"doc_title": ..., "overlap": ..., "bucket": ...}` where `overlap` is the
@@ -82,18 +86,23 @@ File: `eval/build_fonti.py`, output `eval/testsets/fonti/queries.tsv` and `qrels
    (0.2-0.5) or `high` (> 0.5). Low overlap = paraphrase: that is where semantic search should help.
 5. Random sample of **1000 queries** with `random.Random(42)`; ids `F0001`... Print the funnel
    (candidates, after each filter, final) and the bucket sizes: they go on the slides.
-6. Leakage check: the contract says `body` does not contain the sources. Verify it on 20 random
-   queries (the query string must not appear verbatim in `title + lead + body`) and write the
-   result in the log.
-7. Done when both files exist for the full corpus and the funnel is in the log.
+6. Leakage check: the contract says `body` does not contain the sources. On 300 random queries
+   count how many appear verbatim (normalised) in `title + lead + body`. A simulation on the raw
+   dump (16 Nov) found about 4% even before the "Fonti" section, because some articles quote or
+   reuse the headline: that is natural overlap, not leakage, and it is fine. A much higher share
+   means the parser leaked the sources: write it under "Requests" for Daniel.
+7. Expected size (simulation on the raw dump, 16 Nov, before the English-title rule): 17,190
+   source templates, 7,318 queries after the filters, buckets low 2,969, mid 3,549, high 800;
+   51 queries are identical to the article title. Your numbers should be close.
+8. Done when both files exist for the full corpus and the funnel is in the log.
 
 ## Step G3: the `manual` test set (judged by us)
 
 The `fonti` set only has one relevant document per query. The `manual` set measures the ranking
 of the whole first page, with graded judgments.
 
-1. **Write the 40 queries before looking at any result** (avoid choosing queries the system is
-   good at). Four types, 10 each, mixing years (most news are 2005-2008, some up to 2025) and
+1. **Write the 30 queries before looking at any result** (avoid choosing queries the system is
+   good at). Four types, 7 or 8 each, mixing years (most news are 2005-2008, some up to 2025) and
    topics (politics, sport, science, disasters, culture):
    1. `topical`: a subject, e.g. "terremoto in Abruzzo";
    2. `entity`: a person, organisation or place, e.g. "Romano Prodi";
@@ -105,14 +114,22 @@ of the whole first page, with graded judgments.
 2. `eval/testsets/manual/GUIDELINES.md`: grade 2 = the article is mainly about what the query
    asks; 1 = it is related or mentions it substantially; 0 = not relevant. Two or three examples
    for each grade. Judge the article, not the snippet.
-3. Pooling (`eval/pool.py`, needs Fabio's F1 and F4): for every query, the top 10 of **every**
-   configuration in `CONFIGS`, merged and deduplicated, shuffled with seed 42 so the judge does
-   not know which system found what. Output one CSV per judge,
+3. Pooling (`eval/pool.py`, needs Fabio's F1 and F4): for every query, the top 10 of the five
+   configurations the `manual` set is used for (`bm25-standard`, `bm25-italian`, `knn`,
+   `hybrid-rrf`, `hybrid-rrf-published`), merged and deduplicated, shuffled with seed 42 so the
+   judge does not know which system found what. Output one CSV per judge,
    `eval/testsets/manual/judging/<name>.csv` with columns
-   `qid, query, doc_id, title, date, lead, url, grade` (grade empty). Assignment: the 40 queries
-   split in three parts; queries 1-20 are also given to a second judge, to measure agreement.
-4. Done when the three CSVs are ready and the group knows how to fill them (Wednesday morning,
-   about one hour each; open the CSV in a spreadsheet, fill `grade`, save as CSV).
+   `qid, query, doc_id, title, date, lead, url, grade` (grade empty). Assignment: the 30 queries
+   split in three parts of 10; queries 1-10 are also given to a second judge, to measure
+   agreement.
+4. Workload: expect about 20-25 documents per query after deduplication, so about 300 judgments
+   per person. Judge from title and lead, opening the article only when in doubt (about 10
+   seconds each): about one hour. `pool.py` must print the judgments per person; if anyone has
+   more than 350, cut the doubly judged queries first, then the number of queries, and log it.
+   The other configurations (E2, E4) are evaluated on `fonti` only, because their documents are
+   not in the pool.
+5. Done when the three CSVs are ready and the group knows how to fill them (Wednesday morning;
+   open the CSV in a spreadsheet, fill `grade`, save as CSV).
 
 ## Step G4: judgments (Wednesday 18 by 13:00)
 
@@ -135,9 +152,10 @@ reproduces every number.
    per-query scores `results/metrics/<set>_per_query.csv` (needed for significance).
 3. `experiments.py` lists the comparisons of `PLAN.md` as pairs (baseline, variant):
    E1 `bm25-standard` vs `bm25-italian`; E2 `bm25-italian` vs `bm25-italian-title`,
-   `bm25-italian-body`, `bm25-italian-flat`; E3 `bm25-italian` vs `knn` vs `hybrid-rrf`;
-   E4 `bm25-italian` vs `bm25-italian-leak` (only on `fonti`); E5 `hybrid-rrf` vs
-   `hybrid-rrf-published` (only on `manual`). For each pair: difference of the means and p-value
+   `bm25-italian-body`, `bm25-italian-flat` (only on `fonti`); E3 `bm25-italian` vs `knn` vs
+   `hybrid-rrf`; E4 `bm25-italian` vs `bm25-italian-leak` (only on `fonti`); E5 `hybrid-rrf` vs
+   `hybrid-rrf-published` (only on `manual`). On `manual`, run only the five pooled
+   configurations. For each pair: difference of the means and p-value
    of the randomization test, in `results/metrics/significance.csv`.
 4. Costs (E6): query latency p50 and p95 per configuration (`results/metrics/latency.csv`);
    indexing time and index size come from Daniel's `results/indexing.csv`.

@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | not started: next step D1 |
 | Search and interface | Fabio | not started: next step F3a (web skeleton with fake search), then F1 once D2-D3 are pushed |
-| Evaluation | Gioia | not started: next step G1 (does not need the corpus), then writing the 40 queries of G3 |
+| Evaluation | Gioia | not started: next step G1 (does not need the corpus), then writing the 30 queries of G3 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -55,6 +55,22 @@ None yet.
 
 ## Log
 
+### 16 Nov 2026, Daniel: pre-flight checks
+
+Checked the assumptions of the plan before anyone starts, so there are no surprises later.
+
+1. `fonti` test set, simulated on the raw dump with the filters of Gioia's brief: 17,190 source
+   templates -> 7,318 usable queries (one per published article; low overlap 2,969, mid 3,549,
+   high 800). Enough for a sample of 1000. Two findings added to the brief: some `{{fonte}}`
+   titles are in English (new language rule), and about 4% of queries appear verbatim in the
+   text before "Fonti" (natural overlap, not leakage).
+2. Manual judgments were too many: 40 queries pooled from 9 configurations would be well over
+   1000 judgments. Now 30 queries pooled from the 5 configurations of E1, E3, E5, 10 queries
+   judged twice: about 300 judgments, one hour per person. E2 and E4 are measured on `fonti` only.
+3. Elasticsearch 9.5.0 image exists for arm64 and amd64. `uv.lock` resolves torch and
+   sentence-transformers for macOS, Windows and Linux on Python 3.12.
+4. Parser: about 1% of pages have no "Fonti" heading; the brief says to check the variants.
+
 ### 16 Nov 2026, Daniel: personal briefs and session prompts
 
 Added `docs/briefs/` with one detailed brief per person (exact files, functions, checks, "done
@@ -67,7 +83,7 @@ How to start: clone, open Claude Code in the repository, paste the first-session
 `docs/briefs/README.md` with your name.
 
 Next: Daniel D1-D3; Fabio step 0, then F3a (web skeleton with fake search) until the sample is
-pushed; Gioia step 0, then G1 and the 40 queries of G3.
+pushed; Gioia step 0, then G1 and the 30 queries of G3.
 
 ### 16 Nov 2026, Daniel: repository set up
 

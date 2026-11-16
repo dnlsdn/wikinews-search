@@ -11,7 +11,10 @@ indices (D3). Push those first, polish later.
 
 ## Step D1: Elasticsearch
 
-1. `docker compose up -d` (image `elasticsearch:9.5.0`, about 1.5 GB, pulled once).
+1. `docker compose up -d` (image `elasticsearch:9.5.0`, about 1.5 GB, pulled once; the image
+   exists for arm64 and amd64). Docker Desktop must give its VM at least 3 GB of memory
+   (Settings, Resources), since the container is limited to 2 GB. On Daniel's Mac `DOCKER_HOST`
+   is set in `~/.zshrc` for Kathara: check that `docker info` talks to Docker Desktop.
 2. Done when `curl localhost:9200` answers and the README "Setup" section is verified.
 
 ## Step D2: parser (`wikisearch/ingest/parse.py`)
@@ -23,7 +26,8 @@ Fields exactly as in `docs/contracts.md` section 1.
 2. Duplicates: same `identifier` -> keep the record with the latest `date_modified`.
 3. Plain text from `article_body.html` (Parsoid HTML) with an HTML parser (`selectolax` or `lxml`,
    add it with `uv add`): take the paragraphs and lists of the sections, drop the section whose
-   heading is "Fonti" (and "Collegamenti esterni", "Note"), figures, navigation boxes, tables of
+   heading is "Fonti" or "Fonte" (and "Collegamenti esterni", "Note"; about 1% of pages have no
+   "Fonti" heading, check what they use), figures, navigation boxes, tables of
    templates (`{{Dì la tua}}`, `{{Wikinotizie}}` boxes), the first line with the date. Keep the
    text of links. `lead` = first non-empty paragraph after the date.
 4. Date: parse `{{data|21 marzo 2008|venerdì}}` from the wikitext (Italian month names), else the
