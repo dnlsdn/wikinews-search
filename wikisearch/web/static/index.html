@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wikinews search</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Wikinews search</h1>
+    <form id="search-form">
+      <input id="q" name="q" type="search" placeholder="Search the Italian Wikinews archive" autofocus>
+      <select id="config" name="config" aria-label="Configuration"></select>
+      <button type="submit">Search</button>
+    </form>
+  </header>
+  <main>
+    <p id="status"></p>
+    <ol id="results"></ol>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

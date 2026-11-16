@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | not started: next step D1 |
-| Search and interface | Fabio | not started: next step F3a (web skeleton with fake search), then F1 once D2-D3 are pushed |
+| Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
 How to get the dump (not in git): download
@@ -55,6 +55,48 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 12:40, Fabio: F3a web app skeleton with fake mode
+
+Step F3a done: the web API of `docs/contracts.md` section 4 exists and works without
+Elasticsearch, so the interface can be built before the index.
+
+1. `wikisearch/web/app.py`: FastAPI `app` with `/api/search`, `/api/doc/{id}`, `/api/facets`,
+   `/api/configs`; the static UI (`wikisearch/web/static/`) is served at `/`. With
+   `WIKISEARCH_FAKE=1` every endpoint answers from `wikisearch/web/fake.py` (three hits: one with
+   an image, one non-published, one without date; one full document per hit; fake facet counts).
+   The variable is read at every request, so tests switch it with `monkeypatch`.
+2. `/api/search`: `took_ms` measured in Python around `search()`; pagination asks `search()` for
+   `page * size` hits and slices. Page size is `size` (brief) and `k` is accepted as an alias
+   (the name in the contract); default 10, max 100. Filters: `date_from`, `date_to` (validated
+   `YYYY-MM-DD`, 422 otherwise), repeated `category` and `agency`, `published`. Unknown config:
+   400. Empty query: no hits, `search()` not called.
+3. Decision (Fabio): the contract lists a `total` that the brief's response did not have, and
+   `search()` returns at most k hits with no count of all matches. `total` = number of hits
+   `search()` returned for `page * size`, not the number of matches in the index. Cheap, defined
+   for every mode (an exact count is not meaningful for knn), and honest about what it is.
+4. Real mode, ready for when the index exists (not testable yet): `/api/doc` is a `get` on the
+   default configuration's index without `embedding` (404 if missing); `/api/facets` runs the BM25
+   `multi_match` of the configuration on its index with terms aggregations on `categories` (15),
+   `agencies` (10) and a yearly `date_histogram`; for `knn` it uses the default configuration's
+   fields, since facets are lexical by design. Response shape: `{"query", "config",
+   "categories": [{"value", "count"}], "agencies": [...], "years": [...]}`. Elasticsearch down:
+   503; `search()` still `NotImplementedError` (F1): 501.
+5. `wikisearch/search/es.py`: one client per process (`lru_cache`, `ES_URL`) and the
+   `multi_match` builder, to be reused by F1.
+6. Minimal UI (search box, configuration selector, result list with tags, agencies, thumbnail,
+   "not published" label, "N results in X ms"); the rest (filters, pagination, document view,
+   compare mode, URL state) is F3b.
+7. `tests/test_web.py`: 10 tests in fake mode with `TestClient` (shapes, pagination, `k` alias,
+   filters, bad input, 404, facets).
+
+How to run (PowerShell): `$env:WIKISEARCH_FAKE=1; uv run uvicorn wikisearch.web.app:app --reload`,
+then http://localhost:8000; `Remove-Item Env:WIKISEARCH_FAKE` for real mode. Tests:
+`uv run pytest -q tests/test_web.py`. Nothing changes for the others.
+Environment (Step 0): Docker, uv, git, gh ready, Elasticsearch 9.5.0 answers, dump in
+`data/raw/`. On Windows `uv` failed with "Missing expected target directory for Python minor
+version link"; workaround: `uv sync --python <path to the downloaded python.exe>` once, then
+`uv run` works. Next: F3b on fake data, F1 as soon as Daniel's sample and indexer are pushed.
 
 ### 16 Nov 2026 12:30, Gioia: G1 metrics, TREC files, significance
 
