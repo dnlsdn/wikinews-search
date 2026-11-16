@@ -97,7 +97,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 
 ### Daniel: data and indexing
 
-- [ ] **D1, Mon 16 now.** Elasticsearch running locally with `docker compose up -d` (single node, 1 GB
+- [x] **D1, Mon 16 now.** Elasticsearch running locally with `docker compose up -d` (single node, 1 GB
   heap, no Kibana; the laptop has 8 GB). Done when `curl localhost:9200` answers and the README
   says how.
 - [x] **D2, Mon 16 (sample by 15:00).** Parser `wikisearch/ingest/parse.py`: dump -> `data/processed/docs.jsonl`

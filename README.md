@@ -36,6 +36,20 @@ tar -xzf data/raw/itwikinews.tar.gz -C data/raw
 On Windows (PowerShell) use `curl.exe` instead of `curl`; `tar` is built in. The result must be
 `data/raw/itwikinews_namespace_0_0.ndjson` (591 MB, 12,261 lines).
 
+Elasticsearch takes about a minute to start the first time. `curl localhost:9200` must answer
+with `"number" : "9.5.0"`; the container uses about 1.5 GB of memory. `docker compose down` stops
+it and keeps the indices (they live in the `esdata` volume).
+
+If it does not answer:
+
+1. `docker logs --tail 30 wikinews-es`.
+2. `read past EOF ... elasticsearch.keystore`: the container was created while the disk was full
+   and its keystore is truncated. Free some disk, then `docker compose down` and
+   `docker compose up -d` (this recreates the container; the data volume is kept).
+3. Docker Desktop says "unable to start" with "no space left on device" in its logs: the disk is
+   full. Free disk and restart Docker Desktop; on a Mac with 8 GB of RAM, swap also takes disk
+   space, so close heavy applications.
+
 ## Usage
 
 Sections to be completed as the parts are implemented: parsing and indexing, running the web app,

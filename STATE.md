@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D2 done (16 Nov 13:50): parser, full `docs.jsonl` (12,213 docs), sample of 300 pushed; D1 in progress (Elasticsearch starting); next: D3 indexer |
+| Data and indexing | Daniel | D1 done (13:55): Elasticsearch 9.5.0 runs on Daniel's laptop; D2 done (13:50): parser, full `docs.jsonl` (12,213 docs), sample of 300 pushed; next: D3 indexer |
 | Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,21 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 13:55, Daniel: D1 Elasticsearch running
+
+Step D1 done: `docker compose up -d` starts Elasticsearch 9.5.0 on Daniel's Mac (Docker Desktop
+VM with 4 GB, container at about 1.5 GB of 2 GB); `curl localhost:9200` answers. The README
+"Setup" is verified and now says what to do when it does not answer.
+
+Incident worth knowing (it can happen on the 8 GB Macs): the disk filled up while the image was
+being pulled (swap plus an automatic Docker Desktop update), Docker Desktop stopped with "no
+space left on device", and the container created in that moment had a truncated
+`elasticsearch.keystore` ("read past EOF" at start). Fix: free disk, restart Docker Desktop,
+`docker compose down` and `docker compose up -d` (recreates the container, keeps the volume).
+Keep at least 5 GB free before indexing.
+
+Next: D3 indexer.
 
 ### 16 Nov 2026 13:50, Daniel: D2 parser and sample
 
