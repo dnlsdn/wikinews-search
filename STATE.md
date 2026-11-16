@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | not started: next step D1 |
+| Data and indexing | Daniel | D2 done (16 Nov 13:50): parser, full `docs.jsonl` (12,213 docs), sample of 300 pushed; D1 in progress (Elasticsearch starting); next: D3 indexer |
 | Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,58 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 13:50, Daniel: D2 parser and sample
+
+Step D2 done: `wikisearch/ingest/parse.py` turns the dump into `data/processed/docs.jsonl`
+(contract section 1) and writes the committed sample `data/sample/docs.sample.jsonl` (300 docs).
+**Fabio and Gioia can start on the sample now** (G2 on the sample; F1 as soon as the indexer D3
+is pushed, or index the sample yourselves once it is).
+
+How to run: `uv run python -m wikisearch.ingest.parse` (about 15 s, 0.8 GB of RAM; needs the dump
+in `data/raw/`). It also rewrites the sample (deterministic, seed 42) and
+`results/parse_report.json`; `--no-sample` leaves the sample alone. Tests: `uv run pytest -q
+tests/test_parse.py` (13 tests on three real pages in `tests/fixtures/pages.json`).
+
+Numbers (`results/parse_report.json`):
+1. 12,261 lines read, 48 removed as duplicates (25 identifiers: 22 twice, three 5, 11 and 13
+   times; the most recent `date_modified` is kept) -> **12,213 documents**, 11,032 published,
+   1,181 not.
+2. Date: 11,687 from `{{data}}`/`{{luogodata}}`, 40 from the daily category, 486 none.
+3. 9,891 documents with sources, 17,192 sources (655 foreign), 29 without a title.
+   Agencies: 2,965 spellings -> 2,295 after normalization.
+4. 12,104 with at least one category, 10,247 with entities, 3,653 with an image, 23 with an empty
+   body (e.g. "Pagina principale", redirect-like pages). Median body 1,181 characters.
+5. Leakage check: in 51 documents the body contains the title of one of its sources verbatim
+   (4+ words); checked by hand, they are natural (the name of an exhibition or a play quoted in
+   both), not source text left in the body.
+6. Sample strata: 180 news spread over the years in proportion, 40 sport pages with tables,
+   25 lottery, 15 specials, 40 non-published.
+
+Decisions, and why:
+1. Text from the Parsoid HTML (wikitext would need a template expander); date, sources and
+   entities from the wikitext, where templates are readable.
+2. **Leakage**: sections "Fonti", "Fonte", "Collegamenti esterni", "Note" are dropped, and also
+   every `{{fonte}}`/`{{fonteestera}}` transclusion wherever it is: 631 pages have no section
+   heading at all, so dropping the section alone would leak their sources.
+3. Navigation sections are dropped too ("Articoli correlati", "Notizie correlate", "Notizie
+   precedenti", "Altri progetti", "Vedi anche"...): they list other articles' titles, which would
+   make a page match queries about its neighbours.
+4. Block templates are dropped (archive banners, "Dì la tua", Wikipedia/Wikivoyage boxes,
+   "notizia originale", "traduzione", season navigation boxes) except those that carry article
+   text: `interv` (interview questions), `quote`, `citazione`, and match reports
+   (`incontro di club`, `footballbox`, ...).
+5. **Tables are kept** (decided by Daniel): the brief said paragraphs and lists, but 2,832 pages
+   have tables (match reports, standings, lottery draws), they are 34% of the corpus text, and
+   without them 359 pages (234 published) would have an empty body. One line per table row.
+6. Agencies: a key (lowercase, no accents, no leading article, no `.it`/`.com`, no
+   "(quotidiano)") plus 14 explicit aliases (`Corriere.it` -> Corriere della Sera, `AGI` = Agenzia
+   Giornalistica Italia, ...); the displayed name is the most frequent spelling of the group.
+7. `{{fontecarta}}` (159 printed sources) is not in the contract and not parsed; it could be added
+   to `sources` later if the `fonti` test set wants more queries.
+8. Source `date` is `YYYY-MM-DD` or null (the contract did not fix a format).
+
+Next: D1 (Elasticsearch is starting on Daniel's laptop after a full-disk incident), then D3.
 
 ### 16 Nov 2026, Daniel: push and news checks are always automatic
 
