@@ -17,20 +17,24 @@ below. Work outside your directories only after writing it in `STATE.md` ("Reque
 
 | Person | GitHub | Part | Directories | Presentation |
 |---|---|---|---|---|
-| Daniel | dnlsdn | data and indexing: parsing the dump, cleaning, Elasticsearch mappings and analyzers, embeddings | `wikisearch/ingest/`, `docker-compose.yml` | the data and its challenges, indexing choices; assembles the deck |
-| Fabio | fmdimarco | search and interface: BM25, vector and hybrid retrieval, filters, web API and UI, demo | `wikisearch/search/`, `wikisearch/web/` | retrieval choices and the live demo |
-| Gioia | gioburattii | evaluation: test sets, metrics, experiment runner, results | `eval/`, `results/` | test strategy and experimental results |
+| Daniel | dnlsdn | data and indexing: parsing the dump, cleaning, Elasticsearch mappings and analyzers, embeddings | `wikisearch/ingest/`, `data/sample/`, `data/shared/`, `docker-compose.yml`, `tests/test_parse.py`, `tests/test_index.py` | the data and its challenges, indexing choices; assembles the deck; the demo runs on his laptop |
+| Fabio | fmdimarco | search and interface: BM25, vector and hybrid retrieval, filters, web API and UI, demo | `wikisearch/search/`, `wikisearch/web/`, `tests/test_search.py`, `tests/test_web.py` | retrieval choices and the live demo |
+| Gioia | gioburattii | evaluation: test sets, metrics, experiment runner, results | `evaluation/`, `results/`, `tests/test_metrics.py`, `tests/test_evaluation.py` | test strategy and experimental results |
 
 Shared files: `wikisearch/schema.py`, `wikisearch/config.py`, `docs/contracts.md` (change only as
 described there), `STATE.md` (everyone appends), `PLAN.md` (everyone ticks their own boxes),
-`README.md` (Daniel keeps it current, the others send their sections).
+`README.md` (each person writes the "Usage" subsection of their part), `slides/` (one file each).
+
+Laptops: Daniel and Gioia on macOS with 8 GB of RAM, Fabio on Windows with 16 GB. Everything
+must run on both systems (rules in `CLAUDE.md`). The live demo and the presentation run on
+**Daniel's laptop**.
 
 ## Why this split works
 
 1. The only hard dependency is the corpus: search and evaluation need documents. Daniel's first
    job is therefore a **sample** (`data/sample/docs.sample.jsonl`, about 300 pages) pushed within
-   the first afternoon, and the full index the same evening. Until then Fabio and Gioia work on
-   the sample.
+   the first afternoon, and the parser and indexer the same evening. Until then Fabio builds the
+   interface on fake data and Gioia the metrics, which need no documents.
 2. Every design choice to compare is a **named configuration** (`wikisearch/search/configs.py`).
    The person who implements a choice exposes it as a configuration; Gioia's runner evaluates all
    configurations with the same `search()` function the web app uses.
@@ -42,11 +46,11 @@ described there), `STATE.md` (everyone appends), `PLAN.md` (everyone ticks their
 |---|---|---|---|---|
 | E1 | Does Italian text analysis help? | standard vs italian analyzer | Daniel | MRR@10, R@100 on `fonti`; nDCG@10 on `manual` |
 | E2 | Which fields to search, with which weights? | title only, body only, title+lead+body, title^3+lead^2+body | Fabio | MRR@10, R@100 on `fonti` |
-| E3 | Lexical, semantic or both? | BM25, kNN (e5-small), hybrid with RRF | Fabio (query), Daniel (embeddings) | same, plus results split by query-title overlap (low overlap = paraphrase) |
+| E3 | Lexical, semantic or both? | BM25, kNN (e5-small), hybrid with RRF | Fabio (query), Daniel (embeddings) | MRR@10, R@100 on `fonti`, split by query-title overlap (low overlap = paraphrase); nDCG@10 on `manual` |
 | E4 | How much does leakage inflate results? | with and without the sources field | Daniel (field), Gioia (analysis) | MRR@10 on `fonti` |
 | E5 | Should published pages rank higher? | no boost vs boost on `published` | Fabio | nDCG@10 on `manual` |
 | E6 | What does each choice cost? | all of the above | Gioia | indexing time, index size, query latency p50/p95 |
-| E7 (stretch) | Do near-duplicates hurt the result page? | collapse on `series_key` off/on | Fabio | distinct series in top 10, nDCG@10 |
+| E7 (stretch) | Do near-duplicates hurt the result page? | collapse on `series_key` off/on | Fabio | distinct series in the top 10 of the `manual` queries |
 
 Statistical significance: paired randomization test between configurations (as in homework 3),
 reported with every comparison on the slides.
@@ -59,7 +63,9 @@ waiting for someone else) are in the personal briefs: `docs/briefs/daniel.md`,
 `docs/briefs/README.md`.
 
 Everyone runs Elasticsearch and builds the indices on their own laptop with Daniel's scripts
-(the dump and the indices are not in git).
+(the dump and the indices are not in git; the embeddings are, so all laptops index the same
+vectors). The **official numbers** are produced once, at code freeze, by Gioia on her laptop,
+after pulling and rebuilding the indices.
 
 Tick a box only when the "done when" is true, and log it in `STATE.md`.
 
@@ -79,13 +85,16 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   and size. Accepts `--input` so the sample can be indexed too. Done when both indices hold all
   documents and the numbers are in `results/indexing.csv`.
 - [ ] **D4, Tue 17.** Embeddings: `wikisearch/ingest/embed.py` computes e5-small vectors for all
-  documents (cached in `data/processed/embeddings.npy`, not committed) and the indexer loads them
-  into `embedding`. Done when a `knn` query from Kibana-less curl returns sensible neighbours.
+  documents into `data/shared/embeddings.npy` (committed, about 17 MB, so nobody else has to
+  compute them) and the indexer loads them into `embedding`. Done when a `knn` query returns
+  sensible neighbours for a few test articles.
 - [ ] **D5, Tue 17.** `sources_text` field for E4, any further analyzer variant worth testing.
 - [ ] **D6, Wed 18.** Data report for the slides: counts, cleaning decisions with numbers,
   examples of hard pages (`results/data_report.md`).
-- [ ] **D7, Wed 18 - Thu 19.** Own slides (challenges of the data, indexing choices) and assembly
-  of the whole deck.
+- [ ] **D7, Wed 18 - Thu 19.** Own slides (challenges of the data, indexing choices) in
+  `slides/daniel.md`; assembly of the whole deck from the three files; cover with names,
+  institutional emails and the repository link (the professor asked for emails in homework 3);
+  repository made public before the upload.
 
 ### Fabio: search and interface
 
@@ -103,15 +112,16 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   reciprocal rank fusion computed in Python (k=60, parameters in the configuration); boost on
   `published` (E5). Stretch: collapse on `series_key` (E7).
 - [ ] **F5, Wed 18.** Demo script: 5-6 queries that show the features and the differences between
-  configurations; screenshots as a fallback if the live demo fails in class.
-- [ ] **F6, Wed 18 - Thu 19.** Own slides (retrieval choices) and the demo.
+  configurations; screenshots as a fallback if the live demo fails in class. The demo runs on
+  Daniel's laptop: rehearse it there.
+- [ ] **F6, Wed 18 - Thu 19.** Own slides (retrieval choices) in `slides/fabio.md`, and the demo.
 
 ### Gioia: evaluation
 
-- [ ] **G1, Mon 16.** `eval/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
-  unit tests on hand-computed examples (`tests/`). `eval/significance.py`: paired randomization
+- [ ] **G1, Mon 16.** `evaluation/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
+  unit tests on hand-computed examples (`tests/`). `evaluation/significance.py`: paired randomization
   test.
-- [ ] **G2, Mon 16 - Tue 17.** `fonti` test set (`eval/build_fonti.py`): one query per source
+- [ ] **G2, Mon 16 - Tue 17.** `fonti` test set (`evaluation/build_fonti.py`): one query per source
   title, relevant document = the article. Drop titles in foreign languages, titles under 4 words,
   generic titles that occur for many articles (e.g. "Risultati Serie A"), duplicates. Store the
   word overlap between query and article title in `meta` (to split results into easy and
@@ -120,14 +130,35 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 - [ ] **G3, Tue 17.** `manual` test set: 30 queries in four types: topical ("terremoto in
   Abruzzo"), entity ("Romano Prodi"), time-bound ("elezioni 2008"), vague or paraphrased
   ("disastro in una miniera"). Pooling: top 10 of the five configurations of E1, E3 and E5,
-  merged and shuffled, in one CSV per judge; grades 0 (not relevant), 1 (partly), 2 (relevant),
-  with written guidelines in `eval/testsets/manual/GUIDELINES.md`.
+  merged and shuffled, one file per judge; grades 0 (not relevant), 1 (partly), 2 (relevant),
+  given with a small terminal tool (`python -m evaluation.judge`), with written guidelines in
+  `evaluation/testsets/manual/GUIDELINES.md`.
 - [ ] **G4, Wed 18 morning.** Judgments: all three judge (about one hour each, about 300
   judgments per person; 10 queries judged by two people to measure agreement).
-- [ ] **G5, Wed 18.** `eval/run.py`: runs every configuration on every test set, writes runs,
+- [ ] **G5, Wed 18.** `evaluation/run.py`: runs every configuration on every test set, writes runs,
   metrics CSV, significance tests and latency; one command reproduces all numbers.
 - [ ] **G6, Wed 18 - Thu 19.** Tables and plots for the slides (`results/figures/`), reading of
-  the results, own slides (test strategy, results).
+  the results, own slides (test strategy, results) in `slides/gioia.md`.
+
+## Slides
+
+The presentation is in Italian, about 20 minutes: about 6 minutes each, Fabio's demo included in
+his time. No code on the slides. Sober style, not "AI style" (as in homework 2: label plus one
+line, figures and tables carry the content).
+
+Each person writes the content of their slides in `slides/<name>.md`, in Italian, by **Wednesday
+18, 22:00**, with this structure for every slide:
+
+```markdown
+## Slide N: <title>
+Contenuto: <one or two short lines, or the table>
+Figura: <path in the repository, e.g. results/figures/e3_buckets.png, or "nessuna">
+Note del relatore: <what to say, a few sentences>
+```
+
+Order: Daniel (the data and its challenges, indexing choices), Fabio (retrieval choices, demo),
+Gioia (test strategy, results, conclusions). Daniel builds the deck from the three files on
+Thursday morning.
 
 ## Timeline
 
@@ -137,5 +168,6 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 | Tue 17 evening | all configurations searchable, web UI usable, both test sets built, pool ready |
 | Wed 18, 13:00 | judgments done (each person blocks about one hour in the morning) |
 | Wed 18, 20:00 | **code freeze**: all experiments run, numbers final |
-| Thu 19, 12:00 | deck complete; rehearsal with timing (about 7 minutes each) |
+| Wed 18, 22:00 | slide content of each person in `slides/` |
+| Thu 19, 12:00 | deck complete; rehearsal with timing (about 6 minutes each), demo on Daniel's laptop |
 | Thu 19, 16:00 | README final, repository made public, PDF and pptx uploaded (2 hours of margin) |

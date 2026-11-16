@@ -55,6 +55,34 @@ None yet.
 
 ## Log
 
+### 16 Nov 2026, Daniel: second review of the plan before the start
+
+Read every file again looking for steps that would break in practice. Changes:
+
+1. Team machines: Daniel and Gioia on macOS with 8 GB, Fabio on Windows with 16 GB. `CLAUDE.md`
+   now has cross-platform rules (UTF-8 explicitly when opening files, pathlib, PowerShell
+   commands for Fabio); README and Fabio's Step 0 have the Windows notes (WSL 2, `curl.exe`).
+2. All dependencies of every planned step are already in `pyproject.toml` (sentence-transformers,
+   selectolax, matplotlib, httpx for tests): `uv sync` is the only install command and nobody
+   should need `uv add`, which would cause `uv.lock` conflicts.
+3. Package `eval` renamed `evaluation` (it shadowed Python's built-in `eval`).
+4. Embeddings computed once by Daniel and committed in `data/shared/` (about 17 MB): all laptops
+   index the same vectors and the 8 GB Macs do not compute them. Runs in `results/runs/` are not
+   committed (too large); the official numbers are produced once by Gioia at code freeze after
+   rebuilding the indices.
+5. Push protocol: pull before writing the log entry; conflict rules for `STATE.md` (keep both
+   entries) and `uv.lock`.
+6. Manual judgments: a terminal tool (`python -m evaluation.judge`) instead of spreadsheets
+   (Excel with Italian settings breaks CSV separators and accents); pooling only after the
+   vector search exists, otherwise its documents would never be judged.
+7. Fake mode for every web endpoint, so Fabio can build the whole interface before the index.
+8. Slides: each person writes the content of their slides in `slides/<name>.md` (Italian, the
+   only non-English folder) by Wednesday 22:00; Daniel builds the deck. The demo and the
+   presentation run on Daniel's laptop. Cover with names, emails and repository link; repository
+   made public before the upload.
+9. Before the first session: accept the invitation, `gh auth login`, clone, open Claude Code
+   inside the folder (`docs/briefs/README.md`).
+
 ### 16 Nov 2026, Daniel: pre-flight checks
 
 Checked the assumptions of the plan before anyone starts, so there are no surprises later.

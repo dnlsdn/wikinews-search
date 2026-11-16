@@ -24,8 +24,8 @@ Fields exactly as in `docs/contracts.md` section 1.
 
 1. Read the NDJSON line by line (591 MB: never load the whole file in memory at once).
 2. Duplicates: same `identifier` -> keep the record with the latest `date_modified`.
-3. Plain text from `article_body.html` (Parsoid HTML) with an HTML parser (`selectolax` or `lxml`,
-   add it with `uv add`): take the paragraphs and lists of the sections, drop the section whose
+3. Plain text from `article_body.html` (Parsoid HTML) with `selectolax` (already a dependency):
+   take the paragraphs and lists of the sections, drop the section whose
    heading is "Fonti" or "Fonte" (and "Collegamenti esterni", "Note"; about 1% of pages have no
    "Fonti" heading, check what they use), figures, navigation boxes, tables of
    templates (`{{Dì la tua}}`, `{{Wikinotizie}}` boxes), the first line with the date. Keep the
@@ -71,7 +71,9 @@ Fields exactly as in `docs/contracts.md` section 1.
 
 1. `SentenceTransformer(EMBEDDING_MODEL)`, text `PASSAGE_PREFIX + title + ". " + lead`,
    `normalize_embeddings=True`, batch size 32, saved as float32 to `EMBEDDINGS_NPY` with the ids
-   in a sidecar `embeddings_ids.json` to check the order.
+   in `EMBEDDINGS_IDS` (both in `data/shared/`, **committed**: about 17 MB, so Fabio and Gioia
+   do not compute them). The indexer matches vectors to documents by id, not by position, and
+   fails loudly if an id is missing.
 2. Measure the time; then rerun D3 so the vectors are indexed.
 3. Done when a `knn` query on `embedding` returns sensible neighbours for two or three test
    articles (write them in the log).
@@ -90,7 +92,15 @@ Fields exactly as in `docs/contracts.md` section 1.
 (date hidden in a template, maintenance categories, inconsistent agency names, near-duplicate
 series, non-published pages, leakage of the sources). It is the base of Daniel's slides.
 
-## Step D7: slides
+## Step D7: slides, README, publication
 
-Italian, sober style (not "AI style"), no code on the slides. Daniel's part: the data and its
-challenges, the indexing choices. Then assemble the deck from the parts of Fabio and Gioia.
+1. `slides/daniel.md` by Wednesday 22:00 (structure in `PLAN.md`, "Slides"): the data and its
+   challenges, the indexing choices.
+2. Thursday morning: build the deck from `slides/daniel.md`, `fabio.md`, `gioia.md`. Italian,
+   sober style (not "AI style"), no code. Cover with the three names, institutional emails and
+   the repository link.
+3. README: setup verified from a fresh clone, "Usage" sections of the three parts merged.
+4. Make the repository public (`gh repo edit dnlsdn/wikinews-search --visibility public --accept-visibility-change-consequences`)
+   before uploading the presentation, then check the link from a private browser window.
+5. The demo and the presentation run on Daniel's laptop: Elasticsearch and the web app started
+   and warmed up before class.

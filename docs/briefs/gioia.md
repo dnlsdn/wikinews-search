@@ -1,6 +1,6 @@
 # Brief: Gioia, evaluation
 
-You are helping **Gioia Buratti** (GitHub `gioburattii`). Gioia owns the evaluation: `eval/`,
+You are helping **Gioia Buratti** (GitHub `gioburattii`). Gioia owns the evaluation: `evaluation/`,
 `results/` and the evaluation tests in `tests/`. She presents the test strategy and the
 experimental results. Read `CLAUDE.md`, `STATE.md`, `PLAN.md` and `docs/contracts.md` before this
 file.
@@ -25,15 +25,19 @@ and say so in the log. G1 and the query writing of G3 need nothing.
 
 ## Step 0: environment (first session only)
 
-1. Install Docker Desktop, `uv` (https://docs.astral.sh/uv/), git. Check with
-   `docker --version`, `uv --version`.
-2. `uv sync --extra embed` in the repository.
+Gioia works on **macOS with 8 GB of RAM**: keep Elasticsearch to the 1 GB heap of the compose
+file, do not run the experiments with other heavy apps open.
+
+1. Docker Desktop (Settings, Resources: at least 3 GB of memory), `uv`
+   (https://docs.astral.sh/uv/), git. Check with `docker --version`, `uv --version`.
+2. `uv sync` in the repository (installs Python 3.12 and every dependency: a few minutes).
 3. `docker compose up -d`, then `curl localhost:9200` must answer with `"number" : "9.5.0"`.
 4. Download and extract the dump into `data/raw/` (README).
+5. Done when all four work. Nothing to commit.
 
 ## Step G1 (start immediately): metrics and file formats
 
-Files: `eval/trec.py`, `eval/metrics.py`, `eval/significance.py`, `tests/test_metrics.py`.
+Files: `evaluation/trec.py`, `evaluation/metrics.py`, `evaluation/significance.py`, `tests/test_metrics.py`.
 Formats are in `docs/contracts.md` section 5.
 
 1. `trec.py`: `read_queries(path) -> dict[qid, (text, meta)]`, `read_qrels(path) -> dict[qid, dict[doc_id, grade]]`,
@@ -65,7 +69,7 @@ Idea: each Wikinews article cites external sources with their own headline. That
 written by another newspaper about the same event, is a realistic query whose right answer we
 already know: the article. Thousands of queries without manual work.
 
-File: `eval/build_fonti.py`, output `eval/testsets/fonti/queries.tsv` and `qrels.txt`
+File: `evaluation/build_fonti.py`, output `evaluation/testsets/fonti/queries.tsv` and `qrels.txt`
 (committed: they are small).
 
 1. Read `docs.jsonl` (start with the sample, rerun on the full file). For each document, its
@@ -109,39 +113,51 @@ of the whole first page, with graded judgments.
    3. `time`: a subject bound to a period, e.g. "elezioni politiche 2008";
    4. `vague`: a paraphrase or description without the key words, e.g. "incidente in una miniera
       di carbone".
-   Write them in `eval/testsets/manual/queries.tsv` with `meta = {"type": ...}`, and show them to
+   Write them in `evaluation/testsets/manual/queries.tsv` with `meta = {"type": ...}`, and show them to
    the group (Daniel and Fabio can propose changes) before pooling.
-2. `eval/testsets/manual/GUIDELINES.md`: grade 2 = the article is mainly about what the query
+2. `evaluation/testsets/manual/GUIDELINES.md`: grade 2 = the article is mainly about what the query
    asks; 1 = it is related or mentions it substantially; 0 = not relevant. Two or three examples
    for each grade. Judge the article, not the snippet.
-3. Pooling (`eval/pool.py`, needs Fabio's F1 and F4): for every query, the top 10 of the five
+3. Pooling (`evaluation/pool.py`, needs Fabio's F1 and F4): for every query, the top 10 of the five
    configurations the `manual` set is used for (`bm25-standard`, `bm25-italian`, `knn`,
    `hybrid-rrf`, `hybrid-rrf-published`), merged and deduplicated, shuffled with seed 42 so the
-   judge does not know which system found what. Output one CSV per judge,
-   `eval/testsets/manual/judging/<name>.csv` with columns
-   `qid, query, doc_id, title, date, lead, url, grade` (grade empty). Assignment: the 30 queries
-   split in three parts of 10; queries 1-10 are also given to a second judge, to measure
-   agreement.
+   judge does not know which system found what. Output one assignment file per judge,
+   `evaluation/testsets/manual/judging/<name>.tsv` (UTF-8, tab separated) with columns
+   `qid, query, doc_id, title, date, lead, url` (committed, so the others get it with `git pull`).
+   Assignment: the 30 queries split in three parts of 10; queries 1-10 are also given to a
+   second judge, to measure agreement.
+   **Do the pooling only after Fabio's F4 is pushed** (otherwise the documents found only by
+   `knn` are never judged and the comparison is unfair). If F4 is not there by Tuesday 22:00,
+   pool without the vector configurations, and write it in the log as a limit.
 4. Workload: expect about 20-25 documents per query after deduplication, so about 300 judgments
    per person. Judge from title and lead, opening the article only when in doubt (about 10
    seconds each): about one hour. `pool.py` must print the judgments per person; if anyone has
    more than 350, cut the doubly judged queries first, then the number of queries, and log it.
    The other configurations (E2, E4) are evaluated on `fonti` only, because their documents are
    not in the pool.
-5. Done when the three CSVs are ready and the group knows how to fill them (Wednesday morning;
-   open the CSV in a spreadsheet, fill `grade`, save as CSV).
+5. Judging tool, `evaluation/judge.py` (no spreadsheets: Excel with Italian settings breaks CSV
+   separators and accents). `uv run python -m evaluation.judge --judge <name>` shows one document
+   at a time (query, title, date, lead), reads a key (`0`, `1`, `2`; `o` opens the URL in the
+   browser with `webbrowser`; `b` goes back; `q` quits) and **appends each grade immediately** to
+   `evaluation/testsets/manual/judgments/<name>.tsv`, so it can be stopped and resumed. It prints
+   progress (`37/310`). Must work in the macOS terminal and in Windows PowerShell (read a whole
+   line with `input()`, do not depend on raw single-key reading).
+6. Done when the three assignment files and the tool are pushed and each person has judged two
+   documents as a test.
 
 ## Step G4: judgments (Wednesday 18 by 13:00)
 
-1. `eval/merge_judgments.py`: reads the filled CSVs, computes Cohen's kappa on the doubly judged
-   queries (report it: it tells how reliable the judgments are), writes `qrels.txt`.
+1. Each person runs the judging tool and pushes their `judgments/<name>.tsv` (each file is
+   written by one person only, so no conflicts).
+2. `evaluation/merge_judgments.py`: reads the judgment files, computes Cohen's kappa on the
+   doubly judged queries (report it: it tells how reliable the judgments are), writes `qrels.txt`.
    Disagreements: the two judges decide together; write in the log how many there were.
-2. Documents that enter the ranking after pooling (unjudged) count as not relevant: say this on
+3. Documents that enter the ranking after pooling (unjudged) count as not relevant: say this on
    the slides as a limit.
 
 ## Step G5: the experiment runner
 
-File: `eval/run.py`, `eval/experiments.py`. One command, `uv run python -m eval.run`,
+File: `evaluation/run.py`, `evaluation/experiments.py`. One command, `uv run python -m evaluation.run`,
 reproduces every number.
 
 1. For every test set and every configuration in `CONFIGS`: call
@@ -161,12 +177,17 @@ reproduces every number.
    indexing time and index size come from Daniel's `results/indexing.csv`.
 5. Warm up before timing (run 20 queries and discard them), and run the timing with nothing else
    heavy open.
-6. `results/summary.md`: generated tables, one per experiment, with a one-line reading each.
-7. Done when one command produces everything above on the full corpus.
+6. **Official run** (Wednesday, by 20:00): `git pull`, rebuild the data and the indices
+   (`python -m wikisearch.ingest.parse`, then `python -m wikisearch.ingest.index`), run
+   `python -m evaluation.run`, commit `results/metrics/`, `results/summary.md` and the figures.
+   Write in the log the machine used (model, RAM) next to the latencies. Runs (`results/runs/`)
+   are not committed.
+7. `results/summary.md`: generated tables, one per experiment, with a one-line reading each.
+8. Done when one command produces everything above on the full corpus.
 
 ## Step G6: figures and reading of the results (Wednesday)
 
-1. `eval/figures.py` (add `matplotlib` with `uv add --optional eval matplotlib`) writes PNGs into
+1. `evaluation/figures.py` (matplotlib is already a dependency) writes PNGs into
    `results/figures/`: E3 bars of MRR@10 per bucket (low/mid/high overlap) for BM25, kNN and
    hybrid, the key figure of the presentation; E1/E2 bars with p-values; E6 latency against
    quality (one point per configuration, a trade-off chart).
@@ -176,6 +197,14 @@ reproduces every number.
 3. Limits to state honestly on the slides: `fonti` has one relevant document per query; the
    manual pool is judged by us, the authors of the system; unjudged documents count as non
    relevant.
+
+## Slides and README
+
+1. `slides/gioia.md`, in Italian, with the structure in `PLAN.md` ("Slides"), by Wednesday
+   22:00: the test strategy (the two test sets, how they were built, the funnel, the metrics,
+   significance), the results per experiment with the figures, the limits, the conclusions.
+2. The "Usage" subsection of `README.md` for the evaluation (how to rebuild the test sets, how to
+   reproduce every number).
 
 ## What to write in the log
 
