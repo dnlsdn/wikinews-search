@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05); next: E8 indices after Fabio's F4, review of Gioia's queries Tue 10:00, deck on Wednesday |
-| Search and interface | Fabio | F1, F2 done (16 Nov 14:55): BM25 `search()` with filters, highlights and published boost, CLI, web API on real data; next: F3b (full UI), then F4 (by Tue 11:00) |
+| Search and interface | Fabio | F1-F3 done (16 Nov 15:15): BM25 `search()`, web API and full UI (filters, pagination, document view, compare mode) on real data; next: F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
 How to get the dump (not in git): download
@@ -55,6 +55,53 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 15:15, Fabio: F3b web interface complete
+
+Step F3 done (F3a skeleton + F3b interface): every item of the brief works in fake mode and on the
+full indices with the BM25 configurations; with `knn` and `hybrid-*` (including the default
+`hybrid-rrf`) a column shows "configuration not available yet" until F4 (Tuesday 11:00).
+
+How to run (PowerShell): `uv run uvicorn wikisearch.web.app:app --reload`, then
+http://localhost:8000 (fake mode: `$env:WIKISEARCH_FAKE=1` first). Example links:
+`/?q=terremoto+abruzzo&config=bm25-italian&compare=1&config2=bm25-standard` (E1 side by side),
+`/?q=elezioni&config=bm25-italian&date_from=2008-01-01&date_to=2008-12-31&agency=ANSA`.
+Tests: `uv run pytest -q tests/test_web.py` (11 tests). Checked by hand in the browser on real
+data: filters, facets, pagination, browser back, compare mode, document view and back.
+
+What the interface does (`wikisearch/web/static/`, plain HTML, CSS, JS, no build step):
+1. Search box, configuration selector, "Compare" toggle with a second selector.
+2. Results: rank, title (opens the document view), date, agencies, highlighted snippet,
+   category tags, thumbnail, muted "not published"; "N results in X ms".
+3. Left column: date range, "Published only", category and source checkboxes with counts from
+   `/api/facets`, "Clear filters". Every change reruns the search from page 1.
+4. Previous / next. `search()` does not count all matches, so "next" is enabled when a column
+   filled the page (10 hits).
+5. Document view `#/doc/<id>`: title, date, body, categories, sources with links (foreign ones
+   marked), linked Wikipedia entities (links to it.wikipedia.org), link to the original page.
+6. Compare mode: same query, filters and page, two configurations in two columns with ranks.
+   The second column defaults to `knn` (lexical against semantic is E3).
+7. All the state is in the query string (`q`, `config`, `compare`, `config2`, `page`,
+   `date_from`, `date_to`, repeated `category` and `agency`, `published`): a demo query opens
+   from a link and the browser's back button works. The document view uses the hash, so the
+   results stay underneath and "back" does not search again.
+
+Decisions, and why:
+1. Facet counts depend on the query and the configuration's index, not on the active filters
+   (the endpoint has no filter parameters, as in the contract): the counts say how much each
+   value would give for this query. They also count every document matching **any** query word
+   (BM25 `multi_match` is an OR): "romano prodi" gives Europa 505. Worth saying in the demo.
+2. A checked value stays in the list even when it leaves the top buckets, so it can be unchecked.
+3. Responses of an older request are dropped (filters clicked quickly cannot overwrite newer
+   results).
+4. The 501 message of `/api/search` no longer suggests fake mode: "configuration not available
+   yet (...)".
+
+Noted from Daniel's 15:05 entry, for F5: "disastro in una miniera" is not a BM25 failure
+(`bm25-italian` finds the mine explosions through "miniera"); the demo's "knn wins" query must
+share no word with the article.
+
+Nothing changes for the others. Next: F4 (knn, hybrid RRF, published boost), target Tuesday 11:00.
 
 ### 16 Nov 2026 15:05, Daniel: D7 first draft of Daniel's slides
 

@@ -130,7 +130,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   Done when every BM25 configuration of E1 and E2 runs.
 - [x] **F2, Mon 16.** Web API (contracts section 4) with FastAPI: search, document, facets,
   configs. Highlighted snippets from Elasticsearch.
-- [ ] **F3, Mon 16 (on fake data) - Tue 17 morning.** Web UI (`wikisearch/web/static/`): search box, result list (title, date,
+- [x] **F3, Mon 16 (on fake data) - Tue 17 morning.** Web UI (`wikisearch/web/static/`): search box, result list (title, date,
   snippet, categories, source agencies, image), filters (date range, category, agency,
   published), pagination, document page, **compare mode** (two configurations side by side,
   useful in the demo to show E3). Plain HTML, CSS and JS served by FastAPI: no build step.
