@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` added (16:35, issue #6); F5 work in progress (16 Nov 17:00): demo script `docs/demo.md` and screenshots `results/demo/` pushed, rehearsal on Daniel's laptop missing; next: F6 slides, then the rehearsal |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` added (16:35, issue #6); F5 work in progress (16 Nov 16:55): demo script `docs/demo.md` and screenshots `results/demo/` pushed, rehearsal on Daniel's laptop missing; next: F6 slides, then the rehearsal |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; next: G3 (30 manual queries, guidelines, pool, judging tool) |
 
 How to get the dump (not in git): download
@@ -62,7 +62,7 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
-### 16 Nov 2026 17:00, Fabio: F5 demo script and screenshots (work in progress)
+### 16 Nov 2026 16:55, Fabio: F5 demo script and screenshots (work in progress)
 
 F5 work in progress: `docs/demo.md` and the fallback screenshots in `results/demo/` are pushed;
 F5 is not ticked because the plan asks for a rehearsal on Daniel's laptop (issue opened to
