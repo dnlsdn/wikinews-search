@@ -56,6 +56,16 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026, Daniel: faster timeline
+
+The team wants to finish earlier than the official deadline. New target: **code freeze Tuesday
+17 at 20:00, delivery Wednesday 18 by 14:00**; Thursday is only a safety margin. Every step in
+`PLAN.md` and in the briefs has a new date and time ("Timeline" in `PLAN.md`): sample Monday
+15:00, full indices Monday 19:00, embeddings Monday night, vector search Tuesday 11:00, pool
+Tuesday 12:00, judgments Tuesday 12:00-15:00, slide content Tuesday 22:00, deck Wednesday 11:00.
+If on Tuesday at 18:00 something essential is missing, the group decides whether to move the
+freeze to Wednesday 12:00. Stretch items are dropped first.
+
 ### 16 Nov 2026, Daniel: aligned with the course
 
 Added `docs/course.md`: what the course and the professor expect, in our words, with references

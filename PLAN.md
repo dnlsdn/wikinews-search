@@ -2,8 +2,10 @@
 
 Homework 4 of Ingegneria dei Dati (prof. Merialdo): a web search engine over the Italian Wikinews
 dump, a test strategy that compares design choices (ablation study), a 20 minute presentation with
-a live demo. **Deadline: Thursday 19 November 2026, 18:00** (presentation uploaded through the course
-form). Presentations in class on Friday 20.
+a live demo. Official deadline: Thursday 19 November 2026, 18:00 (presentation uploaded through
+the course form; presentations in class on Friday 20). **Team target (decided 16 Nov): code
+freeze Tuesday 17 at 20:00, delivery Wednesday 18 by 14:00.** Thursday is only a safety margin:
+do not plan work on it.
 
 What the course expects, in detail, with references to the slides: `docs/course.md`. Read it.
 
@@ -36,7 +38,7 @@ must run on both systems (rules in `CLAUDE.md`). The live demo and the presentat
 
 1. The only hard dependency is the corpus: search and evaluation need documents. Daniel's first
    job is therefore a **sample** (`data/sample/docs.sample.jsonl`, about 300 pages) pushed within
-   the first afternoon, and the parser and indexer the same evening. Until then Fabio builds the
+   Monday by 15:00, and the full parser and indexer the same evening. Until then Fabio builds the
    interface on fake data and Gioia the metrics, which need no documents.
 2. Every design choice to compare is a **named configuration** (`wikisearch/search/configs.py`).
    The person who implements a choice exposes it as a configuration; Gioia's runner evaluates all
@@ -56,8 +58,8 @@ the briefing.
 | shared embeddings (D4) | Daniel | Fabio, Gioia | reindex with vectors; Fabio starts F4 |
 | BM25 search (F1) | Fabio | Gioia | run the runner on BM25 configurations |
 | vector and hybrid search (F4) | Fabio | Gioia | do the pooling (G3) |
-| draft of the 30 manual queries (G3) | Gioia | Daniel, Fabio | review them by Tuesday evening, before pooling |
-| judging assignments and tool (G3) | Gioia | Daniel, Fabio | judge on Wednesday morning (G4) |
+| draft of the 30 manual queries (G3) | Gioia | Daniel, Fabio | review them by Tuesday 10:00, before pooling |
+| judging assignments and tool (G3) | Gioia | Daniel, Fabio | judge on Tuesday between 12:00 and 15:00 (G4) |
 | official results and figures (G5, G6) | Gioia | Daniel, Fabio | write their slides with the final numbers |
 | slide content (D7, F6, G6) | everyone | Daniel | build the deck |
 
@@ -95,73 +97,73 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 
 ### Daniel: data and indexing
 
-- [ ] **D1, Mon 16.** Elasticsearch running locally with `docker compose up -d` (single node, 1 GB
+- [ ] **D1, Mon 16 now.** Elasticsearch running locally with `docker compose up -d` (single node, 1 GB
   heap, no Kibana; the laptop has 8 GB). Done when `curl localhost:9200` answers and the README
   says how.
-- [ ] **D2, Mon 16.** Parser `wikisearch/ingest/parse.py`: dump -> `data/processed/docs.jsonl`
+- [ ] **D2, Mon 16 (sample by 15:00).** Parser `wikisearch/ingest/parse.py`: dump -> `data/processed/docs.jsonl`
   following `docs/contracts.md` section 1 (dedupe the 25 double pages, date extraction, clean
   categories, sources and agencies, entities, body without "Fonti", `published`, `series_key`).
   Commit `data/sample/docs.sample.jsonl` (about 300 pages, mixed: news, sport tables, lottery,
   specials). Done when the sample is pushed and the parser reports coverage numbers (pages, dated
   pages, pages with sources).
-- [ ] **D3, Mon 16 evening.** Indexer `wikisearch/ingest/index.py`: creates `wikinews-standard`
+- [ ] **D3, Mon 16 by 19:00.** Indexer `wikisearch/ingest/index.py`: creates `wikinews-standard`
   and `wikinews-italian` with the mapping of section 2 and bulk-loads the corpus, measuring time
   and size. Accepts `--input` so the sample can be indexed too. Done when both indices hold all
   documents and the numbers are in `results/indexing.csv`.
-- [ ] **D4, Tue 17.** Embeddings: `wikisearch/ingest/embed.py` computes e5-small vectors for all
+- [ ] **D4, Mon 16 night.** Embeddings: `wikisearch/ingest/embed.py` computes e5-small vectors for all
   documents into `data/shared/embeddings.npy` (committed, about 17 MB, so nobody else has to
   compute them) and the indexer loads them into `embedding`. Done when a `knn` query returns
   sensible neighbours for a few test articles.
-- [ ] **D5, Tue 17.** `sources_text` field for E4, any further analyzer variant worth testing.
-- [ ] **D6, Wed 18.** Data report for the slides: counts, cleaning decisions with numbers,
+- [ ] **D5, Tue 17 morning.** `sources_text` field for E4, any further analyzer variant worth testing.
+- [ ] **D6, Tue 17 afternoon.** Data report for the slides: counts, cleaning decisions with numbers,
   examples of hard pages (`results/data_report.md`).
-- [ ] **D7, Wed 18 - Thu 19.** Own slides (challenges of the data, indexing choices) in
+- [ ] **D7, Tue 17 evening - Wed 18 morning.** Own slides (challenges of the data, indexing choices) in
   `slides/daniel.md`; assembly of the whole deck from the three files; cover with names,
   institutional emails and the repository link (the professor asked for emails in homework 3);
   repository made public before the upload.
 
 ### Fabio: search and interface
 
-- [ ] **F1, Mon 16 - Tue 17.** `wikisearch/search/`: `search()` with BM25 configurations over
+- [ ] **F1, Mon 16 evening.** `wikisearch/search/`: `search()` with BM25 configurations over
   `multi_match` (fields and weights from the configuration) and the filters of `Filters`. Until
   D3 is done, index the sample with `python -m wikisearch.ingest.index --input data/sample/...`.
   Done when every BM25 configuration of E1 and E2 runs.
-- [ ] **F2, Tue 17.** Web API (contracts section 4) with FastAPI: search, document, facets,
+- [ ] **F2, Mon 16.** Web API (contracts section 4) with FastAPI: search, document, facets,
   configs. Highlighted snippets from Elasticsearch.
-- [ ] **F3, Tue 17.** Web UI (`wikisearch/web/static/`): search box, result list (title, date,
+- [ ] **F3, Mon 16 (on fake data) - Tue 17 morning.** Web UI (`wikisearch/web/static/`): search box, result list (title, date,
   snippet, categories, source agencies, image), filters (date range, category, agency,
   published), pagination, document page, **compare mode** (two configurations side by side,
   useful in the demo to show E3). Plain HTML, CSS and JS served by FastAPI: no build step.
-- [ ] **F4, Tue 17.** kNN configuration (query embedded with `EMBEDDING_MODEL`) and hybrid with
+- [ ] **F4, Tue 17 by 11:00.** kNN configuration (query embedded with `EMBEDDING_MODEL`) and hybrid with
   reciprocal rank fusion computed in Python (k=60, parameters in the configuration); boost on
   `published` (E5). Stretch: collapse on `series_key` (E7).
-- [ ] **F5, Wed 18.** Demo script: 5-6 queries that show the features and the differences between
+- [ ] **F5, Tue 17 afternoon.** Demo script: 5-6 queries that show the features and the differences between
   configurations; screenshots as a fallback if the live demo fails in class. The demo runs on
   Daniel's laptop: rehearse it there.
-- [ ] **F6, Wed 18 - Thu 19.** Own slides (retrieval choices) in `slides/fabio.md`, and the demo.
+- [ ] **F6, Tue 17 evening.** Own slides (retrieval choices) in `slides/fabio.md`, and the demo.
 
 ### Gioia: evaluation
 
-- [ ] **G1, Mon 16.** `evaluation/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
+- [ ] **G1, Mon 16 now.** `evaluation/metrics.py`: P@k, R@k, MRR, AP, nDCG@k from TREC qrels and runs, with
   unit tests on hand-computed examples (`tests/`). `evaluation/significance.py`: paired randomization
   test.
-- [ ] **G2, Mon 16 - Tue 17.** `fonti` test set (`evaluation/build_fonti.py`): one query per source
+- [ ] **G2, Mon 16 evening.** `fonti` test set (`evaluation/build_fonti.py`): one query per source
   title, relevant document = the article. Drop titles in foreign languages, titles under 4 words,
   generic titles that occur for many articles (e.g. "Risultati Serie A"), duplicates. Store the
   word overlap between query and article title in `meta` (to split results into easy and
   paraphrase queries). Keep a fixed random sample of 1000 queries (seed in the script). Start on
   the sample, rerun on the full corpus.
-- [ ] **G3, Tue 17.** `manual` test set: 30 queries in four types: topical ("terremoto in
+- [ ] **G3, Mon 16 (queries and tool) - Tue 17 by 12:00 (pooling).** `manual` test set: 30 queries in four types: topical ("terremoto in
   Abruzzo"), entity ("Romano Prodi"), time-bound ("elezioni 2008"), vague or paraphrased
   ("disastro in una miniera"). Pooling: top 10 of the five configurations of E1, E3 and E5,
   merged and shuffled, one file per judge; grades 0 (not relevant), 1 (partly), 2 (relevant),
   given with a small terminal tool (`python -m evaluation.judge`), with written guidelines in
   `evaluation/testsets/manual/GUIDELINES.md`.
-- [ ] **G4, Wed 18 morning.** Judgments: all three judge (about one hour each, about 300
+- [ ] **G4, Tue 17, 12:00-15:00.** Judgments: all three judge (about one hour each, about 300
   judgments per person; 10 queries judged by two people to measure agreement).
-- [ ] **G5, Wed 18.** `evaluation/run.py`: runs every configuration on every test set, writes runs,
+- [ ] **G5, Mon 16 (runner on BM25) - Tue 17 20:00 (official run).** `evaluation/run.py`: runs every configuration on every test set, writes runs,
   metrics CSV, significance tests and latency; one command reproduces all numbers.
-- [ ] **G6, Wed 18 - Thu 19.** Tables and plots for the slides (`results/figures/`), reading of
+- [ ] **G6, Tue 17 evening.** Tables and plots for the slides (`results/figures/`), reading of
   the results, own slides (test strategy, results) in `slides/gioia.md`.
 
 ## Slides
@@ -170,8 +172,8 @@ The presentation is in Italian, about 20 minutes: about 6 minutes each, Fabio's 
 his time. No code on the slides. Sober style, not "AI style" (as in homework 2: label plus one
 line, figures and tables carry the content).
 
-Each person writes the content of their slides in `slides/<name>.md`, in Italian, by **Wednesday
-18, 22:00**, with this structure for every slide:
+Each person writes the content of their slides in `slides/<name>.md`, in Italian, by **Tuesday
+17, 22:00**, with this structure for every slide:
 
 ```markdown
 ## Slide N: <title>
@@ -182,16 +184,24 @@ Note del relatore: <what to say, a few sentences>
 
 Order: Daniel (the data and its challenges, indexing choices), Fabio (retrieval choices, demo),
 Gioia (test strategy, results, conclusions). Daniel builds the deck from the three files on
-Thursday morning.
+Wednesday morning.
 
 ## Timeline
 
 | When | Milestone |
 |---|---|
-| Mon 16 evening | Elasticsearch up, sample and full corpus indexed, metrics module ready |
-| Tue 17 evening | all configurations searchable, web UI usable, both test sets built, pool ready |
-| Wed 18, 13:00 | judgments done (each person blocks about one hour in the morning) |
-| Wed 18, 20:00 | **code freeze**: all experiments run, numbers final |
-| Wed 18, 22:00 | slide content of each person in `slides/` |
-| Thu 19, 12:00 | deck complete; rehearsal with timing (about 6 minutes each), demo on Daniel's laptop |
-| Thu 19, 16:00 | README final, repository made public, PDF and pptx uploaded (2 hours of margin) |
+| Mon 16, 15:00 | sample pushed (Daniel); metrics module ready (Gioia); web app running on fake data (Fabio) |
+| Mon 16, 19:00 | full corpus parsed and indexed on every laptop; BM25 search and `fonti` test set |
+| Mon 16, night | embeddings pushed (Daniel); 30 manual queries drafted and judging tool ready (Gioia) |
+| Tue 17, 10:00 | queries reviewed by Daniel and Fabio |
+| Tue 17, 11:00 | vector and hybrid search pushed (Fabio) |
+| Tue 17, 12:00 | pool ready (Gioia) |
+| Tue 17, 15:00 | judgments done (each person blocks one hour between 12:00 and 15:00) |
+| Tue 17, 20:00 | **code freeze**: official run, numbers final |
+| Tue 17, 22:00 | slide content of each person in `slides/` |
+| Wed 18, 11:00 | deck complete; rehearsal with timing (about 6 minutes each), demo on Daniel's laptop |
+| Wed 18, 14:00 | README final, repository made public, PDF and pptx uploaded |
+
+If on Tuesday at 18:00 something essential is missing, the group decides together whether to move
+the code freeze to Wednesday 12:00 and the delivery to Wednesday evening. Stretch items (E7, E8)
+are dropped first.

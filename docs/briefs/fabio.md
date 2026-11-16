@@ -4,16 +4,17 @@ You are helping **Fabio Massimo Di Marco** (GitHub `fmdimarco`). Fabio owns retr
 interface: `wikisearch/search/` and `wikisearch/web/`. He presents the retrieval choices and runs
 the live demo. Read `CLAUDE.md`, `STATE.md`, `PLAN.md` and `docs/contracts.md` before this file.
 
-Deadline for everything in this brief: **Wednesday 18 November, 20:00** (code freeze).
+Deadline for everything in this brief: **Tuesday 17 November, 20:00** (code freeze). Exact
+times per step in `PLAN.md` ("Timeline"): the team works fast, check them.
 
 ## What the other two give you, and when
 
 | From | What | Expected | How you know |
 |---|---|---|---|
-| Daniel | `data/sample/docs.sample.jsonl` (about 300 pages) and `python -m wikisearch.ingest.index --input <file>` | Mon 16 afternoon | log entry D2/D3 in `STATE.md` |
-| Daniel | full indices `wikinews-standard`, `wikinews-italian` | Mon 16 evening | log entry D3 |
-| Daniel | `embedding` field filled | Tue 17 | log entry D4 |
-| Gioia | `evaluation/run.py` that calls your `search()` | Wed 18 | log entry G5 |
+| Daniel | `data/sample/docs.sample.jsonl` (about 300 pages) and `python -m wikisearch.ingest.index --input <file>` | Mon 16, 15:00 | issue `for:fabio`, log entries D2/D3 in `STATE.md` |
+| Daniel | full parser and indexer | Mon 16, 19:00 | issue `for:fabio`, log entry D3 |
+| Daniel | shared embeddings (`embedding` field after reindexing) | Mon 16, night | issue `for:fabio`, log entry D4 |
+| Gioia | `evaluation/run.py` that calls your `search()` | Mon 16 - Tue 17 | log entry G5 |
 
 Everybody indexes on their own laptop: the dump is downloaded by each person (README), Daniel's
 scripts build the indices locally. If a step you need is not pushed yet, do the next step in the
@@ -130,7 +131,7 @@ Files: `wikisearch/search/__init__.py` (keep the `search()` signature), helpers 
 6. Done when `knn`, `hybrid-rrf` and `hybrid-rrf-published` run from the CLI and in the UI,
    including compare mode.
 
-## Step F5: demo (Wednesday)
+## Step F5: demo (Tuesday afternoon)
 
 1. `docs/demo.md`: 5-6 queries in the order you will run them, each with what to show and the
    sentence to say. Cover: a plain topical query, a filter by date and agency, a query where
@@ -138,13 +139,13 @@ Files: `wikisearch/search/__init__.py` (keep the `search()` signature), helpers 
    query that shows near-duplicates, a non-published page.
 2. Screenshots of each step in `results/demo/` as a fallback if the live demo fails in class.
 3. The demo runs on **Daniel's laptop** (macOS, 8 GB), not on Fabio's: rehearse it there at
-   least once on Wednesday or Thursday morning. Before class: Elasticsearch started, the web app
+   least once, on Tuesday afternoon or Wednesday morning. Before class: Elasticsearch started, the web app
    started, each demo query run once (the first query loads the embedding model, a few seconds),
    other heavy apps closed.
 
 ## Step F6: slides and README
 
-1. `slides/fabio.md`, in Italian, with the structure in `PLAN.md` ("Slides"), by Wednesday 22:00:
+1. `slides/fabio.md`, in Italian, with the structure in `PLAN.md` ("Slides"), by Tuesday 22:00:
    the retrieval choices (BM25 fields and weights, why vectors, why RRF, filters and facets) with
    the numbers from Gioia's results, then the demo.
 2. The "Usage" subsection of `README.md` for the web app (start, open, configurations).

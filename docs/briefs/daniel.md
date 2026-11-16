@@ -6,8 +6,9 @@ choices, and assembles the deck. Read `CLAUDE.md`, `STATE.md`, `PLAN.md` and `do
 before this file. Daniel's Mac has 8 GB of RAM and little free disk: check `df -h ~` before large
 downloads and never run the embedding job while other heavy processes run.
 
-His work is the bottleneck of the first day: Fabio and Gioia wait for the sample (D2) and the
-indices (D3). Push those first, polish later.
+His work is the bottleneck of the first day: Fabio and Gioia wait for the sample (D2, by Monday
+15:00) and the indices (D3, by 19:00). Push those first, polish later. Embeddings (D4) Monday
+night, so Fabio can do the vector search on Tuesday morning.
 
 ## Step D1: Elasticsearch
 
@@ -93,7 +94,7 @@ section 2), otherwise Elasticsearch may choose a quantized structure by default.
    for accents) as `wikinews-italian-folding`, added to `ANALYZER_VARIANTS` with a "Contract
    changes" entry.
 
-## Step D6: data report (Wednesday)
+## Step D6: data report (Tuesday afternoon)
 
 `results/data_report.md`: the challenges of the data with numbers and one real example each
 (date hidden in a template, maintenance categories, inconsistent agency names, near-duplicate
@@ -101,9 +102,9 @@ series, non-published pages, leakage of the sources). It is the base of Daniel's
 
 ## Step D7: slides, README, publication
 
-1. `slides/daniel.md` by Wednesday 22:00 (structure in `PLAN.md`, "Slides"): the data and its
+1. `slides/daniel.md` by Tuesday 22:00 (structure in `PLAN.md`, "Slides"): the data and its
    challenges, the indexing choices.
-2. Thursday morning: build the deck from `slides/daniel.md`, `fabio.md`, `gioia.md`. Italian,
+2. Wednesday morning (deck ready by 11:00, upload by 14:00): build the deck from `slides/daniel.md`, `fabio.md`, `gioia.md`. Italian,
    sober style (not "AI style"), no code. Cover with the three names, institutional emails and
    the repository link.
 3. README: setup verified from a fresh clone, "Usage" sections of the three parts merged.

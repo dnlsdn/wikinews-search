@@ -9,16 +9,17 @@ The professor grades this part most: he asked which datasets, which metrics, and
 support the design choices, like an ablation study. Every number on the slides must be
 reproducible with one command.
 
-Deadline: all numbers final by **Wednesday 18 November, 20:00** (code freeze).
+Deadline: all numbers final by **Tuesday 17 November, 20:00** (code freeze). Exact times per
+step in `PLAN.md` ("Timeline"): the team works fast, check them.
 
 ## What the other two give you, and when
 
 | From | What | Expected | How you know |
 |---|---|---|---|
-| Daniel | `data/sample/docs.sample.jsonl`, then the full `data/processed/docs.jsonl` (built locally with his parser) | Mon 16 afternoon / evening | log entries D2, D3 in `STATE.md` |
-| Daniel | indices on your laptop with `python -m wikisearch.ingest.index` | Mon 16 evening | log entry D3 |
-| Fabio | `search(query, config, k, filters)` working for BM25 | Tue 17 | log entry F1 |
-| Fabio | `knn` and hybrid configurations | Tue 17 evening | log entry F4 |
+| Daniel | `data/sample/docs.sample.jsonl`, then the full `data/processed/docs.jsonl` (built locally with his parser) | Mon 16, 15:00 / 19:00 | issue `for:gioia`, log entries D2, D3 in `STATE.md` |
+| Daniel | indices on your laptop with `python -m wikisearch.ingest.index` | Mon 16, 19:00 | issue `for:gioia`, log entry D3 |
+| Fabio | `search(query, config, k, filters)` working for BM25 | Mon 16 evening | issue `for:gioia`, log entry F1 |
+| Fabio | `knn` and hybrid configurations | Tue 17, 11:00 | issue `for:gioia`, log entry F4 |
 
 If a step you need is not pushed yet, do the next step in the order below that does not need it,
 and say so in the log. G1 and the query writing of G3 need nothing.
@@ -136,7 +137,7 @@ of the whole first page, with graded judgments.
    Assignment: the 30 queries split in three parts of 10; queries 1-10 are also given to a
    second judge, to measure agreement.
    **Do the pooling only after Fabio's F4 is pushed** (otherwise the documents found only by
-   `knn` are never judged and the comparison is unfair). If F4 is not there by Tuesday 22:00,
+   `knn` are never judged and the comparison is unfair). If F4 is not there by Tuesday 12:00,
    pool without the vector configurations, and write it in the log as a limit.
 4. Workload: expect about 20-25 documents per query after deduplication, so about 300 judgments
    per person. Judge from title and lead, opening the article only when in doubt (about 10
@@ -154,7 +155,7 @@ of the whole first page, with graded judgments.
 6. Done when the three assignment files and the tool are pushed and each person has judged two
    documents as a test.
 
-## Step G4: judgments (Wednesday 18 by 13:00)
+## Step G4: judgments (Tuesday 17, 12:00-15:00)
 
 1. Each person runs the judging tool and pushes their `judgments/<name>.tsv` (each file is
    written by one person only, so no conflicts).
@@ -190,7 +191,7 @@ reproduces every number.
 5. Warm up before timing (run 20 queries and discard them), and run the timing with nothing else
    heavy open.
 6. During development use `--dev` (the 1000-query subset of `fonti`). **Official run**
-   (Wednesday, by 20:00), on all the queries: `git pull`, rebuild the data and the indices
+   (Tuesday, by 20:00), on all the queries: `git pull`, rebuild the data and the indices
    (`python -m wikisearch.ingest.parse`, then `python -m wikisearch.ingest.index`), run
    `python -m evaluation.run`, commit `results/metrics/`, `results/summary.md` and the figures.
    Write in the log the machine used (model, RAM) next to the latencies. Runs (`results/runs/`)
@@ -198,7 +199,7 @@ reproduces every number.
 7. `results/summary.md`: generated tables, one per experiment, with a one-line reading each.
 8. Done when one command produces everything above on the full corpus.
 
-## Step G6: figures and reading of the results (Wednesday)
+## Step G6: figures and reading of the results (Tuesday evening)
 
 1. `evaluation/figures.py` (matplotlib is already a dependency) writes PNGs into
    `results/figures/`: E3 bars of MRR@10 per bucket (low/mid/high overlap) for BM25, kNN and
@@ -213,7 +214,7 @@ reproduces every number.
 
 ## Slides and README
 
-1. `slides/gioia.md`, in Italian, with the structure in `PLAN.md` ("Slides"), by Wednesday
+1. `slides/gioia.md`, in Italian, with the structure in `PLAN.md` ("Slides"), by Tuesday
    22:00: the test strategy (the two test sets, how they were built, the funnel, the metrics,
    significance), the results per experiment with the figures, the limits, the conclusions.
 2. The "Usage" subsection of `README.md` for the evaluation (how to rebuild the test sets, how to
