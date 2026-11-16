@@ -62,6 +62,14 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026 15:56, Gioia: commit messages without step codes
+
+Decided by Gioia: her commit messages no longer contain the plan's step codes (G1, G2, "wip"),
+because GitHub shows the last commit message next to every file. The step stays in the log title
+and in `PLAN.md`. Pushed commits are not rewritten (no force-push on `main`); the docstrings of
+`build_fonti.py`, `judge.py`, `pool.py` and of their tests no longer name the step either. No code
+change, nothing changes for the others.
+
 ### 16 Nov 2026 15:50, Gioia: G3 judging tool, pooling script, guidelines (work in progress)
 
 G3 in progress. Pushed what does not depend on the 30 queries; the queries are being written by
