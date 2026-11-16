@@ -13,7 +13,7 @@ Status: in progress. See `PLAN.md` and `STATE.md`.
 1. Docker Desktop (Elasticsearch runs in a container with a 1 GB heap; give Docker at least 3 GB
    of memory). On Windows Docker Desktop needs WSL 2.
 2. [uv](https://docs.astral.sh/uv/): it installs Python 3.12 by itself.
-3. git, with access to GitHub (for example GitHub CLI and `gh auth login`).
+3. git and GitHub CLI (`gh auth login`), with access to the repository.
 4. About 5 GB of free disk for the Docker image, the dump, the index and the embedding model.
 
 ## Setup

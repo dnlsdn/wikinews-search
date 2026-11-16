@@ -49,11 +49,34 @@ Analysed on 16 Nov 2026 before writing the plan.
 
 None yet.
 
-## Requests
+## Messages
 
-None yet.
+Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to the other
+sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026, Daniel: sessions talk to each other through GitHub issues
+
+The three Claude Code sessions run on different laptops and accounts and cannot talk directly.
+Added a way for them to coordinate without the humans relaying every detail:
+
+1. **Messages = GitHub issues** with labels `for:daniel`, `for:fabio`, `for:gioia`, `blocker`,
+   `contract-change` (created on GitHub). Rules in `CLAUDE.md`, "Talking to the other sessions":
+   self-contained body, `Closes #n` in the commit that solves it, contract changes always as an
+   issue to the other two. Issues never conflict, unlike `STATE.md`; the old "Requests" section
+   is gone.
+2. **Session briefing**: `.claude/settings.json` has a SessionStart hook that runs
+   `scripts/briefing.py` (standard library only). Every session starts knowing who its user is,
+   whether the copy is behind GitHub, the latest log entries, the next step, and the open issues
+   for its user. It never blocks a session: on any error it prints what to read by hand.
+3. **Contract tests** in `tests/test_contracts.py`: sample documents, shared embeddings, test set
+   files and `search()` results are checked in everyone's `pytest` as soon as they exist, so a
+   push that breaks another part fails before it reaches the others.
+4. **Scope rules** in `CLAUDE.md`: only the brief and the issues, no unplanned features, stretch
+   items last, check the time against the timeline.
+5. **Handoffs** table in `PLAN.md`: who messages whom when a step unblocks someone.
+6. GitHub CLI is now required for everyone (`docs/briefs/README.md`).
 
 ### 16 Nov 2026, Daniel: second review of the plan before the start
 

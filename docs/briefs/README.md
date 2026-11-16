@@ -13,10 +13,14 @@ put in the log. The plan is in `PLAN.md`; the interfaces in `docs/contracts.md`.
 
 1. Accept the GitHub invitation to `dnlsdn/wikinews-search` (email from GitHub, or
    https://github.com/dnlsdn/wikinews-search/invitations).
-2. Make git able to read the private repository: install GitHub CLI and run `gh auth login`
-   (on Windows, Git Credential Manager also works: it opens the browser at the first clone).
+2. Install GitHub CLI (https://cli.github.com) and run `gh auth login` (GitHub.com, HTTPS,
+   login with the browser). It is **required**: git uses it to read the private repository, and
+   the Claude Code sessions use it to send each other messages as GitHub issues.
 3. `git clone https://github.com/dnlsdn/wikinews-search.git`
-4. Open Claude Code **inside** the `wikinews-search` folder, so it reads `CLAUDE.md`.
+4. Install `uv` (https://docs.astral.sh/uv/): the session briefing at startup runs with it.
+5. Open Claude Code **inside** the `wikinews-search` folder and accept when it asks whether to
+   trust the folder: that enables `CLAUDE.md` and the startup hook that prints the session
+   briefing.
 
 Installing Docker, uv and the dependencies is Step 0 of your brief: Claude guides you through it.
 
@@ -30,16 +34,19 @@ I am <NAME>, one of the three members of the team that builds this project (Dani
 Each of us works with a separate Claude Code session and you have no memory of previous sessions:
 the repository is our only shared memory.
 
-1. Run `git pull --rebase`.
+1. Check that the session briefing is in your context (printed at startup by
+   scripts/briefing.py); if not, run `uv run python scripts/briefing.py`. Run `git pull --rebase`.
 2. Read, in this order and completely: CLAUDE.md, STATE.md, PLAN.md, docs/contracts.md,
    docs/briefs/<name>.md.
-3. Tell me in a few lines: the state of the project, what the others have already pushed, my next
-   step according to my brief, and whether that step is blocked by something not pushed yet
-   (in that case, which step of my brief I can do meanwhile).
-4. Check my environment (Step 0 of my brief) and tell me what is missing.
-5. Then work on my next step following my brief exactly, explaining what you do as you go.
-   Stay inside my directories. Before every push follow the "Before every push" rules of
-   CLAUDE.md, including the log entry in STATE.md.
+3. Read every open GitHub issue addressed to me (`gh issue list --label for:<name>`).
+4. Tell me in a few lines: the state of the project, what the others have already pushed, the
+   issues for me, my next step according to my brief, and whether that step is blocked by
+   something not pushed yet (in that case, which step of my brief I can do meanwhile).
+5. Check my environment (Step 0 of my brief) and tell me what is missing.
+6. Then work on my next step following my brief exactly, explaining what you do as you go.
+   Stay inside my part and inside the plan ("Scope" in CLAUDE.md). Talk to the other sessions
+   only through GitHub issues, as CLAUDE.md says, and tell me about each one. Before every push
+   follow the "Before every push" rules of CLAUDE.md.
 
 Talk to me in Italian. Everything written in the repository stays in English.
 ```
@@ -47,10 +54,11 @@ Talk to me in Italian. Everything written in the repository stays in English.
 ## Every following session
 
 ```text
-I am <NAME>. Run `git pull --rebase`, reread CLAUDE.md, STATE.md (new log entries, requests,
-contract changes) and docs/briefs/<name>.md, tell me what changed since my last log entry and
-whether I must rebuild my local data or run `uv sync`, then continue from my next unticked step.
-Same rules as always (CLAUDE.md). Talk to me in Italian.
+I am <NAME>. Read the session briefing, run `git pull --rebase`, reread CLAUDE.md, STATE.md
+(new log entries, contract changes) and docs/briefs/<name>.md, and read the open issues for me.
+Tell me what changed since my last log entry, which issues need an answer, and whether I must
+rebuild my local data or run `uv sync`. Deal with the issues first, then continue from my next
+unticked step. Same rules as always (CLAUDE.md). Talk to me in Italian.
 ```
 
 ## When a session gets long

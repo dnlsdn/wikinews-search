@@ -13,7 +13,8 @@ instructions on GitHub.
 ## Team and ownership
 
 Each person owns a part of the system, the matching part of the presentation, and the directories
-below. Work outside your directories only after writing it in `STATE.md` ("Requests").
+below. If something outside your directories must change, open a GitHub issue for its owner
+(rules in `CLAUDE.md`, "Talking to the other sessions").
 
 | Person | GitHub | Part | Directories | Presentation |
 |---|---|---|---|---|
@@ -39,6 +40,24 @@ must run on both systems (rules in `CLAUDE.md`). The live demo and the presentat
    The person who implements a choice exposes it as a configuration; Gioia's runner evaluates all
    configurations with the same `search()` function the web app uses.
 3. Each experiment has an owner who implements the knob and Gioia who measures it (table below).
+
+## Handoffs
+
+The moments when one part unblocks another. Whoever completes the left column opens a GitHub
+issue to the person on the right (or comments on their open issue), so their session finds it in
+the briefing.
+
+| When this is pushed | By | Message to | So that they can |
+|---|---|---|---|
+| sample `docs.sample.jsonl` and indexer (D2, D3 on the sample) | Daniel | Fabio, Gioia | index the sample locally; Fabio starts F1, Gioia tries G2 on the sample |
+| full parser and indexer (D3) | Daniel | Fabio, Gioia | rebuild the full indices locally |
+| shared embeddings (D4) | Daniel | Fabio, Gioia | reindex with vectors; Fabio starts F4 |
+| BM25 search (F1) | Fabio | Gioia | run the runner on BM25 configurations |
+| vector and hybrid search (F4) | Fabio | Gioia | do the pooling (G3) |
+| draft of the 30 manual queries (G3) | Gioia | Daniel, Fabio | review them by Tuesday evening, before pooling |
+| judging assignments and tool (G3) | Gioia | Daniel, Fabio | judge on Wednesday morning (G4) |
+| official results and figures (G5, G6) | Gioia | Daniel, Fabio | write their slides with the final numbers |
+| slide content (D7, F6, G6) | everyone | Daniel | build the deck |
 
 ## Experiments (the ablation study)
 

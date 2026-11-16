@@ -94,7 +94,7 @@ File: `evaluation/build_fonti.py`, output `evaluation/testsets/fonti/queries.tsv
    count how many appear verbatim (normalised) in `title + lead + body`. A simulation on the raw
    dump (16 Nov) found about 4% even before the "Fonti" section, because some articles quote or
    reuse the headline: that is natural overlap, not leakage, and it is fine. A much higher share
-   means the parser leaked the sources: write it under "Requests" for Daniel.
+   means the parser leaked the sources: open an issue `for:daniel` with the examples.
 7. Expected size (simulation on the raw dump, 16 Nov, before the English-title rule): 17,190
    source templates, 7,318 queries after the filters, buckets low 2,969, mid 3,549, high 800;
    51 queries are identical to the article title. Your numbers should be close.
@@ -209,5 +209,5 @@ reproduces every number.
 ## What to write in the log
 
 For every push: what you built, how to run it, the numbers (funnel of the test set, kappa,
-metrics), what you noticed in the results, and anything you need from Daniel or Fabio under
-"Requests".
+metrics), what you noticed in the results, and the issues opened or closed. Anything you need
+from Daniel or Fabio goes in an issue addressed to them.
