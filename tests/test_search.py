@@ -7,7 +7,7 @@ localhost:9200 and the indices are built (otherwise they are skipped).
 import pytest
 
 from wikisearch.schema import Filters, Hit
-from wikisearch.search import search
+from wikisearch.search import _index, search
 from wikisearch.search.configs import CONFIGS
 from wikisearch.search import embed
 from wikisearch.search.es import boost_published, client, filters_to_es, knn_query, rrf_fuse, snippet
@@ -136,6 +136,21 @@ def test_empty_query_returns_nothing_without_calling_elasticsearch():
     assert search("governo", "bm25-italian", k=0) == []
 
 
+def test_e8_configurations_differ_from_knn_only_in_the_vector_index():
+    # E8 must measure the vector structure alone: everything else is the same as "knn"
+    for name, vector_index in [("knn-int8", "int8_hnsw"), ("knn-bbq", "bbq_hnsw")]:
+        cfg = dict(CONFIGS[name])
+        assert cfg.pop("vector_index") == vector_index
+        assert cfg == CONFIGS["knn"]
+
+
+def test_each_configuration_queries_its_own_index():
+    assert _index(CONFIGS["knn"]) == "wikinews-italian"
+    assert _index(CONFIGS["bm25-standard"]) == "wikinews-standard"
+    assert _index(CONFIGS["knn-int8"]) == "wikinews-italian-int8"
+    assert _index(CONFIGS["knn-bbq"]) == "wikinews-italian-bbq"
+
+
 # --- integration (Elasticsearch running, indices built) ----------------------------------------
 
 
@@ -192,6 +207,8 @@ def test_bm25_does_not_load_the_embedding_model(monkeypatch):
 @needs_es
 @pytest.mark.parametrize("config", VECTOR_CONFIGS)
 def test_every_vector_configuration_returns_hits(config):
+    if not client().indices.exists(index=_index(CONFIGS[config])):
+        pytest.skip(f"index {_index(CONFIGS[config])} not built on this laptop (E8 indices are optional)")
     hits = search("terremoto abruzzo", config, k=5)
     assert len(hits) == 5
     assert all(isinstance(h, Hit) and h.id and h.title for h in hits)

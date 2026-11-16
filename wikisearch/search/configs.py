@@ -8,6 +8,9 @@ Fields of a configuration:
   rrf_k      reciprocal rank fusion constant (hybrid)
   depth      how many hits each retriever returns before fusion (hybrid)
   boost_published  multiplicative boost for published pages (1.0 = none)
+  vector_index     vector structure of the index, a key of wikisearch.config.VECTOR_INDEX_TYPES
+                   (optional, default "hnsw"; the other values need their own indices, built with
+                   `python -m wikisearch.ingest.index --analyzers italian --vector-index ...`)
 """
 
 CONFIGS: dict[str, dict] = {
@@ -42,6 +45,9 @@ CONFIGS: dict[str, dict] = {
         "depth": 100,
         "boost_published": 1.5,
     },
+    # E8 (stretch): vector quantization, same as "knn" except the vector structure of the index
+    "knn-int8": {"analyzer": "italian", "mode": "knn", "vector_index": "int8_hnsw"},
+    "knn-bbq": {"analyzer": "italian", "mode": "knn", "vector_index": "bbq_hnsw"},
 }
 
 DEFAULT_CONFIG = "hybrid-rrf"

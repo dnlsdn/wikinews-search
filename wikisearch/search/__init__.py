@@ -37,11 +37,16 @@ def search(query: str, config: str, k: int = 10, filters: Filters | None = None)
     return hits[:k]
 
 
+def _index(cfg: dict) -> str:
+    """Index of a configuration: the analyzer variant and, for E8, the vector structure."""
+    return index_name(cfg["analyzer"], cfg.get("vector_index", "hnsw"))
+
+
 def _bm25(query: str, cfg: dict, size: int, filters: Filters | None) -> list[Hit]:
     from wikisearch.search import es
 
     resp = es.client().search(
-        index=index_name(cfg["analyzer"]),
+        index=_index(cfg),
         query=es.bm25_query(query, cfg, filters),
         highlight=es.HIGHLIGHT,
         source_includes=es.HIT_SOURCE,
@@ -56,7 +61,7 @@ def _knn(query: str, cfg: dict, size: int, filters: Filters | None) -> list[Hit]
     from wikisearch.search.embed import embed_query
 
     resp = es.client().search(
-        index=index_name(cfg["analyzer"]),
+        index=_index(cfg),
         knn=es.knn_query(embed_query(query), size, filters),
         source_includes=es.HIT_SOURCE,
         size=size,
