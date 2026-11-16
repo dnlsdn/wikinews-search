@@ -34,7 +34,12 @@ def mapping(analyzer: str, vector_index_type: str = "hnsw") -> dict:
     text = {"type": "text", "analyzer": analyzer}
     keyword = {"type": "keyword"}
     return {
-        "settings": {"number_of_shards": 1, "number_of_replicas": 0},
+        "settings": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            # the store size is cached for 10 s by default: measure the real size after the load
+            "store.stats_refresh_interval": "0s",
+        },
         "mappings": {
             "dynamic": "strict",  # a field not listed here is an error, not a silent new mapping
             "properties": {
@@ -123,7 +128,7 @@ def build_index(name: str, analyzer: str, docs: list[dict], vectors: dict | None
     if count != len(docs):
         raise RuntimeError(f"{name} holds {count} documents, expected {len(docs)}")
     size = es.indices.stats(index=name, metric="store")["indices"][name]["primaries"]["store"]["size_in_bytes"]
-    return {"index": name, "analyzer": analyzer, "documents": count, "embeddings": vectors is not None,
+    return {"timestamp": datetime.now().isoformat(timespec="seconds"), "index": name, "analyzer": analyzer, "documents": count, "embeddings": vectors is not None,
             "seconds": round(seconds, 2), "size_bytes": size}
 
 
@@ -139,7 +144,7 @@ def append_csv(rows: list[dict], input_path: Path) -> None:
                 shown = input_path.resolve().relative_to(config.ROOT).as_posix()
             except ValueError:
                 shown = input_path.name
-            writer.writerow({"timestamp": datetime.now().isoformat(timespec="seconds"), "input": shown, **row})
+            writer.writerow({"input": shown, **row})
 
 
 def main() -> None:

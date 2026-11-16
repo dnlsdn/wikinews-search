@@ -1,0 +1,7 @@
+timestamp,index,analyzer,input,documents,embeddings,seconds,size_bytes
+2026-11-16T13:52:45,wikinews-standard,standard,data/processed/docs.jsonl,12213,False,4.69,38158658
+2026-11-16T13:52:49,wikinews-italian,italian,data/processed/docs.jsonl,12213,False,3.84,35748930
+2026-11-16T13:52:53,wikinews-standard,standard,data/processed/docs.jsonl,12213,False,3.89,38158658
+2026-11-16T13:52:57,wikinews-italian,italian,data/processed/docs.jsonl,12213,False,3.87,35748930
+2026-11-16T13:53:01,wikinews-standard,standard,data/processed/docs.jsonl,12213,False,3.92,38158658
+2026-11-16T13:53:05,wikinews-italian,italian,data/processed/docs.jsonl,12213,False,3.82,35748930
