@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 done (16 Nov 14:02): full indices with vectors on Daniel's laptop, embeddings committed in `data/shared/`; next: D6 data report, then the D5 extras (E8 after F4) |
-| Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
+| Search and interface | Fabio | F1 done (16 Nov 14:40): BM25 `search()` with filters, highlights and published boost, CLI, web API on real data; next: F3b (full UI), then F4 (by Tue 11:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
 How to get the dump (not in git): download
@@ -55,6 +55,61 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 14:40, Fabio: F1 BM25 search
+
+Step F1 done: `search()` (contract section 3) works for every `bm25` configuration
+(`bm25-standard`, `bm25-italian`, `bm25-italian-title`, `bm25-italian-body`, `bm25-italian-flat`,
+`bm25-italian-leak`), so E1, E2 and E4 can be run. **Gioia: the runner can call it now** (issue
+opened). `knn` and `hybrid` raise `NotImplementedError` until F4 (Tuesday 11:00); this includes
+the default configuration `hybrid-rrf`, so in the web app pick a `bm25-*` configuration until then.
+
+How to run:
+- CLI: `uv run python -m wikisearch.search "terremoto abruzzo" --config bm25-italian` (options
+  `-k`, `--date-from`, `--date-to`, `--category` and `--agency` repeatable, `--published`);
+  prints rank, score, date, title.
+- Web app on real data (PowerShell): `Remove-Item Env:WIKISEARCH_FAKE` if set, then
+  `uv run uvicorn wikisearch.web.app:app --reload`; `/api/search`, `/api/facets` and `/api/doc`
+  checked on the full indices.
+- Tests: `uv run pytest -q tests/test_search.py` (8 unit tests, 8 integration tests skipped when
+  Elasticsearch is not running).
+- Local data on Fabio's laptop rebuilt after D2-D4 (`parse --no-sample`, `index --no-csv`): same
+  counts and sizes as Daniel's (12,213 docs, 57.4 MB and 54.9 MB); `--no-csv` so that Windows
+  timings do not mix with Daniel's rows in `results/indexing.csv`.
+
+How it works (`wikisearch/search/__init__.py`, `es.py`):
+1. Query: `bool.must = multi_match(best_fields, fields and weights of the configuration,
+   tie_breaker 0.3)`, `bool.filter = filters_to_es(filters)`. Filters are in `filter`, not in
+   `must`: they restrict the result set without changing the BM25 scores, so a filtered and an
+   unfiltered ranking are comparable (and Elasticsearch can cache them).
+2. `filters_to_es` (pure function): inclusive `range` on `date`, one `term` per category (all
+   must match), one `terms` on `agencies` (any), `term` on `published` when not None. No default
+   filter, as the contract requires.
+3. Snippet: highlight on `lead` and `body`, one fragment of 160 characters; the first lead
+   fragment, else the body fragment, else the first 200 characters of `lead`. Decision (not in
+   the brief): highlight `encoder: html` and the fallback escaped too, because the UI inserts the
+   snippet as HTML; the only markup in a snippet is `<em>`. Highlighting follows the searched
+   fields, so `bm25-italian-title` shows the plain start of the lead (nothing highlighted there).
+4. Only the fields of a `Hit` plus `lead` are fetched (`_source` includes), never `body` or
+   `embedding`.
+5. `boost_published` (none of the BM25 configurations uses it yet; E5 is on the hybrid): fetch
+   `max(k, depth)` hits, multiply published scores, re-sort with ties by id, cut to `k`. Pure
+   function with a hand-computed unit test, ready for F4.
+6. Unknown configuration: `ValueError`; empty query or `k <= 0`: `[]` without calling
+   Elasticsearch.
+
+Numbers (Fabio's Windows laptop, 16 GB, Elasticsearch heap 1 GB, warm, k=100, 8 queries x 3,
+highlight included): p50 / p95 latency `bm25-standard` 67 / 110 ms, `bm25-italian` 52 / 91 ms,
+`bm25-italian-flat` 76 / 83 ms. Indicative only: the official E6 latencies are Gioia's.
+
+Observation for E1 and the slides: "terremoto abruzzo" with `bm25-italian` ranks "Sisma in
+Abruzzo: la lista con i dati dei terremoti" 3rd (the stemmer makes terremoti = terremoto); with
+`bm25-standard` it is not in the top 5. With `bm25-italian-body` the top 5 changes completely
+(the title is the strongest signal for news).
+
+Issues: commented #3 and #4 (read, data rebuilt; left open because they are also for Gioia);
+opened one for Gioia (F1 handoff). Next: F3b (filters, pagination, document view, compare mode),
+then F4.
 
 ### 16 Nov 2026 14:15, Daniel: order of the remaining data steps
 

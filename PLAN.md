@@ -124,7 +124,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 
 ### Fabio: search and interface
 
-- [ ] **F1, Mon 16 evening.** `wikisearch/search/`: `search()` with BM25 configurations over
+- [x] **F1, Mon 16 evening.** `wikisearch/search/`: `search()` with BM25 configurations over
   `multi_match` (fields and weights from the configuration) and the filters of `Filters`. Until
   D3 is done, index the sample with `python -m wikisearch.ingest.index --input data/sample/...`.
   Done when every BM25 configuration of E1 and E2 runs.
