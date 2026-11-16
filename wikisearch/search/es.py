@@ -80,6 +80,39 @@ def bm25_query(query: str, cfg: dict, filters: Filters | None) -> dict:
     }
 
 
+def knn_query(vector: tuple[float, ...] | list[float], k: int, filters: Filters | None) -> dict:
+    """Approximate nearest neighbours on `embedding` (HNSW, cosine).
+
+    num_candidates is how many neighbours each shard examines before keeping the best k: larger
+    is more accurate and slower. The filters are applied inside the search (not after it), so a
+    filtered query still returns k hits when k matching documents exist.
+    """
+    query = {
+        "field": "embedding",
+        "query_vector": list(vector),
+        "k": k,
+        "num_candidates": max(100, 10 * k),
+    }
+    clauses = filters_to_es(filters)
+    if clauses:
+        query["filter"] = clauses
+    return query
+
+
+def rrf_fuse(rankings: list[list[str]], k: int) -> list[tuple[str, float]]:
+    """Reciprocal rank fusion: score(d) = sum over the lists of 1 / (k + rank of d), ranks from 1.
+
+    A document missing from a list gets nothing from it. Only ranks are used, never the original
+    scores, which are on different scales (BM25 unbounded, cosine compressed in 0.9-0.96 with e5).
+    Best first; equal scores are broken by document id, so the order is deterministic.
+    """
+    scores: dict[str, float] = {}
+    for ranking in rankings:
+        for rank, doc_id in enumerate(ranking, 1):
+            scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank)
+    return sorted(scores.items(), key=lambda item: (-item[1], item[0]))
+
+
 def snippet(highlight: dict | None, lead: str | None) -> str:
     """First highlighted fragment (lead, then body); otherwise the start of the lead, escaped."""
     for field in ("lead", "body"):

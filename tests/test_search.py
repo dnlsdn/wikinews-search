@@ -9,9 +9,11 @@ import pytest
 from wikisearch.schema import Filters, Hit
 from wikisearch.search import search
 from wikisearch.search.configs import CONFIGS
-from wikisearch.search.es import boost_published, client, filters_to_es, snippet
+from wikisearch.search import embed
+from wikisearch.search.es import boost_published, client, filters_to_es, knn_query, rrf_fuse, snippet
 
 BM25_CONFIGS = [name for name, cfg in CONFIGS.items() if cfg["mode"] == "bm25"]
+VECTOR_CONFIGS = [name for name, cfg in CONFIGS.items() if cfg["mode"] in ("knn", "hybrid")]
 
 
 # --- filters_to_es -----------------------------------------------------------------------------
@@ -81,6 +83,46 @@ def test_boost_reorders_and_cuts_to_k():
     assert hits[1].score == 8  # the input is not modified
 
 
+# --- rrf_fuse -----------------------------------------------------------------------------------
+
+
+def test_rrf_fuse_hand_computed_example():
+    # k = 60. BM25 ranks a, b, c; kNN ranks c, a, d.
+    #   a: 1/61 + 1/62 = 0.032522   (1st and 2nd)
+    #   c: 1/63 + 1/61 = 0.032266   (3rd and 1st)
+    #   b: 1/62        = 0.016129   (2nd, BM25 only)
+    #   d: 1/63        = 0.015873   (3rd, kNN only)
+    fused = rrf_fuse([["a", "b", "c"], ["c", "a", "d"]], k=60)
+    assert [doc for doc, _ in fused] == ["a", "c", "b", "d"]
+    assert fused[0][1] == pytest.approx(1 / 61 + 1 / 62)
+    assert fused[1][1] == pytest.approx(1 / 63 + 1 / 61)
+    assert fused[2][1] == pytest.approx(1 / 62)
+    assert fused[3][1] == pytest.approx(1 / 63)
+
+
+def test_rrf_fuse_breaks_ties_by_id_and_handles_empty_lists():
+    # x is 1st in one list, y is 1st in the other: same score, x before y by id
+    assert [doc for doc, _ in rrf_fuse([["y"], ["x"]], k=60)] == ["x", "y"]
+    assert rrf_fuse([[], []], k=60) == []
+    assert rrf_fuse([["a", "b"], []], k=60) == [("a", 1 / 61), ("b", 1 / 62)]
+
+
+# --- knn_query ----------------------------------------------------------------------------------
+
+
+def test_knn_query_uses_the_same_filters_as_bm25():
+    q = knn_query((0.1, 0.2), k=10, filters=Filters(published=True))
+    assert q == {
+        "field": "embedding",
+        "query_vector": [0.1, 0.2],
+        "k": 10,
+        "num_candidates": 100,
+        "filter": [{"term": {"published": True}}],
+    }
+    assert "filter" not in knn_query((0.1,), k=50, filters=None)
+    assert knn_query((0.1,), k=50, filters=None)["num_candidates"] == 500
+
+
 # --- search() without Elasticsearch -------------------------------------------------------------
 
 
@@ -135,3 +177,46 @@ def test_italian_stemming_matches_plural_forms():
     # "terremoti" (plural) is found by the singular query only with the italian analyzer (E1)
     titles = [h.title for h in search("terremoto abruzzo", "bm25-italian", k=5)]
     assert any("terremoti" in t for t in titles)
+
+
+@needs_es
+def test_bm25_does_not_load_the_embedding_model(monkeypatch):
+    def fail():
+        raise AssertionError("the bm25 configurations must not load the embedding model")
+
+    monkeypatch.setattr(embed, "model", fail)
+    embed.embed_query.cache_clear()
+    assert search("terremoto abruzzo", "bm25-italian", k=3)
+
+
+@needs_es
+@pytest.mark.parametrize("config", VECTOR_CONFIGS)
+def test_every_vector_configuration_returns_hits(config):
+    hits = search("terremoto abruzzo", config, k=5)
+    assert len(hits) == 5
+    assert all(isinstance(h, Hit) and h.id and h.title for h in hits)
+    assert len({h.id for h in hits}) == 5
+    assert [h.score for h in hits] == sorted((h.score for h in hits), reverse=True)
+
+
+@needs_es
+def test_knn_finds_the_meaning_without_the_words():
+    # Daniel's D4 check: mine explosions, none of them containing the word "disastro"
+    titles = " ".join(h.title.lower() for h in search("disastro in una miniera", "knn", k=5))
+    assert "miniera" in titles or "minatori" in titles
+
+
+@needs_es
+@pytest.mark.parametrize("config", ["knn", "hybrid-rrf"])
+def test_vector_configurations_apply_the_filters(config):
+    hidden = search("calcio", config, k=20, filters=Filters(published=False))
+    assert len(hidden) == 20 and all(not h.published for h in hidden)
+    dated = search("terremoto", config, k=20, filters=Filters(date_from="2009-04-01", date_to="2009-04-30"))
+    assert dated and all(h.date and "2009-04-01" <= h.date <= "2009-04-30" for h in dated)
+
+
+@needs_es
+def test_hybrid_score_is_the_rrf_score():
+    hits = search("terremoto abruzzo", "hybrid-rrf", k=10)
+    # at most 1/61 per list: no hit can score more than 2/61
+    assert all(0 < h.score <= 2 / 61 + 1e-12 for h in hits)
