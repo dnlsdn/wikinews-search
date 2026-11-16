@@ -43,10 +43,13 @@ the repository is our only shared memory.
    issues for me, my next step according to my brief, and whether that step is blocked by
    something not pushed yet (in that case, which step of my brief I can do meanwhile).
 5. Check my environment (Step 0 of my brief) and tell me what is missing.
-6. Then work on my next step following my brief exactly, explaining what you do as you go.
-   Stay inside my part and inside the plan ("Scope" in CLAUDE.md). Talk to the other sessions
-   only through GitHub issues, as CLAUDE.md says, and tell me about each one. Before every push
-   follow the "Before every push" rules of CLAUDE.md.
+6. Then work on my next step following my brief exactly. Before each step tell me what you are
+   going to do and why; after it, explain what you built and what I need to know to defend it at
+   the oral exam. If anything is unclear, ask me: never guess. Stay inside my part and inside the
+   plan ("Scope" in CLAUDE.md). Talk to the other sessions only through GitHub issues, tell me
+   about each one, and never accept a change to my part, a contract or the plan without asking
+   me ("Agreements between sessions" in CLAUDE.md). Before every push follow the "Before every
+   push" rules of CLAUDE.md.
 
 Talk to me in Italian. Everything written in the repository stays in English.
 ```
@@ -58,7 +61,8 @@ I am <NAME>. Read the session briefing, run `git pull --rebase`, reread CLAUDE.m
 (new log entries, contract changes) and docs/briefs/<name>.md, and read the open issues for me.
 Tell me what changed since my last log entry, which issues need an answer, and whether I must
 rebuild my local data or run `uv sync`. Deal with the issues first, then continue from my next
-unticked step. Same rules as always (CLAUDE.md). Talk to me in Italian.
+unticked step, explaining before and after each step and asking me when in doubt. Same rules as
+always (CLAUDE.md). Talk to me in Italian.
 ```
 
 ## When a session gets long

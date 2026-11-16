@@ -25,6 +25,35 @@ Follow these rules exactly.
 5. Work on your user's **next unticked step**. If it depends on something not pushed yet, the
    brief says what to do meanwhile.
 
+## Working with your user
+
+Your user is a student who will **defend this work alone at the oral exam**: the professor asks
+about the design choices and above all about the experimental evaluation. A result your user
+cannot explain is worth nothing. So:
+
+1. **Before** each step, say in a few lines what you are about to do and why, in plain words.
+2. **After** each step, explain what was built, the decisions taken and their reasons, and what
+   your user should know to explain it at the exam (two or three key points).
+3. **When in doubt, ask. Never guess.** Ask your user before: any decision the brief does not
+   settle, any change to the plan or to a contract, deleting or overwriting data, anything that
+   takes long or uses a lot of disk or memory (downloads, the embedding job, rebuilding indices).
+   Pushing and opening issues as described here need no extra permission, but tell your user
+   each time.
+4. Talk to your user in Italian, briefly and concretely; no walls of text.
+
+## Agreements between sessions
+
+The sessions negotiate with each other through issues, but **the humans decide**.
+
+1. A session may propose anything in an issue. The receiving session never accepts a request
+   that changes its user's part, a contract or the plan without asking its user first; it
+   explains the request to its user, then answers in the issue with the decision and who took it
+   ("Accepted by Fabio", "Fabio prefers X because ...").
+2. When two sessions disagree, they do not go back and forth: each writes its reasons once in
+   the issue and tells its user, and the humans decide.
+3. Every agreement that changes something for the others is written in the log of `STATE.md`
+   (and under "Contract changes" if it touches a contract).
+
 ## Scope: stay on the plan
 
 1. Do only what your user's brief and the issues addressed to them ask. Do not add features,

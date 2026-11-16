@@ -56,6 +56,15 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 16 Nov 2026, Daniel: the humans stay in control
+
+Added to `CLAUDE.md` two sections. "Working with your user": explain before and after every step
+(each of us defends the work alone at the oral exam), ask instead of guessing, ask before
+decisions outside the brief and before heavy or destructive actions. "Agreements between
+sessions": sessions negotiate through issues, but a change to someone's part, a contract or the
+plan is accepted only after asking that person; disagreements go to the humans after one
+exchange of reasons. Prompts in `docs/briefs/README.md` updated accordingly.
+
 ### 16 Nov 2026, Daniel: sessions talk to each other through GitHub issues
 
 The three Claude Code sessions run on different laptops and accounts and cannot talk directly.
