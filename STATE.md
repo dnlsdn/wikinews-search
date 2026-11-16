@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30): BM25, `knn`, `hybrid-rrf`, `hybrid-rrf-published` in `search()`, web API and full UI on real data; next: E8 configurations (issue #6, waiting for Fabio's decision), then F5 demo (Tue afternoon) |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30): BM25, `knn`, `hybrid-rrf`, `hybrid-rrf-published` in `search()`, web API and full UI on real data; E8 configurations `knn-int8`, `knn-bbq` added (16 Nov 16:35, issue #6); next: F5 demo (Tue afternoon) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; next: G3 (30 manual queries, guidelines, pool, judging tool) |
 
 How to get the dump (not in git): download
@@ -61,6 +61,44 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 16:35, Fabio: E8 configurations `knn-int8` and `knn-bbq` (issue #6)
+
+Issue #6 (contract change by Daniel) handled, decided by Fabio: the E8 configurations are added
+now, before F5, because the change is small and Gioia's runner needs their names. E8 stays a
+stretch item for the measurement.
+
+1. `search()` queries `index_name(cfg["analyzer"], cfg.get("vector_index", "hnsw"))` (helper
+   `_index` in `wikisearch/search/__init__.py`). Every existing configuration still queries the
+   same index.
+2. Two configurations in `configs.py`, names chosen by Fabio (the ones Daniel proposed):
+   `knn-int8` (`vector_index: int8_hnsw`) and `knn-bbq` (`vector_index: bbq_hnsw`). They are
+   exactly `knn` plus the `vector_index` key: same model, same `k`, same
+   `num_candidates = max(100, 10 * k)`, same filters, so E8 measures the vector structure alone.
+   A unit test checks this.
+3. The web app lists them like every configuration (selector and compare mode). Facets keep
+   using the main index of the analyzer: the documents are the same.
+4. Tests: `uv run pytest -q tests/test_search.py`. Two new unit tests (E8 configurations differ
+   from `knn` only in `vector_index`; each configuration queries its own index). The integration
+   test of the vector configurations **skips** a configuration whose index is not built on that
+   laptop, so laptops without the E8 indices still pass. Full suite: 107 passed.
+
+How to run (PowerShell the same), Elasticsearch running: build the two indices once,
+`uv run python -m wikisearch.ingest.index --analyzers italian --vector-index int8_hnsw bbq_hnsw --no-csv`
+(about 30 s on Fabio's laptop; `--no-csv` so that `results/indexing.csv`, Daniel's official
+sizes, is not touched), then
+`uv run python -m wikisearch.search "disastro in una miniera" --config knn-bbq`.
+
+Quick sanity check on Fabio's laptop (5 queries, not an evaluation: E8 numbers come from Gioia's
+runner on `fonti`): the top 10 of `knn-int8` is the same set as `knn` on 5 / 5 queries, `knn-bbq`
+on 4 / 5 (9 of 10 on the fifth). Median latency at k=100: `knn` 57 ms, `knn-int8` 52 ms,
+`knn-bbq` 53 ms (warm model). Index size on disk: `wikinews-italian` 52.4 MB, `-int8` 57.0 MB,
+`-bbq` 53.1 MB: the quantized indices are not smaller on disk because Elasticsearch keeps the
+float vectors next to the quantized ones (for rescoring); the gain is in the memory the graph
+search needs (Daniel's memory split in the log of 16 Nov 15:30).
+
+For the others: Gioia, the names are `knn-int8` and `knn-bbq`; build the two indices before
+running them (command above). Answered in issue #6. Next: F5 (demo script and screenshots).
 
 ### 16 Nov 2026 15:56, Gioia: commit messages without step codes
 
