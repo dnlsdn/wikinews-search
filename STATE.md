@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30): BM25, `knn`, `hybrid-rrf`, `hybrid-rrf-published` in `search()`, web API and full UI on real data; E8 configurations `knn-int8`, `knn-bbq` added (16 Nov 16:35, issue #6); next: F5 demo (Tue afternoon) |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` added (16:35, issue #6); F5 work in progress (16 Nov 17:00): demo script `docs/demo.md` and screenshots `results/demo/` pushed, rehearsal on Daniel's laptop missing; next: F6 slides, then the rehearsal |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45): `fonti` test set, 7,223 queries; next: G3 (30 manual queries, guidelines, pool, judging tool) |
 
 How to get the dump (not in git): download
@@ -61,6 +61,41 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 17:00, Fabio: F5 demo script and screenshots (work in progress)
+
+F5 work in progress: `docs/demo.md` and the fallback screenshots in `results/demo/` are pushed;
+F5 is not ticked because the plan asks for a rehearsal on Daniel's laptop (issue opened to
+Daniel). Queries chosen by Claude on the real data and approved by Fabio.
+
+The demo, five queries in this order (links, what to show and the sentence to say in
+`docs/demo.md`):
+
+| # | query | configurations | what it shows |
+|---|---|---|---|
+| 1 | `terremoto in Abruzzo` | `hybrid-rrf`, then `hybrid-rrf-published` | result page and facets; the first hit "Speciale Terremoto in Abruzzo" is not published, the boost moves it out of the top |
+| 2 | `terremoto`, 6-30 Apr 2009, agency ANSA | `bm25-italian` | filters: 3 articles left |
+| 3 | `Pontecorvo` | `bm25-italian` vs `knn` | exact name, BM25 wins: BM25 finds "Si è spento Gillo Pontecorvo" first; `knn` returns service pages and "crolla un ponteggio" (sub-word look-alikes) |
+| 4 | `il pontefice è deceduto` | `bm25-italian` vs `knn`, then `knn` vs `hybrid-rrf` | paraphrase, kNN wins: "Il papa emerito Benedetto XVI è morto" is 1st for `knn`, 78th for BM25 (the article says "papa", never "pontefice"), 6th for the hybrid, which puts "Giovanni Paolo II è morto" 4th |
+| 5 | `concorso superenalotto` | `bm25-italian` | near-duplicates: 9 of the top 10 are lottery draw pages (motivates E7) |
+
+Spare query: `rincaro del greggio`, where `knn` fails (unrelated pages) and BM25 and the hybrid
+find the oil price records: vectors do not always win.
+
+Decisions, and why:
+1. Every step is a link (query, configurations, filters in the URL), so nothing is typed live.
+2. The "knn wins" query had to have no **title** word in common with its target (Daniel's note
+   of 15:05: "disastro in una miniera" is found by BM25 through "miniera"). The Benedetto XVI
+   article contains "deceduto" once in its lead, so the demo says "BM25 ranks it 78th", not "no
+   word in common".
+3. Two cases against the vectors (3 and the spare query) next to the one in their favour (4):
+   the comparison is fair and prepares the question "why hybrid".
+4. Screenshots: headless Edge on the real web app, 1400 or 1700 px wide, 8 PNG files, 1.4 MB.
+
+How to run: Elasticsearch and `uv run uvicorn wikisearch.web.app:app`, then the links in
+`docs/demo.md` (the first vector query loads the model: 25 s today). Tests: 107 passed, no code
+change. Next: F6 (slides in `slides/fabio.md`); rehearsal on Daniel's laptop Tuesday afternoon
+or Wednesday morning.
 
 ### 16 Nov 2026 16:35, Fabio: E8 configurations `knn-int8` and `knn-bbq` (issue #6)
 
