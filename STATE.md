@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1 done (13:55): Elasticsearch 9.5.0 runs on Daniel's laptop; D2 done (13:50): parser, full `docs.jsonl` (12,213 docs), sample of 300 pushed; next: D3 indexer |
+| Data and indexing | Daniel | D1, D2 done (16 Nov 13:55); D3 in progress (14:10): indexer works on the sample, full corpus next |
 | Search and interface | Fabio | F3a done (16 Nov 12:40): web app and API with fake mode; next: F3b (full UI on fake data), then F1 once D2-D3 are pushed |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
@@ -55,6 +55,38 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 14:10, Daniel: D3 indexer, work in progress (sample indexed)
+
+`wikisearch/ingest/index.py` builds `wikinews-standard` and `wikinews-italian` with the mapping of
+contract section 2 and bulk-loads the documents. **Fabio can start F1 now** on the sample:
+
+    uv run python -m wikisearch.ingest.index --input data/sample/docs.sample.jsonl --no-csv
+
+(300 documents per index, under a second each, about 1 MB each). Without `--input` it indexes the
+full `data/processed/docs.jsonl` (run the parser first). Other options: `--analyzers italian`,
+`--no-embeddings`, `--repeat 3` (timings for E6), `--no-csv`. Each build appends one row per index
+to `results/indexing.csv` (timestamp, index, analyzer, input, documents, embeddings, seconds,
+size_bytes).
+
+Details:
+1. 1 shard, 0 replicas; `refresh_interval: -1` during the load, then `1s`, refresh and flush;
+   bulk in chunks of 500. The script fails if any document is rejected or if `count` differs
+   from the number of input documents.
+2. `"dynamic": "strict"`: a field not in the mapping is an error, so the contract cannot drift
+   silently.
+3. `_source` holds the whole processed document (the web app's `/api/doc` reads it) plus
+   `sources_text` (source titles joined, analyzed, searched only by `bm25-italian-leak`, E4;
+   included now so that D5 needs no reindex) and `embedding` when `data/shared/embeddings.npy`
+   exists (matched by id, the script stops if a document has no vector).
+4. `embedding` is in the mapping already (384 dims, cosine, `index_options: hnsw` explicitly);
+   documents without a vector are simply not in the knn graph until D4.
+5. Tests (`tests/test_index.py`, 6): mapping against the contract, `sources_text`, vectors
+   matched by id; with Elasticsearch running, a temporary index from 50 sample documents checks
+   the count, that a source title is found in `sources_text` but never in `body`, and that the
+   `italian` analyzer stems (`elezioni` = `elezione`) and removes elision (`l'Italia` = `Italia`).
+
+Next: full corpus, three builds per variant for the timings, then D3 is done.
 
 ### 16 Nov 2026 13:55, Daniel: D1 Elasticsearch running
 
