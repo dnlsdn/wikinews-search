@@ -103,7 +103,8 @@ def rrf_fuse(rankings: list[list[str]], k: int) -> list[tuple[str, float]]:
     """Reciprocal rank fusion: score(d) = sum over the lists of 1 / (k + rank of d), ranks from 1.
 
     A document missing from a list gets nothing from it. Only ranks are used, never the original
-    scores, which are on different scales (BM25 unbounded, cosine compressed in 0.9-0.96 with e5).
+    scores, which are on different scales (BM25 unbounded, e5 kNN scores compressed in a narrow
+    band around 0.93-0.95).
     Best first; equal scores are broken by document id, so the order is deterministic.
     """
     scores: dict[str, float] = {}

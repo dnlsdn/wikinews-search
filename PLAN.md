@@ -134,7 +134,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   snippet, categories, source agencies, image), filters (date range, category, agency,
   published), pagination, document page, **compare mode** (two configurations side by side,
   useful in the demo to show E3). Plain HTML, CSS and JS served by FastAPI: no build step.
-- [ ] **F4, Tue 17 by 11:00.** kNN configuration (query embedded with `EMBEDDING_MODEL`) and hybrid with
+- [x] **F4, Tue 17 by 11:00.** kNN configuration (query embedded with `EMBEDDING_MODEL`) and hybrid with
   reciprocal rank fusion computed in Python (k=60, parameters in the configuration); boost on
   `published` (E5). Stretch: collapse on `series_key` (E7).
 - [ ] **F5, Tue 17 afternoon.** Demo script: 5-6 queries that show the features and the differences between

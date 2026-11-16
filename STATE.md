@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
-| Search and interface | Fabio | F1-F3 done (16 Nov 15:15): BM25 `search()`, web API and full UI (filters, pagination, document view, compare mode) on real data; next: F4 (by Tue 11:00) |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30): BM25, `knn`, `hybrid-rrf`, `hybrid-rrf-published` in `search()`, web API and full UI on real data; next: E8 configurations (issue #6, waiting for Fabio's decision), then F5 demo (Tue afternoon) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; next: the 30 queries of G3, then G2 on the sample |
 
 How to get the dump (not in git): download
@@ -61,6 +61,59 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 16 Nov 2026 16:30, Fabio: F4 vector and hybrid search
+
+Step F4 done: every configuration in `configs.py` runs, from the CLI, the web API and the UI
+(compare mode included). Commit 08054d3. The 501 "configuration not available yet" is gone.
+
+How to run (PowerShell, Elasticsearch running, indices built with the shared embeddings):
+`uv run python -m wikisearch.search "disastro in una miniera" --config knn` (also `hybrid-rrf`,
+`hybrid-rrf-published`); in the browser
+`/?q=disastro+in+una+miniera&config=bm25-italian&compare=1&config2=knn`. Tests:
+`uv run pytest -q tests/test_search.py` (unit tests of `rrf_fuse` and `knn_query` with a
+hand-computed example, integration tests for every vector configuration, filters, and "bm25 does
+not load the model"). First use downloads the model (`intfloat/multilingual-e5-small`, 471 MB in
+the Hugging Face cache).
+
+What was built (`wikisearch/search/`):
+1. `embed.py`: the model is loaded once and lazily (the bm25 configurations never import
+   sentence-transformers or torch); query = `"query: " + text`, `normalize_embeddings=True`.
+   Query vectors are cached by text (knn, hybrid-rrf, hybrid-rrf-published and every page of
+   the web app embed the same query once).
+2. `knn`: Elasticsearch `knn` on `embedding`, `num_candidates = max(100, 10 * k)`, the same
+   filters as BM25 inside `knn.filter` (filtered during the graph search, so a filtered query
+   still returns k hits). Snippet = start of the lead (no words to highlight).
+3. `hybrid`: BM25 and kNN, `depth` = 100 hits each, same filters, fused with
+   `rrf_fuse(rankings, k=60)`: `score(d) = sum 1 / (60 + rank)`, ties broken by id. The score
+   of a hybrid hit is its RRF score (at most 2/61 = 0.0328). Hit fields and the highlighted
+   snippet come from the BM25 side when the document is there.
+4. `boost_published` applies after fusion (and after kNN), as in F1: hits are fetched to
+   `depth`, the published ones multiplied by 1.5, re-sorted, cut to k.
+
+Decisions, and why:
+1. RRF instead of a weighted sum of scores: BM25 scores are unbounded and depend on the query,
+   the kNN scores of e5 are compressed (0.934-0.948 for the top 5 of "disastro in una miniera"; Elasticsearch reports (1 + cosine) / 2): a sum would need a
+   normalization and a weight to tune. RRF uses only ranks, has one constant (k=60, the value of
+   the original paper, Cormack et al. 2009) and is computed in Python so it is visible and tested.
+2. Hybrid depth is `max(depth, k)`: equal to 100 for the evaluation (`k=100`); only a web page
+   beyond the 10th asks for more.
+3. With the published boost (1.5) on RRF scores, a published document beats an unpublished one
+   unless the unpublished one is ranked much higher in both lists: E5 measures whether this helps.
+
+Latencies (Fabio's Windows laptop, warm model, median of 10 queries, k=10 / k=100):
+`bm25-italian` 68 / 57 ms, `knn` 67 / 88 ms, `hybrid-rrf` 140 / 139 ms,
+`hybrid-rrf-published` 191 / 187 ms. Query embedding alone 17 ms. **Loading the model takes
+about 23 s** (first query after starting the web app: the API answered in 27.8 s): for the demo,
+run one query before class.
+
+Example (E3, for the demo): "disastro in una miniera", `knn` top 5 are mine explosions in Ukraine,
+China and Utah; `hybrid-rrf` keeps them in the top 5. As Daniel wrote, BM25 also finds them through
+"miniera": the "knn wins" query of the demo still needs no word in common with the article.
+
+For the others: Gioia, every configuration can now be run by the runner (issue #4 asked for this;
+the pooling of G3 can use the five configurations). Issues #6 (E8 configurations) and #7 (new
+rule) received; #6 needs Fabio's decision. Next: E8 configurations if Fabio agrees, then F5.
 
 ### 16 Nov 2026 16:00, Daniel: preparing the presentation and the oral is part of every session
 
