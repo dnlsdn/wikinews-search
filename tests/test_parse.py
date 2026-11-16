@@ -132,3 +132,22 @@ def test_duplicates_keep_the_latest_version(tmp_path):
     records, read, removed = read_latest(dump)
     assert (read, removed) == (3, 1)
     assert sorted(r["name"] for r in records) == ["new", "other"]
+
+
+# --- data report (D6): where the source templates are ------------------------------------------
+
+
+def test_sources_under_fonti_and_its_subsections_are_inside():
+    from wikisearch.ingest.report import sources_outside
+
+    wikitext = "Testo.\n\n== Fonti ==\n=== Giornalistiche ===\n{{fonte|titolo=Un titolo|agenzia=ANSA}}\n"
+    assert sources_outside(wikitext) == (False, False)
+
+
+def test_sources_with_no_heading_or_under_collegamenti_esterni_are_outside():
+    from wikisearch.ingest.report import sources_outside
+
+    no_heading = "Testo.\n\n{{Fonte\n|titolo=Partite\n|agenzia=Soccerway.com\n}}\n"
+    assert sources_outside(no_heading) == (True, True)
+    links = "Testo.\n\n== Collegamenti esterni ==\n{{fonte|titolo=Un titolo}}\n"
+    assert sources_outside(links) == (True, False)  # outside "Fonti", but the parser drops the section

@@ -272,12 +272,13 @@ def _drop_template(names: list[str], tag: str) -> bool:
     return tag in _BLOCK_TAGS and not any(n in KEEP_BLOCK_TEMPLATES for n in names)
 
 
-def html_blocks(html: str) -> tuple[list[str], int]:
-    """Text blocks of the article in reading order, and the number of tables kept."""
+def html_blocks(html: str) -> tuple[list[str], int, int]:
+    """Text blocks of the article in reading order, the number of tables kept and the characters
+    of text that come from tables (for the data report)."""
     tree = LexborHTMLParser(html)
     body = tree.body
     if body is None:
-        return [], 0
+        return [], 0, 0
     dropped_abouts = set()
     for node in body.css('[typeof~="mw:Transclusion"]'):
         if _drop_template(_template_names(node), node.tag):
@@ -298,10 +299,10 @@ def html_blocks(html: str) -> tuple[list[str], int]:
         except Exception:  # already removed with an ancestor
             pass
 
-    blocks, tables = [], 0
+    blocks, tables, table_chars = [], 0, 0
 
     def walk(node):
-        nonlocal tables
+        nonlocal tables, table_chars
         for child in node.iter(include_text=False):
             tag = child.tag
             if tag in _SKIPPED_TAGS:
@@ -320,11 +321,12 @@ def html_blocks(html: str) -> tuple[list[str], int]:
                 if rows:
                     tables += 1
                     blocks.append("\n".join(rows))
+                    table_chars += len(blocks[-1])
             else:
                 walk(child)
 
     walk(body)
-    return blocks, tables
+    return blocks, tables, table_chars
 
 
 # ---------------------------------------------------------------------------------------------
@@ -338,7 +340,7 @@ def parse_page(record: dict) -> dict:
     raw_categories = [c["name"].removeprefix("Categoria:") for c in record.get("categories", []) or []]
 
     date, date_source = extract_date(wikitext, raw_categories)
-    blocks, tables = html_blocks(html)
+    blocks, tables, table_chars = html_blocks(html)
     lead = next((b for b in blocks if "\n" not in b and len(b) >= 20), blocks[0] if blocks else "")
     body = "\n\n".join(blocks)
 
@@ -370,7 +372,9 @@ def parse_page(record: dict) -> dict:
         "published": "Pubblicati" in raw_categories,
         "series_key": re.sub(r"\d+", "#", title),
         "n_chars": len(body),
-        "_tables": tables,  # internal, removed before writing
+        "_tables": tables,  # internal fields (leading underscore) are removed before writing
+        "_table_chars": table_chars,
+        "_text_chars": sum(len(b) for b in blocks),
     }
 
 
@@ -399,9 +403,10 @@ def normalize_agencies(docs: list[dict]) -> int:
 # ---------------------------------------------------------------------------------------------
 
 
-def read_latest(path: Path) -> tuple[list[dict], int, int]:
+def read_latest(path: Path, counts: Counter | None = None) -> tuple[list[dict], int, int]:
     """Read the dump line by line and keep, for each identifier, the most recent version.
-    Returns (records, lines read, duplicates removed)."""
+    Returns (records, lines read, duplicates removed); `counts`, if given, receives the number of
+    lines of each identifier."""
     latest: dict[int, dict] = {}
     lines = 0
     with open(path, encoding="utf-8") as f:
@@ -411,6 +416,8 @@ def read_latest(path: Path) -> tuple[list[dict], int, int]:
             lines += 1
             record = json.loads(line)
             key = record["identifier"]
+            if counts is not None:
+                counts[key] += 1
             old = latest.get(key)
             if old is None or (record.get("date_modified") or "") > (old.get("date_modified") or ""):
                 latest[key] = record
