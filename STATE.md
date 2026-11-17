@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); next: demo rehearsal 15:00, D7 slides Tuesday evening, deck on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); next: `docs/demo.md` as interface actions (F5) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
 How to get the dump (not in git): download
@@ -61,6 +61,40 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 16:50, Fabio: Fabio's judgments of the `manual` pool (G4), M21-M30 graded by Claude
+
+`evaluation/testsets/manual/judgments/fabio.tsv`: 286 of 286 assigned documents, none missing
+(checked against `judging/fabio.tsv`). One line per document, in the order of the assignment file.
+
+**Who judged what (decided by Fabio, to state as a limit):**
+1. **M06-M10** (88 documents, the doubly judged queries): judged by Fabio himself. Claude showed
+   him the documents in chat in blocks of one query (title, date, start of the lead, the need
+   translated into Italian, the grade definitions) and wrote down the grades Fabio typed; Claude
+   never suggested a grade. Three times the number of grades typed did not match the number of
+   documents of the block: Claude saved nothing and asked Fabio to type the block again. As agreed
+   in #10, Fabio was not shown `judgments/gioia.tsv` or per-query counts before judging. So the kappa on M06-M10 is between two humans.
+   Grades: 0 = 32, 1 = 14, 2 = 42.
+2. **M21-M30** (198 documents, judged by one person only): **graded by Claude**, at Fabio's request
+   (16:45), the same arrangement as Daniel's M11-M20 (entry of 14:25): from title, date and lead
+   following `GUIDELINES.md`, reading the body when the lead was not enough (e.g. an article on
+   environment and conflicts that quotes an analysis of Darfur over several sentences: 1). Rules
+   applied: rule 3 for the `time` queries (for M27, the 2009 flu and COVID news about other
+   countries or later years score 0, world-wide overviews of 2020 score 1); a scheduled event or follow-up of the right subject is 1
+   (e.g. the 2008 elections called after the fall of Prodi for M24); fan-against-fan deaths are 1
+   for M28, whose need asks for fans against police. Grades: 0 = 107, 1 = 28, 2 = 63. While
+   recording, one block of M30 was shifted by one position; Claude noticed it from the count and
+   re-recorded those seven documents before the push.
+
+Accepted by Gioia in issue #15 (16:48): M21-M30 go into `qrels.txt` as they are. **For the slides:
+20 of the 30 `manual` queries (M11-M30) now carry a model's grades**, so the fallback mentioned in
+the 15:05 entry ("report on the 20 human-judged queries") becomes **10 queries (M01-M10)**.
+
+How to check: `uv run python -m evaluation.merge_judgments` (Gioia runs it). Tests: 102 passed,
+22 skipped (Elasticsearch not running on Fabio's laptop at this moment). For the others: Gioia can
+merge now; the answer on the blind third judge (#15) follows in the issue. Next: rewrite the steps
+of `docs/demo.md` as interface actions (Daniel's entry of 14:50, F5), then `slides/fabio.md` after
+the official run (F6, by 22:00).
 
 ### 17 Nov 2026 15:05, Gioia: Daniel's model grades on M11-M20 accepted (G4)
 
