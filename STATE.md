@@ -62,6 +62,27 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 17 Nov 2026 14:50, Daniel: how the live demo is run in class (agreed with Fabio)
+
+Decided by Daniel and Fabio (they talked directly; issue #8):
+1. **Fabio speaks, Daniel operates the laptop.** The demo stays in Fabio's part and time; Daniel
+   only drives the web app on his own laptop.
+2. **Everything through the interface, no links**: the query typed in the search box, the
+   configuration chosen in the menu, the Compare toggle, the two date fields, the agency
+   checkbox, "Clear filters". It shows that the interface works, not only prepared URLs. The
+   links of `docs/demo.md` and the screenshots in `results/demo/` stay only as the fallback.
+3. Step 1 uses the configuration menu (`hybrid-rrf-published`, the boost measured by E5), **not**
+   the "Published only" checkbox, which is a filter and would remove the special page instead of
+   ranking it lower.
+4. No joint rehearsal on Daniel's laptop is needed for the results: the links were checked there
+   on 16 Nov 18:10 and again today (indices, shared embeddings and code are the same as Fabio's).
+   Daniel practises the steps alone (the dates are the delicate part); before class he starts
+   Elasticsearch and the web app and runs one `knn` query as warm-up (about 19 s on his Mac).
+
+For Fabio: please rewrite the steps of `docs/demo.md` (your file) as interface actions in this
+order (query, menu, Compare, dates, checkbox), keeping the links as fallback. No code change; tests
+not rerun (nothing changed). Next: D7 after the official run.
+
 ### 17 Nov 2026 14:25, Daniel: Daniel's judgments of the `manual` pool (G4), M11-M20 judged by Claude
 
 `evaluation/testsets/manual/judgments/daniel.tsv`: 287 of 287 assigned documents, none missing
