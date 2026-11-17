@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); next: demo rehearsal 15:00, D7 slides Tuesday evening, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
@@ -61,6 +61,33 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 14:25, Daniel: Daniel's judgments of the `manual` pool (G4), M11-M20 judged by Claude
+
+`evaluation/testsets/manual/judgments/daniel.tsv`: 287 of 287 assigned documents, none missing
+(checked against `judging/daniel.tsv`).
+
+**Who judged what (decided by Daniel, to state as a limit):**
+1. **M01-M05** (90 documents, the doubly judged queries): judged by Daniel himself. Claude showed
+   him each document in chat (title, date, start of the lead) with the information need
+   translated into Italian and the guideline rules, and wrote down the grade Daniel gave; Claude
+   never suggested a grade. Twice it pointed Daniel to a rule of `GUIDELINES.md`: rule 3 (an
+   election of another year or type in the `time` query M03, two grades changed by Daniel), and a
+   reply with a missing number, asked again. Daniel did not read Gioia's grades or the per-query
+   counts of the 09:22 entry before judging. So the kappa on M01-M05 is between two humans.
+2. **M11-M20** (197 documents, judged by one person only): **graded by Claude**, at Daniel's
+   request, from title, date and lead, following `GUIDELINES.md` (rule 3 applied strictly: an
+   election or referendum of another year scores 0 when the year is in the query). Grades: 0 =
+   100, 1 = 29, 2 = 68. This differs from the plan (all judgments by humans) and from Gioia's
+   choice of the morning (issue #10); it touches no doubly judged query, so the kappa is not
+   affected, but one third of the single-judged `manual` queries carry a model's grades: to
+   state on the limits slide.
+
+Also today: #9 answered (the 30 queries approved by Daniel unchanged), #8 answered (demo rehearsal
+with Fabio today 15:00-15:30 at Daniel's laptop), #12 opened to Gioia for the E8 official numbers
+(accepted, entry of 12:35). Tests: 102 passed, 22 skipped (Elasticsearch not running on Daniel's
+laptop at this moment). For the others: Gioia can merge once Fabio's file is in. Next: demo
+rehearsal at 15:00, then D7 (slides with the official numbers, Tuesday evening).
 
 ### 17 Nov 2026 12:35, Gioia: E3b and E8 accepted, one full run at the freeze (G5, work in progress)
 
