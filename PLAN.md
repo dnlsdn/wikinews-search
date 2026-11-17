@@ -160,9 +160,9 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   merged and shuffled, one file per judge; grades 0 (not relevant), 1 (partly), 2 (relevant),
   given with a small terminal tool (`python -m evaluation.judge`), with written guidelines in
   `evaluation/testsets/manual/GUIDELINES.md`.
-- [ ] **G4, Tue 17, 12:00-15:00.** Judgments: all three judge (about one hour each, about 300
+- [x] **G4, Tue 17, 12:00-15:00.** Judgments: all three judge (about one hour each, about 300
   judgments per person; 10 queries judged by two people to measure agreement).
-- [ ] **G5, Mon 16 (runner on BM25) - Tue 17 20:00 (official run).** `evaluation/run.py`: runs every configuration on every test set, writes runs,
+- [x] **G5, Mon 16 (runner on BM25) - Tue 17 20:00 (official run).** `evaluation/run.py`: runs every configuration on every test set, writes runs,
   metrics CSV, significance tests and latency; one command reproduces all numbers.
 - [ ] **G6, Tue 17 evening.** Tables and plots for the slides (`results/figures/`), reading of
   the results, own slides (test strategy, results) in `slides/gioia.md`.

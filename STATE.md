@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; next: D7 slides with the official numbers (by 22:00), deck last, on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; next: `slides/fabio.md` after the official run (F6, by 22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; next: G6 (figures, reading of the results, `manual` also on M01-M10 only), slides by 22:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,37 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 17:30, Gioia: final official run, numbers frozen (G5 done, G4 done)
+
+`uv run python -m evaluation.run` (full, every configuration, both test sets; started 16:56,
+ended 17:27, commit `216e862`), Apple M4, 16 GB RAM, Elasticsearch 1 GB heap. `manual` uses the
+final qrels (merge of 17:10). Committed: `results/metrics/` (`fonti.csv`, `manual.csv`, both
+`_per_query.csv`, `significance.csv`, `latency.csv`) and `results/summary.md`. These are the
+official numbers; nothing is rerun after this unless the code changes. The `fonti` means are
+identical to the 09:35 run (same index and code): only `manual`, E8 and the latencies are new.
+
+Headline numbers (95% bootstrap interval in `summary.md`, Holm-corrected p):
+1. E1 analyzer: `fonti` MRR@10 0.743 -> 0.768 (Holm p 0.0002); `manual` nDCG@10 0.648 -> 0.701
+   (p 0.038): the Italian analyzer helps on both sets.
+2. E3 `fonti` MRR@10: BM25 0.768, `knn` 0.781, hybrid 0.811 (all pairs significant); low
+   bucket 0.525 / 0.557 / 0.611. `knn` loses recall (R@100 0.942 against 0.958). `manual`
+   nDCG@10: 0.701 / 0.764 / 0.804; only hybrid against BM25 is significant (Holm p 0.010).
+3. E3b: hybrid against `bm25-italian-flat`: MRR@10 +0.011 (Holm p 0.003), but worse on the low
+   bucket (-0.036): the equal-weights BM25 is the stronger lexical baseline on paraphrases.
+4. E4 leakage: MRR@10 0.768 -> 0.900 with the sources searchable.
+5. E5 published boost on `manual`: nDCG@10 0.804 -> 0.758, **worse** (p 0.029): the boost pushes
+   up published but less relevant pages.
+6. E8 quantization: `knn-int8` and `knn-bbq` MRR@10 -0.0004 (not significant); `bbq` loses
+   R@100 -0.003 (Holm p 0.026); latency unchanged (p50 25-26 ms, all three).
+7. E6 latency p50: BM25 14.6 ms, `knn` 25.8 ms (query embedding included), hybrid 43.1 ms.
+8. `random` scores 0 everywhere: the floor holds, the metric code is sane.
+
+G4 ticked (judgments merged, kappa reported, disagreements adjudicated) and G5 ticked (one
+command reproduces every number on the full corpus). Tests: 125 passed. For Daniel and Fabio:
+the official numbers are in `results/summary.md`, you can put them on your slides. #12 closed
+(E8). Next: G6, figures and one-sentence reading per experiment; the `manual` numbers also on
+M01-M10 only (the human-judged queries, as promised in #15).
 
 ### 17 Nov 2026 17:22, Daniel: delivery is the pptx only, cover without emails (D7)
 
