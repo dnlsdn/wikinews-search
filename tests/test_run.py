@@ -106,6 +106,9 @@ def test_significance_rows_and_summary(tmp_path):
     e1 = [r for r in rows if r["experiment"] == "E1"]
     assert {r["metric"] for r in e1} == {"MRR@10", "R@100"}
     assert all(r["diff"] == 1.0 and r["queries"] == 4 for r in e1)
+    # two tests in the E1 family: Holm doubles the smaller p
+    assert all(r["p_holm"] >= r["p_value"] for r in e1)
+
     # pairs whose configurations were not run are left out
     assert all(r["experiment"] == "E1" for r in rows)
 

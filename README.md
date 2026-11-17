@@ -109,3 +109,64 @@ on the interface): `WIKISEARCH_FAKE=1 uv run uvicorn wikisearch.web.app:app` (Po
 
 The API used by the interface (`docs/contracts.md`, section 4): `/api/search`, `/api/doc/{id}`,
 `/api/facets`, `/api/configs`.
+
+### Evaluation
+
+Every command below is the same in PowerShell. They need the parsed corpus
+(`data/processed/docs.jsonl`); all but the first also need Elasticsearch and the indices.
+
+**Test sets** (`evaluation/testsets/`, committed, so rebuilding them is only needed to check them):
+
+1. `fonti`, known-item search: the query is the headline of an external source cited by an
+   article, the only relevant document is the article. 7,072 queries, one per article, and a
+   fixed subset of 1,000 (`queries_dev.tsv`, seed 42). Rebuild it and print the funnel, the
+   overlap buckets and the leakage check with:
+
+   ```bash
+   uv run python -m evaluation.build_fonti
+   ```
+
+   `--show-language 50` also prints 50 titles dropped and 50 kept by the language rule, for an
+   eye check.
+2. `manual`: 30 queries written by the group (`queries.tsv`, each with its type and information
+   need), the top 10 of the five configurations compared on it pooled and judged 0 / 1 / 2 by
+   the three authors (`GUIDELINES.md`). The steps, in order:
+
+   ```bash
+   uv run python -m evaluation.pool
+   uv run python -m evaluation.judge --judge <name>
+   uv run python -m evaluation.merge_judgments
+   ```
+
+   `pool` writes one blind assignment file per judge in `judging/`; `judge` shows one document at
+   a time and saves every grade at once in `judgments/<name>.tsv` (stop with `q`, resume later);
+   `merge_judgments` computes Cohen's kappa on the queries judged twice (M01-M10), lists the
+   disagreements and writes `qrels.txt`.
+
+**Reproducing every number** (an estimated 20 minutes on a laptop; close other heavy applications, the
+latencies depend on it):
+
+```bash
+uv run python -m evaluation.run
+```
+
+For every test set and configuration it searches each query (k = 100), writes the run to
+`results/runs/` (not committed), and computes from the runs:
+
+| file | content |
+|---|---|
+| `results/metrics/fonti.csv`, `manual.csv` | one row per configuration and the `random` baseline: MRR@10, R@10, R@100 (`fonti`, also per overlap bucket); P@10, nDCG@10, MAP, MRR@10 (`manual`); each with its 95% bootstrap interval |
+| `results/metrics/<set>_per_query.csv` | the per-query scores behind the intervals and the tests |
+| `results/metrics/significance.csv` | each comparison of the experiments E1-E5 (and E8): difference of the means, p-value of the paired randomization test, p-value corrected with Holm-Bonferroni within the experiment |
+| `results/metrics/latency.csv` | query latency p50 / p95 per configuration (E6), measured on 500 `fonti` queries with the configurations in random order |
+| `results/summary.md` | all the tables above, with the machine and the commit |
+
+Seeds are fixed (42), so the same corpus and indices give the same numbers; latencies depend on
+the machine. Options: `--dev` runs on the 1,000 dev queries of `fonti` and writes under
+`results/runs/dev/` (a few minutes, for development); `--configs <name> ...` reruns only some
+configurations and reuses the other runs; the `manual` set is skipped until `qrels.txt` exists;
+the E8 configurations are skipped where their indices are not built.
+
+Tests of the metrics (hand-computed examples), the significance tests, the test-set builders and
+the runner, all without Elasticsearch: `uv run pytest -q tests/test_metrics.py
+tests/test_build_fonti.py tests/test_judging.py tests/test_merge_judgments.py tests/test_run.py`.

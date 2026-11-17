@@ -56,3 +56,22 @@ def bootstrap_ci(
         done += m
     low, high = np.quantile(means, [alpha / 2, 1 - alpha / 2])
     return float(low), float(high)
+
+
+def holm(p_values: list[float]) -> list[float]:
+    """Holm-Bonferroni adjusted p-values, in the order of the input.
+
+    Many comparisons inside one experiment (pairs x metrics x buckets) make a few p < 0.05 likely
+    by chance alone. Holm controls the probability of even one false positive in the family, like
+    Bonferroni, but is less conservative, and it needs no independence between the tests (ours
+    share the queries). Sort the m p-values ascending; the i-th smallest (i from 0) becomes
+    (m - i) * p, made non-decreasing along the order and capped at 1. A difference is significant
+    when its adjusted p is below 0.05."""
+    m = len(p_values)
+    order = sorted(range(m), key=lambda i: p_values[i])
+    adjusted = [0.0] * m
+    running = 0.0
+    for rank, i in enumerate(order):
+        running = max(running, min(1.0, (m - rank) * p_values[i]))
+        adjusted[i] = running
+    return adjusted

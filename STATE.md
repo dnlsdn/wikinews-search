@@ -62,6 +62,35 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 17 Nov 2026 09:30, Gioia: Holm correction for multiple comparisons, evaluation usage in the README (G5, work in progress)
+
+1. **Multiple comparisons** (open point 3 of the log of 16 Nov 21:40). Each experiment makes many
+   tests (E3 on `fonti`: 3 pairs x 8 metrics and buckets = 24), so a few p < 0.05 are expected
+   by chance alone. Proposed by Claude, done at Gioia's request: `significance.csv` keeps the raw
+   p-value and adds `p_holm`, the Holm-Bonferroni correction over every comparison of the same
+   experiment on the same test set (the family); `summary.md` calls a difference significant
+   only when `p_holm` < 0.05 and says when the raw p alone would have. Why Holm: like Bonferroni it
+   bounds the probability of even one false positive in the family, but it is less conservative,
+   and it needs no independence between the tests (ours share the queries and the metrics are
+   correlated). A raw p of 0 (no permutation out of 10,000 reached the observed difference) enters
+   as 1 / 10,000, its upper bound. Code: `holm()` in `evaluation/significance.py`; test with a
+   hand-computed example in `tests/test_metrics.py`.
+
+   Effect on the dev run (not results): still significant after the correction, the hybrid over
+   BM25 (MRR@10, Holm p 0.002, also on the low bucket), equal field weights over the default
+   (E2, 0.0006), the Italian analyzer on MRR@10 (E1, 0.0002), leakage (E4, 0.0001). No longer
+   significant: `hybrid-rrf` over `knn` on the low bucket (raw 0.003, Holm 0.054) and `knn` below
+   BM25 on R@100 (raw 0.003, Holm 0.054). `knn` over BM25 on MRR@10 was already not significant.
+2. **README**, subsection "Evaluation" of "Usage" (brief, "Slides and README"): how to rebuild
+   and check the two test sets, the three commands of the `manual` judging, the one command that
+   reproduces every number, what each output file contains, the options and the tests. The 20
+   minutes of the full run are an estimate from the dev run, to be checked on the official run.
+3. The Kathara containers mentioned on 16 Nov are no longer running: only `wikinews-es` runs.
+
+How to run: `uv run python -m evaluation.run --dev`. Tests: 122 passed, 2 skipped. Nothing changes
+for the others. Next: the review of the queries (by 10:00), the judgments of Daniel and Fabio
+(12:00-15:00), `merge_judgments`, the official run by 20:00; slides with Gioia after it.
+
 ### 17 Nov 2026 09:22, Gioia: Gioia's judgments of the `manual` pool (G4, work in progress)
 
 Gioia judged her assignment, queries M01-M10: `evaluation/testsets/manual/judgments/gioia.tsv`,

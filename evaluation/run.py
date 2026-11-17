@@ -11,7 +11,8 @@ written to `results/runs/<set>/<config>.txt`. Then, from the runs:
    overlap bucket (`MRR@10:low`, ...).
 2. `results/metrics/<set>_per_query.csv`: the per-query scores the intervals and tests use.
 3. `results/metrics/significance.csv`: the pairs of `evaluation/experiments.py`, difference of the
-   means and two-sided p-value of the paired randomization test.
+   means, two-sided p-value of the paired randomization test and `p_holm`, the p corrected with
+   Holm-Bonferroni over every comparison of the same experiment on the same test set.
 4. `results/metrics/latency.csv`: p50 and p95 of the query latency, from a separate pass on 500
    `fonti` queries with the configurations in random order per query (`measure_latency`).
 5. `results/summary.md`: the tables, with the machine the latencies were measured on.
@@ -39,7 +40,7 @@ import numpy as np
 from evaluation.experiments import (BUCKET_METRICS, BUCKETS, EXPERIMENTS, MANUAL_CONFIGS, METRICS,
                                     RANDOM, TEST_SETS)
 from evaluation.metrics import evaluate
-from evaluation.significance import bootstrap_ci, paired_randomization_test
+from evaluation.significance import bootstrap_ci, holm, paired_randomization_test
 from evaluation.trec import read_qrels, read_queries, read_run, write_run
 from wikisearch import config
 from wikisearch.search.configs import CONFIGS
@@ -209,7 +210,21 @@ def significance_rows(set_name: str, per_query_by_config: dict, n_resamples: int
                     "diff": round(float(np.mean(b) - np.mean(a)), 4),
                     "p_value": p,
                 })
+    add_holm(rows, n_resamples)
     return rows
+
+
+def add_holm(rows: list[dict], n_resamples: int = N_RESAMPLES) -> None:
+    """Add `p_holm`: the p-value corrected for the multiple comparisons of its family, i.e. every
+    pair and metric of one experiment on one test set. A p of 0 (no permutation reached the
+    observed difference) enters the correction as 1 / n_resamples, its upper bound."""
+    families: dict[tuple[str, str], list[dict]] = {}
+    for r in rows:
+        families.setdefault((r["experiment"], r["set"]), []).append(r)
+    for family in families.values():
+        adjusted = holm([max(r["p_value"], 1 / n_resamples) for r in family])
+        for r, p in zip(family, adjusted):
+            r["p_holm"] = round(p, 4)
 
 
 def latency_row(set_name: str, name: str, latencies: list[float]) -> dict:
@@ -283,12 +298,15 @@ def fmt_p(p: float, n_resamples: int = N_RESAMPLES) -> str:
     return f"< {1 / n_resamples:g}" if p == 0 else f"{p:.4f}"
 
 
+
 def reading(row: dict) -> str:
     """One generated line per comparison; the conclusions in words are written by hand (G6)."""
-    sig = "significant" if row["p_value"] < ALPHA else "not significant"
+    sig = "significant" if row["p_holm"] < ALPHA else "not significant"
+    note = " before the correction" if (row["p_value"] < ALPHA) != (row["p_holm"] < ALPHA) else ""
     sign = "+" if row["diff"] >= 0 else ""
     return (f"`{row['variant']}` vs `{row['baseline']}`: {row['metric']} {sign}{row['diff']:.4f} "
-            f"(p {fmt_p(row['p_value'])}, {sig} at {ALPHA})")
+            f"(p {fmt_p(row['p_value'])}, Holm p {row['p_holm']:.4f}: {sig} at {ALPHA}"
+            + (f"; significant{note}" if note else "") + ")")
 
 
 def write_summary(path: Path, info: dict, summaries_by_set: dict, sig_rows: list[dict],
@@ -298,7 +316,9 @@ def write_summary(path: Path, info: dict, summaries_by_set: dict, sig_rows: list
              + f" on {info['date']}, commit `{info['commit']}`.",
              f"Machine (latencies): {info['machine']}.", "",
              f"Every mean has its 95% bootstrap interval ({N_RESAMPLES} resamples, seed {SEED}); "
-             f"p-values are two-sided paired randomization tests ({N_RESAMPLES} permutations). "
+             f"p-values are two-sided paired randomization tests ({N_RESAMPLES} permutations); "
+             "`p Holm` is the same p corrected with Holm-Bonferroni over every comparison of the "
+             "experiment on that test set, and decides what is called significant. "
              f"`{RANDOM}` is a random ranking (the floor: it must score near zero).", ""]
     for set_name, summaries in summaries_by_set.items():
         names = metric_names(set_name)
@@ -325,11 +345,11 @@ def write_summary(path: Path, info: dict, summaries_by_set: dict, sig_rows: list
         if not rows:
             continue
         lines += [f"## {exp.name}: {exp.question}" + (" (stretch)" if exp.stretch else ""), "",
-                  "| set | metric | baseline | variant | baseline mean | variant mean | diff | p |",
-                  "|---|---|---|---|---|---|---|---|"]
+                  "| set | metric | baseline | variant | baseline mean | variant mean | diff | p | p Holm |",
+                  "|---|---|---|---|---|---|---|---|---|"]
         for r in rows:
             lines.append(f"| {r['set']} | {r['metric']} | `{r['baseline']}` | `{r['variant']}` | "
-                         f"{r['baseline_mean']:.4f} | {r['variant_mean']:.4f} | {r['diff']:+.4f} | {fmt_p(r['p_value'])} |")
+                         f"{r['baseline_mean']:.4f} | {r['variant_mean']:.4f} | {r['diff']:+.4f} | {fmt_p(r['p_value'])} | {r['p_holm']:.4f} |")
         lines.append("")
         lines += [f"- {reading(r)}" for r in rows]
         lines.append("")

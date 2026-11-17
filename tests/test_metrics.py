@@ -225,3 +225,12 @@ def test_bootstrap_contains_the_mean():
     assert low < 0.5 < high
     assert 0.38 < low < 0.45 and 0.55 < high < 0.62
     assert (low, high) == significance.bootstrap_ci(scores)  # reproducible with the seed
+
+
+def test_holm_by_hand():
+    # p = [0.01, 0.04, 0.03], m = 3. Ascending: 0.01 x 3 = 0.03; 0.03 x 2 = 0.06; 0.04 x 1 = 0.04,
+    # raised to 0.06 to keep the order. Back in input order: [0.03, 0.06, 0.06]
+    assert significance.holm([0.01, 0.04, 0.03]) == pytest.approx([0.03, 0.06, 0.06])
+    assert significance.holm([0.5, 0.9]) == pytest.approx([1.0, 1.0])  # capped at 1
+    assert significance.holm([0.02]) == pytest.approx([0.02])  # one test: unchanged
+    assert significance.holm([]) == []
