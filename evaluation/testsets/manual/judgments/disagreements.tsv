@@ -1,0 +1,50 @@
+qid	doc_id	title	judge_a	grade_a	judge_b	grade_b	resolved
+M01	7655	Trovato un uccello infettato da H5N1 negli Stati Uniti	gioia	2	daniel	1	2
+M02	18522	Consultazioni al Quirinale, Forza Italia: "Elezioni subito"	gioia	2	daniel	1	2
+M02	29849	Gioele Magaldi: "Il Fratello Silvio Berlusconi è un massone a tutti gli effetti"	gioia	2	daniel	1	2
+M02	8250	Riaperta in Spagna l'inchiesta contro Silvio Berlusconi	gioia	2	daniel	1	2
+M02	9540	Remunerazioni record per Silvio Berlusconi nel 2006	gioia	2	daniel	1	2
+M03	1447	Iniziate le elezioni politiche nel Regno Unito	gioia	2	daniel	0	0
+M03	18682	Speciale Elezioni politiche italiane 2008	gioia	2	daniel	1	0
+M03	19774	Speciale Elezioni politiche italiane 2008/Affluenza	gioia	0	daniel	1	0
+M03	19825	Elezioni politiche italiane 2008: i commenti dei politici sui risultati provvisori	gioia	2	daniel	0	0
+M03	3280	Berlusconi: elezioni politiche italiane il 9 aprile 2006	gioia	2	daniel	1	1
+M03	5043	Elezioni politiche italiane 2006	gioia	1	daniel	2	2
+M03	5053	Elezioni politiche italiane 2006/Calendario	gioia	0	daniel	2	1
+M03	5096	Elezioni politiche italiane 2006/Dibattiti	gioia	1	daniel	2	2
+M03	5444	Elezioni 2006: come si vota	gioia	1	daniel	2	1
+M03	5465	Elezioni politiche italiane 2006: dati sull'affluenza alle urne	gioia	0	daniel	2	2
+M03	5485	Elezioni politiche 2006: risultati	gioia	0	daniel	2	2
+M03	5838	Elezioni presidenziali 2006: secondo giorno di votazioni	gioia	2	daniel	1	0
+M03	6000	Elezioni amministrative italiane 2006	gioia	0	daniel	1	0
+M04	13785	Morte di Chris Benoit: su Wikipedia una modifica annuncia la morte della moglie	gioia	2	daniel	0	0
+M04	14699	Luciano Pavarotti è stato dimesso dall'ospedale	gioia	0	daniel	1	1
+M04	15032	È morto Luciano Pavarotti	gioia	1	daniel	2	2
+M05	3060	USA Uragano Katrina 2005	gioia	0	daniel	2	2
+M05	36435	Uragano Sandy: la tragedia non finisce qua	gioia	2	daniel	0	0
+M05	4964	Un video smentisce Bush su Katrina	gioia	0	daniel	1	2
+M05	9755	Uragano Kyrill termina la sua corsa: 46 morti	gioia	2	daniel	0	0
+M06	18716	Valentino Rossi: il 12 febbraio incontro con il Fisco	gioia	2	fabio	0	0
+M06	23653	Motomondiale: ottavo titolo iridato per Valentino Rossi	gioia	0	fabio	2	2
+M07	3667	Calcio Campionato mondiale 2006 spareggi 12 novembre 2005	gioia	1	fabio	0	1
+M07	3715	Calcio Campionato mondiale 2006 spareggi 16 novembre 2005	gioia	1	fabio	0	1
+M07	5975	Speciale Campionato del mondo di calcio 2006	gioia	2	fabio	1	2
+M07	6078	Speciale Campionato del mondo di calcio 2006/Asia	gioia	1	fabio	0	1
+M07	6079	Speciale Campionato del mondo di calcio 2006/Africa	gioia	1	fabio	0	1
+M07	6080	Speciale Campionato del mondo di calcio 2006/America meridionale	gioia	1	fabio	0	1
+M07	6261	Mondiali 2006: I risultati del Girone D	gioia	2	fabio	1	2
+M07	6264	Mondiali 2006: I risultati del Girone E	gioia	2	fabio	1	2
+M07	6464	Mondiali 2006: sarà Portogallo-Francia la seconda semifinale	gioia	2	fabio	1	2
+M07	6558	Mondiali 2006: Italia-Francia la finale di domenica	gioia	2	fabio	1	2
+M07	9303	Campionato mondiale per club di calcio 2006	gioia	0	fabio	1	0
+M08	2473	Incendio isola di Ohahu 2005	gioia	1	fabio	0	0
+M08	38186	Costa Concordia: cominciano i lavori di rimozione	gioia	0	fabio	2	1
+M08	38189	Costa Concordia: rotazione ultimata, nave in asse	gioia	0	fabio	2	1
+M08	50012	Egitto: grossa nave da carico si arena su una sponda del canale di Suez	gioia	1	fabio	0	0
+M09	18837	Fiorello si scaglia contro i politici: «O risolvono l'emergenza rifiuti, o non andremo al voto»	gioia	1	fabio	0	1
+M10	12462	Calcio: tifosi della Juve affidano al legale di Bosman il ricorso alla Commissione Europea	gioia	2	fabio	1	1
+M10	13558	Claudio Ranieri è il nuovo allenatore della Juventus	gioia	2	fabio	1	2
+M10	34775	Calcio: trionfo della Juventus a Novara	gioia	0	fabio	2	2
+M10	6624	Calcio: Deschamps è il nuovo allenatore della Juventus	gioia	2	fabio	1	2
+M10	9348	Serie B: Juventus - Cesena rinviata per lutto	gioia	2	fabio	1	1
+M10	9534	Morto Sandro Salvadore, ex di Juventus e Milan	gioia	1	fabio	0	0

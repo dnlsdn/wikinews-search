@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); next: D7 slides with the official numbers (by 22:00), deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; next: `slides/fabio.md` after the official run (F6, by 22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543, `qrels.txt` provisional until the 49 disagreements are adjudicated blind by Daniel's session (#13, #15); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,27 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 17:10, Gioia: disagreements adjudicated, final `manual` qrels (G4)
+
+`evaluation/testsets/manual/judgments/resolved.tsv` written from the 49 blind third-judge grades
+of Daniel's session (25 in #13 for M01-M05, 24 in #15 for M06-M10; same 49 keys as the
+disagreements), then `uv run python -m evaluation.merge_judgments`. `qrels.txt` is now **final**:
+30 queries, 573 judged documents, grades 0: 279, 1: 76, 2: 218 (provisional: 293 / 83 / 197).
+No query is left without relevant documents: **M05 is back** in the metrics (3060 and 4964
+graded 2). `disagreements.tsv` is pushed now that the adjudication is closed: it shows both
+judges' grades and the third grade.
+
+Kappa unchanged (computed on the original human grades): 0.543 on 0/1/2, 0.674 binary, 178
+documents. How the third judge decided the 49: the higher of the two grades 27 times, the lower
+16, the middle grade 1 on 6 pairs 0-2. Pairs: 1-2: 21, 0-1: 14, 0-2: 14.
+
+Timing: the full official run (`uv run python -m evaluation.run`, started 16:56) was still on the
+`fonti` configurations when the merge ran; it loads the `manual` qrels only when it reaches that
+set, so it uses the final qrels and **no second run is needed** (Daniel's suggestion in #15 of a
+rerun with `--configs random` becomes unnecessary). Tests: 125 passed. Nothing changes for the
+others. #13 and #15 closed. Next: finish the official run, commit `results/metrics/` and
+`results/summary.md`, close #12 (E8), then G6.
 
 ### 17 Nov 2026 17:35, Fabio: demo script as interface actions, F5 done
 
