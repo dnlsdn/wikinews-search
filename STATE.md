@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; review of the queries by Tue 10:00 still open (issue #9); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; review of the queries by Tue 10:00 still open (issue #9); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`), `manual` run after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,66 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 09:40, Gioia: official run on `fonti` (G5, work in progress)
+
+The official numbers of the `fonti` set are final and committed: `results/metrics/fonti.csv`,
+`fonti_per_query.csv`, `significance.csv` (with `p_holm`), `latency.csv`, and `results/summary.md`
+(tables per experiment). The `manual` set follows after the merge of the judgments (Tuesday 15:00):
+`uv run python -m evaluation.run --sets manual`.
+
+How it was produced (Gioia's laptop: MacBook Air M4, 16 GB, fanless; only the Elasticsearch
+container running, the 43 Kathara containers of another course stopped):
+1. `uv run python -m wikisearch.ingest.parse --no-sample`: `docs.jsonl` byte-identical to the
+   previous one (same SHA-1), so the corpus is the one of every earlier log entry.
+2. `uv run python -m wikisearch.ingest.index --no-csv`: both indices rebuilt, 12,213 documents
+   with vectors (`--no-csv` so that Daniel's `results/indexing.csv` is not touched).
+3. `uv run python -m evaluation.run --sets fonti` (09:08-09:31, all 7,072 queries), then
+   `uv run python -m evaluation.run --sets fonti --configs random` (09:35). The second command was
+   needed because the Holm commit (09:30, entry below) arrived while the first run was going: it
+   reuses the nine runs from disk, recomputes intervals and tests with the current code, and
+   measures the latency again with nothing else running. E8 skipped: the `-int8`, `-bbq` indices
+   are not built on this laptop (stretch).
+
+Numbers (MRR@10 with 95% bootstrap interval; full tables in `results/summary.md`):
+
+| configuration | MRR@10 | R@100 | MRR@10 low | MRR@10 high |
+|---|---|---|---|---|
+| `random` | 0.000 | 0.007 | 0.000 | 0.000 |
+| `bm25-standard` | 0.743 [0.734, 0.753] | 0.945 | 0.475 | 0.995 |
+| `bm25-italian` | 0.768 [0.759, 0.777] | 0.958 | 0.525 | 0.996 |
+| `bm25-italian-title` | 0.663 [0.653, 0.673] | 0.887 | 0.283 | 0.997 |
+| `bm25-italian-body` | 0.726 [0.717, 0.735] | 0.956 | 0.621 | 0.856 |
+| `bm25-italian-flat` | 0.800 [0.791, 0.808] | 0.969 | 0.646 | 0.982 |
+| `knn` | 0.781 [0.772, 0.789] | 0.942 | 0.557 | 0.979 |
+| `hybrid-rrf` | 0.811 [0.802, 0.819] | 0.965 | 0.611 | 0.990 |
+| `hybrid-rrf-published` | 0.814 [0.805, 0.822] | 0.965 | 0.616 | 0.990 |
+| `bm25-italian-leak` | 0.900 [0.894, 0.906] | 0.999 | 0.808 | 0.998 |
+
+What they say (significance with Holm-corrected p, family = one experiment on `fonti`):
+1. E1: the Italian analyzer helps, MRR@10 +0.025 (Holm p 0.0002), R@100 +0.013.
+2. E2: searching the title only loses 0.105 MRR@10; equal field weights (`-flat`) beat the default
+   `title^3 lead^2 body` by +0.032 (Holm p 0.0006), as in the dev run: confirmed. Fabio's E2 slide
+   must say it (Gioia tells Fabio).
+3. E3: `hybrid-rrf` is best, +0.043 MRR@10 over BM25 and +0.030 over `knn` (both Holm p 0.002).
+   `knn` beats BM25 on MRR@10 by +0.013 (Holm p 0.009: significant on all 7,072 queries, not on
+   the dev subset) but loses on R@100 (-0.016). The gain is on the paraphrases: low bucket hybrid
+   0.611 vs BM25 0.525 (+0.086); high bucket all near 0.99 and BM25 slightly ahead of `knn`
+   (-0.017). The one comparison that loses significance with Holm: hybrid vs BM25 on the high
+   bucket (raw p 0.03, Holm 0.18).
+4. E4: indexing the sources would inflate MRR@10 by +0.132 (Holm p 0.0001).
+5. E6 latency, p50 / p95 in ms (second pass): `bm25-italian` 13.9 / 20.4, `bm25-standard` 18.3 /
+   26.2, `bm25-italian-flat` 15.2 / 22.3, `knn` 28.5 / 37.7, `hybrid-rrf` 43.3 / 55.2. The first
+   pass (09:29, a dev recomputation was running at the same time) gave `knn` 23.1 and `hybrid-rrf`
+   38.6, the BM25 ones within 0.5 ms: the vector configurations vary by about 5 ms between passes
+   (likely the fanless laptop after 25 minutes of load). The ranking of the costs does not change;
+   to state on the slides as the precision of the latency numbers.
+
+Judgments: the file `judgments/gioia.tsv` pushed at 09:23 (entry below) was judged by Gioia with
+the tool. Grades drafted by Claude earlier this morning were discarded and are not used anywhere
+(issue #10 explains it to Daniel and Fabio). Tests: 122 passed, 2 skipped. Nothing changes for the
+others, except Fabio's E2 slide (point 2). Next: review of the queries (issue #9, 10:00), judgments
+of Daniel and Fabio (by 15:00), `merge_judgments`, `--sets manual`, then G6 with Gioia.
 
 ### 17 Nov 2026 09:30, Gioia: Holm correction for multiple comparisons, evaluation usage in the README (G5, work in progress)
 

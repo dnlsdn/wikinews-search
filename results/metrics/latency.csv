@@ -1,0 +1,10 @@
+set,config,queries,p50_ms,p95_ms,mean_ms
+fonti,bm25-standard,500,18.3,26.2,18.7
+fonti,bm25-italian,500,13.9,20.4,14.5
+fonti,bm25-italian-title,500,3.8,4.7,3.6
+fonti,bm25-italian-body,500,11.1,17.5,11.6
+fonti,bm25-italian-flat,500,15.2,22.3,15.7
+fonti,knn,500,28.5,37.7,28.7
+fonti,hybrid-rrf,500,43.3,55.2,43.9
+fonti,bm25-italian-leak,500,15.5,23.0,16.1
+fonti,hybrid-rrf-published,500,43.8,56.2,44.4
