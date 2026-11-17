@@ -52,6 +52,14 @@ EXPERIMENTS = [
         [("bm25-italian", "knn"), ("bm25-italian", "hybrid-rrf"), ("knn", "hybrid-rrf")],
         {"fonti": ["MRR@10", "R@100"] + _E3_BUCKETS, "manual": ["nDCG@10"]},
     ),
+    # Added after the official `fonti` results (issue #11): the best BM25 of E2 (equal field
+    # weights) was never tested against the hybrid. Its own experiment, hence its own Holm family,
+    # so the E3 p-values do not change; a comparison chosen after seeing the results, said so.
+    Experiment(
+        "E3b", "Is the hybrid better than the best BM25 (equal field weights)? (added after the results)",
+        [("bm25-italian-flat", "hybrid-rrf")],
+        {"fonti": ["MRR@10", "R@100"] + _E3_BUCKETS},
+    ),
     Experiment(
         "E4", "How much does leakage inflate results?",
         [("bm25-italian", "bm25-italian-leak")],

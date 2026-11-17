@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; review of the queries by Tue 10:00 still open (issue #9); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`), `manual` run after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,36 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 12:35, Gioia: E3b and E8 accepted, one full run at the freeze (G5, work in progress)
+
+Three decisions taken by Gioia on the issues of this morning:
+
+1. **E3b, issue #11 (Fabio), accepted.** New experiment in `evaluation/experiments.py`:
+   `bm25-italian-flat` against `hybrid-rrf` on `fonti`, MRR@10 and R@100 overall and per bucket
+   (8 tests). Its own experiment, so its own Holm family: the E3 p-values already in this log do
+   not change. It is a comparison chosen after seeing the official results, and `summary.md` says
+   so in its title; to state on the slides. Dev preview (1000 queries, not results): the hybrid
+   is +0.010 MRR@10 over `flat`, Holm p 0.64, not significant; significant only on the `mid`
+   bucket (+0.039, Holm p 0.0008); on `low` `flat` is ahead (-0.032, Holm p 0.39). The official
+   run decides.
+2. **E8, issue #12 (Daniel), accepted.** The `wikinews-italian-int8` and `-bbq` indices are built
+   on Gioia's laptop (`uv run python -m wikisearch.ingest.index --analyzers italian --vector-index
+   int8_hnsw bbq_hnsw --no-csv`: 6.6 s and 6.1 s, 59.8 and 55.7 MB, `results/indexing.csv` not
+   touched). With them the two E8 tests of `tests/test_search.py` run too: 124 passed, 0 skipped.
+   Dev preview: `knn-int8` and `knn-bbq` both -0.0002 MRR@10 against `knn` (p 0.71 and 1.0).
+3. **The final run is the full command**, not `--sets manual` as written in the entry of 09:40.
+   `evaluation/run.py` rewrites `significance.csv`, `latency.csv` and `summary.md` from the sets
+   of the current command only, so `--sets manual` alone would drop the `fonti` tests and the
+   latencies. After the merge of the judgments: `uv run python -m evaluation.run` (every set,
+   every configuration, about 25-30 minutes): one command for every number, as the brief asks,
+   and one latency pass with all eleven configurations, E8 included, so all latencies are
+   comparable. The `fonti` numbers of 09:40 should come out identical (same index, same code);
+   the latencies will be measured again.
+
+Also: issue #9 closed, Daniel and Fabio approved the 30 `manual` queries unchanged. Nothing
+changes for the others: Daniel and Fabio push their `judgments/<name>.tsv` by 15:00. Next: merge
+of the judgments, the full run, then G6 with Gioia.
 
 ### 17 Nov 2026 09:40, Gioia: official run on `fonti` (G5, work in progress)
 
