@@ -153,7 +153,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   word overlap between query and article title in `meta` (to split results into easy and
   paraphrase queries). Keep a fixed random sample of 1000 queries (seed in the script). Start on
   the sample, rerun on the full corpus.
-- [ ] **G3, Mon 16 (queries and tool) - Tue 17 by 12:00 (pooling).** `manual` test set: 30 queries in four types: topical ("terremoto in
+- [x] **G3, Mon 16 (queries and tool) - Tue 17 by 12:00 (pooling).** `manual` test set: 30 queries in four types: topical ("terremoto in
   Abruzzo"), entity ("Romano Prodi"), time-bound ("elezioni 2008"), vague or paraphrased
   ("disastro in una miniera"). Pooling: top 10 of the five configurations of E1, E3 and E5,
   merged and shuffled, one file per judge; grades 0 (not relevant), 1 (partly), 2 (relevant),

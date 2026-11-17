@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); next: demo rehearsal 15:00, D7 slides Tuesday evening, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); next: `docs/demo.md` as interface actions (F5) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543, `qrels.txt` provisional until the 49 disagreements are adjudicated blind by Daniel's session (#13, #15); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,36 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 17:05, Gioia: all judgments merged, provisional `manual` qrels (G4, work in progress)
+
+`uv run python -m evaluation.merge_judgments` run with the three files (Gioia 178, Daniel 287,
+Fabio 286, none missing). `evaluation/testsets/manual/qrels.txt` committed: 30 queries, 573
+judged documents, grades 0: 293, 1: 83, 2: 197. It is **provisional**: the 49 disagreements are
+still open and get the lower grade (GUIDELINES.md, rule 5) until Daniel's session sends its blind
+grades (#13 for M01-M05, #15 for M06-M10); then `judgments/resolved.tsv` is written and the merge
+run again.
+
+Agreement on the 178 doubly judged documents (original human grades, before any resolution; this
+is the number for the slides):
+1. all: raw agreement 0.725, Cohen's kappa 0.543 on 0/1/2, 0.674 on relevant / not relevant;
+2. Gioia-Daniel (M01-M05, 90 documents): 0.722, kappa 0.527 and 0.711;
+3. Gioia-Fabio (M06-M10, 88 documents): 0.727, kappa 0.549 and 0.619.
+Moderate agreement on three grades, substantial on binary relevance (Landis and Koch): most
+disagreements are 1 against 2, i.e. on how relevant, not whether. They cluster on two `time`
+queries, M03 (13) and M07 (11), where rule 3 (other year or other election) applies.
+
+Note: with the lower grade for every open disagreement, **M05 has no relevant document** and is
+skipped by the metrics (29 queries); the third judge's grades on its 4 disputed documents decide
+whether it comes back.
+
+`disagreements.tsv` is **not** pushed until the adjudication is done (it shows both judges'
+grades, the third judge must stay blind). Blind list for M06-M10 posted in #15 (24 documents);
+deadline given to Daniel: 19:15, after that the open disagreements keep the lower grade and the
+full run starts. G3 ticked: its "done when" holds (assignment files and tool pushed, everyone has
+judged). Tests: 125 passed. Nothing changes for the others, except Daniel's session: grades in
+#13 and #15. Next: the full official run `uv run python -m evaluation.run` once the grades are
+in (or at 19:15), then G6.
 
 ### 17 Nov 2026 16:50, Fabio: Fabio's judgments of the `manual` pool (G4), M21-M30 graded by Claude
 
