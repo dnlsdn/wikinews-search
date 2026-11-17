@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); next: check the three slide files for consistency after 22:00, deck last, on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; next: `slides/fabio.md` after the official run (F6, by 22:00) |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; next: `slides/gioia.md` by 22:00 |
 
 How to get the dump (not in git): download
@@ -61,6 +61,36 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 18:10, Fabio: `slides/fabio.md` with the official numbers (F6, work in progress)
+
+`slides/fabio.md` written in Italian with the structure of `PLAN.md` ("Slides"), numbers from the
+final run (`results/summary.md`, 17:27), Holm p everywhere. Five slides, as in the outline of
+16 Nov 17:05: (1) one `search()`, eleven named configurations, one per experiment (figure: compare
+mode screenshot); (2) E2 fields and weights (`results/figures/e1_e2_bm25.png`); (3) E3 lexical,
+semantic, hybrid, with latencies and E3b (`e3_buckets.png`); (4) filters, facets and E5
+(screenshot of the filters); (5) the demo. Not ticked yet: Fabio reviews the text first.
+
+How the results read for Fabio's part, decided with Fabio:
+1. **E2 contradicts our default weights**: equal weights (`-flat`) 0.800 against `title^3 lead^2
+   body` 0.768 (+0.032, Holm p 0.0006), almost all on paraphrases (0.646 against 0.525). Said
+   openly on slide 2. Why E3 and E5 still use 3-2-1: the configurations were fixed before the
+   results, and changing them after seeing the test set would tune the engine on the queries that
+   evaluate it.
+2. **E3 confirms RRF**: hybrid best on `fonti` (0.811; paraphrases 0.611), on `manual` only hybrid
+   against BM25 is significant (+0.103, p 0.010); cost 43 ms p50 against 15. E3b is stated as a
+   limit: against equal-weights BM25 the hybrid loses on paraphrases (-0.036); a hybrid on equal
+   weights was not tested (next step, not done after the freeze).
+3. **E5 contradicts the published boost** (`manual` nDCG@10 0.804 -> 0.758, p 0.029), so the
+   default configuration stays without boost. Why E5 is not measured on `fonti`: its target is
+   always a published article, so the test would favour the boost by construction.
+`docs/demo.md` step 1: the sentence now gives the E5 result instead of "E5 measures whether it
+helps".
+
+No code change. Tests: 130 passed. For Daniel (deck): the figures used are Gioia's
+`e1_e2_bm25.png` and `e3_buckets.png` and two screenshots of `results/demo/`; Gioia may show the
+same figures in her results part, to be kept consistent in the deck. Next: Fabio's review, then
+F6 ticked.
 
 ### 17 Nov 2026 17:35, Gioia: figures, `manual` on the human-judged queries, reading of the results (G6, work in progress)
 

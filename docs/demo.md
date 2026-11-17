@@ -55,9 +55,11 @@ Terremoto in Abruzzo", marked **not published**: an index page, not a news artic
 `hybrid-rrf-published` the special page leaves the top, the first hit is "Nuova fortissima scossa
 di terremoto in Abruzzo".
 
-Say: "We kept the 1,195 pages that are not published, flagged, instead of dropping them. Ranking
-them lower is a configuration, a boost of 1.5 on published pages, and experiment E5 measures
-whether it helps."
+Say: "We kept the pages that are not published, flagged, instead of dropping them. Ranking them
+lower is a configuration, a boost of 1.5 on published pages. Here it helps, but experiment E5
+says that on average it does not: on the `manual` queries nDCG@10 drops from 0.804 to 0.758,
+because the boost also pushes up published pages that are less relevant. So the default
+configuration has no boost."
 
 Fallback: http://localhost:8000/?q=terremoto+in+Abruzzo&config=hybrid-rrf, then
 http://localhost:8000/?q=terremoto+in+Abruzzo&config=hybrid-rrf-published
