@@ -118,8 +118,9 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 - [x] **D6, Tue 17 afternoon.** Data report for the slides: counts, cleaning decisions with numbers,
   examples of hard pages (`results/data_report.md`).
 - [ ] **D7, Tue 17 evening - Wed 18 morning.** Own slides (challenges of the data, indexing choices) in
-  `slides/daniel.md`; assembly of the whole deck from the three files; cover with names,
-  institutional emails and the repository link (the professor asked for emails in homework 3);
+  `slides/daniel.md`; assembly of the whole deck from the three files; cover with the names and
+  the repository link (no emails: decided by Daniel on 17 Nov, the course asks for them only in
+  the homework 3 reports);
   repository made public before the upload.
 
 ### Fabio: search and interface
@@ -200,7 +201,7 @@ Wednesday morning.
 | Tue 17, 20:00 | **code freeze**: official run, numbers final |
 | Tue 17, 22:00 | slide content of each person in `slides/` |
 | Wed 18, 11:00 | deck complete; rehearsal with timing (about 6 minutes each), demo on Daniel's laptop |
-| Wed 18, 14:00 | README final, repository made public, PDF and pptx uploaded |
+| Wed 18, 14:00 | README final, repository made public, pptx uploaded |
 
 If on Tuesday at 18:00 something essential is missing, the group decides together whether to move
 the code freeze to Wednesday 12:00 and the delivery to Wednesday evening. Stretch items (E7, E8)

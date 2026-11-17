@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); next: D7 slides with the official numbers (by 22:00), deck on Wednesday |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; next: D7 slides with the official numbers (by 22:00), deck last, on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; next: `slides/fabio.md` after the official run (F6, by 22:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
@@ -61,6 +61,22 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 17:22, Daniel: delivery is the pptx only, cover without emails (D7)
+
+Decided by Daniel:
+1. **Only the pptx is uploaded**, no PDF: the professor never asked for a PDF (`docs/course.md`
+   has no such request; "PDF and pptx" was our own line in the timeline of `PLAN.md`).
+2. **The cover carries the three names and the repository link, no emails.** The professor asked
+   for the authors' emails in the homework 3 reports (`docs/course.md`, section 2, item 5), not
+   for the presentation.
+3. **The deck is the last thing**: it is built only when the code and all the numbers are final
+   (after the official run), as already planned for Wednesday morning.
+
+`PLAN.md` (D7 and the timeline row of Wednesday 14:00) and `docs/briefs/daniel.md` updated. No
+code change; tests 125 passed. Nothing changes for Fabio and Gioia (their slide files are due as
+before, Tuesday 22:00). Next: E1 nDCG@10 on `manual` and the E8 numbers in `slides/daniel.md` as
+soon as Gioia's final run is pushed.
 
 ### 17 Nov 2026 17:10, Gioia: disagreements adjudicated, final `manual` qrels (G4)
 

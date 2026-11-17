@@ -25,7 +25,7 @@ At every session, besides the next step:
    explain; once the official results are out, go through E1, E3, E4 (and E8) with him, since
    they test his choices, and the limits to state openly (`docs/course.md`, section 2).
 4. Care for the delivery as much as for the code: sober slides with figures and tables, the demo
-   rehearsed on Daniel's laptop, README verified from a fresh clone, repository public, emails on
+   rehearsed on Daniel's laptop, README verified from a fresh clone, repository public, names on
    the cover.
 
 ## Step D1: Elasticsearch
@@ -123,8 +123,8 @@ series, non-published pages, leakage of the sources). It is the base of Daniel's
 1. `slides/daniel.md` by Tuesday 22:00 (structure in `PLAN.md`, "Slides"): the data and its
    challenges, the indexing choices.
 2. Wednesday morning (deck ready by 11:00, upload by 14:00): build the deck from `slides/daniel.md`, `fabio.md`, `gioia.md`. Italian,
-   sober style (not "AI style"), no code. Cover with the three names, institutional emails and
-   the repository link.
+   sober style (not "AI style"), no code. Cover with the three names and the repository link (no
+   emails, decided by Daniel on 17 Nov). Only the pptx is uploaded (no PDF).
 3. README: setup verified from a fresh clone, "Usage" sections of the three parts merged.
 4. Make the repository public (`gh repo edit dnlsdn/wikinews-search --visibility public --accept-visibility-change-consequences`)
    before uploading the presentation, then check the link from a private browser window.
