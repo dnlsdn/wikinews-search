@@ -1,7 +1,8 @@
 # Slide di Daniel: i dati e l'indicizzazione
 
-Bozza del 16 novembre. Numeri da `results/data_report.md` (rigenerabile con
-`uv run python -m wikisearch.ingest.report`) e da `results/indexing.csv`. Circa 6 minuti, sette
+Bozza del 16 novembre, risultati aggiunti il 17. Numeri da `results/data_report.md` (rigenerabile
+con `uv run python -m wikisearch.ingest.report`), da `results/indexing.csv` e, per gli esperimenti,
+dalla run ufficiale di Gioia (`results/summary.md`). Circa 6 minuti, sette
 slide; la numerazione definitiva si fa quando si monta il deck.
 
 ## Slide 1: Il corpus
@@ -78,6 +79,7 @@ Contenuto: le query del test set sono scritte dentro le pagine; le togliamo dal 
 | query | "Il Dna lo scagiona, ma ha già scontato 24 anni" (titolo della fonte) |
 | articolo | "Texas: scagionato da una violenza sessuale dopo 25 anni di carcere" |
 | pagine con fonti fuori dalla sezione "Fonti" | 381 |
+| se le fonti fossero cercabili (E4, 7.072 query) | MRR@10 da 0,768 a 0,900 (+0,132, p Holm 0,0001) |
 
 Figura: nessuna
 Note del relatore: Il test set `fonti` usa come query i titoli delle fonti citate, cioè titoli di
@@ -86,7 +88,9 @@ la pagina, nel template `{{fonte}}`: se fossero cercabili il test non misurerebb
 togliere la sezione "Fonti": in 381 pagine le fonti sono altrove, e in 19 resterebbero anche
 togliendo tutte le sezioni di link. Quindi togliamo ogni template di fonte, dovunque sia. I titoli
 restano in un campo separato, `sources_text`, usato solo per misurare quanto il leakage gonfierebbe
-i risultati (E4).
+i risultati (E4). L'abbiamo misurato: con le fonti cercabili MRR@10 sale da 0,77 a 0,90, il 17% in
+più, e sulle query più difficili (poche parole in comune col titolo) da 0,53 a 0,81. Un test set
+con leakage avrebbe fatto sembrare il motore molto migliore di quello che è.
 
 ## Slide 6: Due indici, due analisi del testo
 Contenuto: stessi campi, analyzer `standard` contro `italian` (esperimento E1).
@@ -98,13 +102,21 @@ Contenuto: stessi campi, analyzer `standard` contro `italian` (esperimento E1).
 | `wikinews-standard` con vettori | 14,9 | 57,4 |
 | `wikinews-italian` con vettori | 13,8 | 54,9 |
 
+E1 su `fonti` (7.072 query): MRR@10 da 0,743 a 0,768 (+0,025), R@100 da 0,945 a 0,958 (+0,013),
+entrambi p Holm 0,0002; latenza p50 da 18,3 a 13,9 ms.
+
 Figura: nessuna
 Note del relatore: `italian` aggiunge elisione, stop word italiane e uno stemmer leggero:
 "l'Italia" diventa `ital`, "elezioni" ed "elezione" diventano entrambi `elezion`. L'indice viene il 6% più piccolo,
 perché ci sono meno termini distinti. Lo stemmer leggero però non unisce tutto: "scagiona" e
 "scagionato" restano diversi. Gli accenti: lo stemmer li toglie già nelle parole lunghe ("perché"
 e "perche" diventano `perc`), non in quelle corte ("città" e "citta" restano diverse) né nei nomi
-come "Erdoğan". Una variante con `asciifolding` non è stata costruita: nei due test set le query
+come "Erdoğan". Il risultato di E1: l'analisi italiana migliora sia la precisione in cima
+(MRR@10 +0,025) sia il recall (R@100 +0,013), entrambi significativi dopo la correzione di Holm,
+e costa meno, perché l'indice è più piccolo e la query più veloce (13,9 contro 18,3 ms). Non è
+un compromesso: è meglio su tutto. Il guadagno è più grande sulle query con poche parole in comune
+col titolo (MRR@10 da 0,475 a 0,525), dove conta riconoscere forme diverse della stessa parola.
+Una variante con `asciifolding` non è stata costruita: nei due test set le query
 hanno gli accenti, quindi non avrebbe misurato nulla. Titolo, lead e corpo sono campi di testo; categorie, agenzie e serie
 sono `keyword`, per filtri e faccette. Mapping rigido: un campo non previsto è un errore. Un nodo,
 uno shard, 1 GB di heap su un portatile con 8 GB. Ogni costruzione è ripetuta tre volte perché la
@@ -119,13 +131,17 @@ Contenuto: un vettore per documento, calcolato una volta e condiviso da tutti.
 | testo | "passage: " + titolo + lead |
 | tempo | 121 s per 12.213 documenti, su CPU |
 | struttura | HNSW non quantizzato: +19 MB, costruzione 3,6 volte più lenta |
+| `knn` contro BM25, query con poche parole in comune | MRR@10 da 0,525 a 0,557 (+0,032, p Holm 0,002) |
 
 Figura: nessuna
 Note del relatore: I vettori sono nel repository, così tutti indicizzano gli stessi e i portatili
 da 8 GB non devono ricalcolarli. Vettorizziamo titolo e lead perché il modello tronca i testi
 lunghi (512 token) e l'inizio di una notizia ne dice l'essenziale. La query "disastro in una
 miniera" trova "Cina: esplosione in miniera, 11 morti" e notizie simili, nessuna delle quali
-contiene la parola "disastro": il vettore coglie il significato, non le parole. I punteggi di
+contiene la parola "disastro": il vettore coglie il significato, non le parole. I numeri lo
+confermano dove ce lo aspettavamo: sulle parafrasi `knn` batte BM25 (+0,032 MRR@10), ma da solo
+perde recall (R@100 0,942 contro 0,958) e costa il doppio (28,5 contro 13,9 ms, quasi tutto per
+vettorizzare la query); per questo nel motore i due si combinano, come mostra Fabio. I punteggi di
 similarità sono tutti vicini (0,91-0,96), quindi conta solo l'ordine; per questo la ricerca ibrida
 fonde le classifiche con RRF e non i punteggi. Abbiamo fissato HNSW senza quantizzazione perché
 Elasticsearch 9.5, a 384 dimensioni, sceglierebbe da solo `bbq_hnsw`, la quantizzazione binaria:

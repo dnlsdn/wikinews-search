@@ -62,6 +62,21 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 17 Nov 2026 17:20, Daniel: experiment results on Daniel's slides (D7, work in progress)
+
+`slides/daniel.md`: each indexing choice now carries its number from Gioia's official `fonti` run
+(`results/summary.md`, 09:35), which the final run reproduces (same index and code):
+1. slide 5, leakage (E4): MRR@10 0.768 -> 0.900 with the sources searchable (+17%; low bucket
+   0.525 -> 0.808);
+2. slide 6, analyzer (E1): MRR@10 +0.025, R@100 +0.013 (Holm p 0.0002), and cheaper (p50 13.9
+   against 18.3 ms): better on every count, not a trade-off;
+3. slide 7, embeddings: `knn` over BM25 on the low-overlap bucket +0.032 MRR@10 (Holm p 0.002),
+   but lower R@100 (0.942 against 0.958) and twice the latency: the reason to combine them, shown
+   by Fabio (E3). Daniel's slide gives one number; the full E3 comparison stays on Fabio's slides,
+   the full tables on Gioia's.
+Still to add after the final run: E1 nDCG@10 on `manual` and E8 (quality and latency of `knn-int8`,
+`knn-bbq`). No code change; tests 125 passed. Next: those numbers, then the deck on Wednesday.
+
 ### 17 Nov 2026 17:05, Daniel: blind third-judge grades for the 49 disagreements of M01-M10 (G4)
 
 Daniel's session graded the 49 disagreements as the blind third judge agreed in #13 (M01-M05,
