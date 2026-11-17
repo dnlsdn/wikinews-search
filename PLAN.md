@@ -137,7 +137,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 - [x] **F4, Tue 17 by 11:00.** kNN configuration (query embedded with `EMBEDDING_MODEL`) and hybrid with
   reciprocal rank fusion computed in Python (k=60, parameters in the configuration); boost on
   `published` (E5). Stretch: collapse on `series_key` (E7).
-- [ ] **F5, Tue 17 afternoon.** Demo script: 5-6 queries that show the features and the differences between
+- [x] **F5, Tue 17 afternoon.** Demo script: 5-6 queries that show the features and the differences between
   configurations; screenshots as a fallback if the live demo fails in class. The demo runs on
   Daniel's laptop: rehearse it there.
 - [ ] **F6, Tue 17 evening.** Own slides (retrieval choices) in `slides/fabio.md`, and the demo.

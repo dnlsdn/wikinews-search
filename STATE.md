@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); next: D7 slides with the official numbers (by 22:00), deck on Wednesday |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); next: `docs/demo.md` as interface actions (F5) |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; next: `slides/fabio.md` after the official run (F6, by 22:00) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543, `qrels.txt` provisional until the 49 disagreements are adjudicated blind by Daniel's session (#13, #15); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
 How to get the dump (not in git): download
@@ -61,6 +61,41 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 17:35, Fabio: demo script as interface actions, F5 done
+
+`docs/demo.md` rewritten as Daniel asked in the entry of 14:50 (issue #8): every step is now a
+list of **interface actions for Daniel** (query typed in the box, configuration menu, Compare and
+the second menu, the two date fields, the ANSA checkbox, "Clear filters"), then what Fabio shows
+and the sentence he says; the links stay at the end of each step as the fallback, with the
+screenshots of `results/demo/`. Order and sentences unchanged. New section "How the interface
+reacts", for Daniel.
+
+Checked live on Fabio's laptop (Elasticsearch, the web app, the app's browser in Italian): every
+action of the file run once through the interface, results identical to the links. Found and
+written in the file:
+1. **Dates**: typing the year, the list refreshes at every digit (years 0002, 0020, 0200, then
+   2009), because each complete date fires a new search; it is harmless, keep typing.
+2. **"N results"** counts the results of the page (10 per page), not all the matching documents:
+   the old line "untick ANSA to show how many there were" is removed, the step says only that the
+   page fills up again and "Next" appears.
+3. **Filters stay active** when a new query is typed: "Clear filters" is now an explicit action at
+   the end of step 2 (otherwise "Pontecorvo" would run with the April 2009 dates and ANSA).
+4. Step 1 uses the configuration menu (`hybrid-rrf-published`), not the "Published only"
+   checkbox, as agreed with Daniel; step 4 changes the second menu before the first so the two
+   columns never show the same configuration.
+5. Warm-up: the first `knn` query took **78 s** on Fabio's laptop right after starting Docker
+   (19 s on Daniel's Mac on 16 Nov): the file asks to run it at least two minutes before the demo.
+6. Spare query: `knn` does find an oil article at rank 5, so the sentence now says "starts with
+   unrelated pages, first oil article only at rank 5" instead of "returns unrelated pages".
+
+Decided by Fabio: **F5 ticked** in `PLAN.md`. The plan asked for a rehearsal on Daniel's laptop;
+Daniel and Fabio agreed at 14:50 that a joint rehearsal is not needed (links checked twice on
+Daniel's Mac, Daniel practises the actions alone, same indices and code everywhere).
+
+No code change. Tests: 124 passed, 0 skipped (Elasticsearch and the E8 indices up). For Daniel:
+please practise from the new `docs/demo.md`, above all the dates. Next: `slides/fabio.md` (F6)
+with the official numbers, by 22:00.
 
 ### 17 Nov 2026 17:20, Daniel: experiment results on Daniel's slides (D7, work in progress)
 
