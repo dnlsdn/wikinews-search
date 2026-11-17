@@ -62,6 +62,17 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 17 Nov 2026 15:05, Gioia: Daniel's model grades on M11-M20 accepted (G4)
+
+Decided by Gioia: the grades of M11-M20 in `judgments/daniel.tsv`, given by Claude at Daniel's
+request (entry of 14:25), are accepted and enter `qrels.txt` as they are; Daniel is not asked to
+judge them again. Why it is acceptable: they are single-judged queries, so the kappa on M01-M10
+(human against human) is not affected, and the grades follow `GUIDELINES.md`. To state on the
+limits slide: 10 of the 30 `manual` queries (M11-M20, 197 of 573 pooled documents) carry a
+model's grades, not a human's; any `manual` number can also be reported on the 20 human-judged
+queries if the professor asks. Issue #10 commented. Nothing changes for the others. Next: merge
+when Fabio's `judgments/fabio.tsv` is in, then the full run.
+
 ### 17 Nov 2026 14:50, Daniel: how the live demo is run in class (agreed with Fabio)
 
 Decided by Daniel and Fabio (they talked directly; issue #8):
