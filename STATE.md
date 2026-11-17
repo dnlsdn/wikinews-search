@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); next: demo rehearsal 15:00, D7 slides Tuesday evening, deck on Wednesday |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); next: D7 slides with the official numbers (by 22:00), deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); next: `docs/demo.md` as interface actions (F5) |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543, `qrels.txt` provisional until the 49 disagreements are adjudicated blind by Daniel's session (#13, #15); G5 in progress: official run on `fonti` done (17 Nov 09:35, `results/metrics/`, `results/summary.md`); E3b (issue #11) and E8 (issue #12, indices built) added (12:35); final full run `uv run python -m evaluation.run` after the merge of the judgments (Tuesday 15:00); G4 merge script `evaluation/merge_judgments.py` ready |
 
@@ -61,6 +61,28 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 17:05, Daniel: blind third-judge grades for the 49 disagreements of M01-M10 (G4)
+
+Daniel's session graded the 49 disagreements as the blind third judge agreed in #13 (M01-M05,
+proposed by Daniel, accepted by Gioia) and #15 (M06-M10, proposed by Gioia, accepted by Fabio and,
+at 17:00, by Daniel). Grades posted in the issues as `qid<TAB>doc_id<TAB>grade` (25 in #13, 24 in
+#15): 2 = 21, 1 = 14, 0 = 14. M05 gets two documents of grade 2 (3060, 4964), so it stays in the
+metrics once the merge is rerun.
+
+How: Claude read only the qid, the `need` in `queries.tsv`, `GUIDELINES.md` and the article in
+`docs.jsonl`; it never opened `judgments/{gioia,daniel,fabio}.tsv`, and Daniel was not asked about
+any document (he is one of the two judges of M01-M05). Rules applied, for consistency: rule 3
+strictly on the `time` queries (other elections in M03, the Club World Cup in M07: 0); events
+closely connected but not the need itself are 1 (qualifying play-offs and squad lists of the 2006
+World Cup, procedural pages on the 2006 election, Pavarotti leaving hospital, the removal of the
+Costa Concordia wreck in 2013); special pages carrying the results are 2 (rule 4); entity needs
+read as written (a tax case of Valentino Rossi is 0 for "races, championships and results").
+Limit for the slides (already agreed): the disagreements of M01-M10 were resolved by a model as
+third judge; the kappa stays on the original human grades.
+
+For Gioia: write `judgments/resolved.tsv` from the two comments and rerun the merge and the run
+before 19:15. No code change; tests 125 passed. Next: D7 (slides with the official numbers).
 
 ### 17 Nov 2026 17:05, Gioia: all judgments merged, provisional `manual` qrels (G4, work in progress)
 
