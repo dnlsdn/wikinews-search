@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); next: review of Gioia's queries Tue 10:00, deck on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00) |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; review of the queries by Tue 10:00 still open (issue #9); G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 in progress (16 Nov 22:08): queries, guidelines, tool and pool done, judging files pushed; review of the queries by Tue 10:00 still open (issue #9); G4: Gioia's 178 judgments pushed (17 Nov 09:22), Daniel and Fabio judge Tue 12:00-15:00; G5 in progress (21:50): runner `evaluation/run.py` works, dev run of every configuration done, latency measured in a separate fair pass; official run Tuesday by 20:00; G4 merge script `evaluation/merge_judgments.py` ready for Tuesday 15:00 |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,20 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 17 Nov 2026 09:22, Gioia: Gioia's judgments of the `manual` pool (G4, work in progress)
+
+Gioia judged her assignment, queries M01-M10: `evaluation/testsets/manual/judgments/gioia.tsv`,
+178 of 178 documents, none missing. Grades: 0 = 71, 1 = 18, 2 = 89. Per query (0 / 1 / 2): M01
+1/0/11, M02 0/1/16, M03 5/3/11, M04 25/1/1, M05 13/0/2, M06 2/0/9, M07 2/8/13, M08 20/2/1, M09
+2/2/9, M10 1/1/16. Two `vague` queries have almost nothing relevant in the pool: M04 (death of
+Pavarotti, 1 document of grade 2) and M08 (Costa Concordia, 1); they still have a relevant
+document, so they are not skipped by the metrics.
+
+Grades are not discussed with the others: queries M01-M05 are judged again by Daniel and M06-M10
+by Fabio, for Cohen's kappa. For Daniel and Fabio: `git pull`, then
+`uv run python -m evaluation.judge --judge <name>`, and push `judgments/<name>.tsv`. Next:
+`uv run python -m evaluation.merge_judgments` once the three files are in (Tuesday 15:00).
 
 ### 16 Nov 2026 22:08, Gioia: `manual` pool done before the review (G3, work in progress)
 
