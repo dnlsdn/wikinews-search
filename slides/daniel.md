@@ -1,6 +1,6 @@
 # Slide di Daniel: i dati e l'indicizzazione
 
-Bozza del 16 novembre, risultati aggiunti il 17. Numeri da `results/data_report.md` (rigenerabile
+Bozza del 16 novembre, risultati aggiunti il 17 (run ufficiale finale delle 17:27). Numeri da `results/data_report.md` (rigenerabile
 con `uv run python -m wikisearch.ingest.report`), da `results/indexing.csv` e, per gli esperimenti,
 dalla run ufficiale di Gioia (`results/summary.md`). Circa 6 minuti, sette
 slide; la numerazione definitiva si fa quando si monta il deck.
@@ -67,7 +67,9 @@ Contenuto: pagine non pubblicate, serie quasi identiche, tabelle; le teniamo tut
 Figura: nessuna
 Note del relatore: Una classifica o uno speciale sulle elezioni possono rispondere a una query
 vera, e la valutazione deve vedere tutte le pagine; se convenga penalizzare le non pubblicate lo
-misura un esperimento (E5). Le serie, come i 216 concorsi del SuperEnalotto, hanno titoli uguali a
+misura un esperimento (E5): non conviene, la spinta alle pubblicate fa scendere nDCG@10 su `manual`
+da 0,804 a 0,758 (p 0,029), perché porta su pagine pubblicate ma meno pertinenti. Tenerle e trattarle come le altre funziona
+meglio che penalizzarle. Le serie, come i 216 concorsi del SuperEnalotto, hanno titoli uguali a
 meno dei numeri: `series_key` sostituisce le cifre con `#` e permette di raggrupparle. Le tabelle
 non si possono buttare: 366 pagine sono fatte solo di tabelle e sarebbero rimaste vuote.
 
@@ -103,7 +105,8 @@ Contenuto: stessi campi, analyzer `standard` contro `italian` (esperimento E1).
 | `wikinews-italian` con vettori | 13,8 | 54,9 |
 
 E1 su `fonti` (7.072 query): MRR@10 da 0,743 a 0,768 (+0,025), R@100 da 0,945 a 0,958 (+0,013),
-entrambi p Holm 0,0002; latenza p50 da 18,3 a 13,9 ms.
+entrambi p Holm 0,0002; latenza p50 da 19,2 a 14,6 ms.
+E1 su `manual` (30 query, giudizi 0/1/2): nDCG@10 da 0,648 a 0,701 (+0,052, p 0,038).
 
 Figura: nessuna
 Note del relatore: `italian` aggiunge elisione, stop word italiane e uno stemmer leggero:
@@ -113,8 +116,10 @@ perché ci sono meno termini distinti. Lo stemmer leggero però non unisce tutto
 e "perche" diventano `perc`), non in quelle corte ("città" e "citta" restano diverse) né nei nomi
 come "Erdoğan". Il risultato di E1: l'analisi italiana migliora sia la precisione in cima
 (MRR@10 +0,025) sia il recall (R@100 +0,013), entrambi significativi dopo la correzione di Holm,
-e costa meno, perché l'indice è più piccolo e la query più veloce (13,9 contro 18,3 ms). Non è
-un compromesso: è meglio su tutto. Il guadagno è più grande sulle query con poche parole in comune
+e costa meno, perché l'indice è più piccolo e la query più veloce (14,6 contro 19,2 ms). Non è
+un compromesso: è meglio su tutto. Lo conferma il secondo test set, `manual`, con giudizi
+graduati: nDCG@10 da 0,648 a 0,701, significativo (p 0,038) ma con intervalli larghi, perché le
+query sono solo 30. Il guadagno è più grande sulle query con poche parole in comune
 col titolo (MRR@10 da 0,475 a 0,525), dove conta riconoscere forme diverse della stessa parola.
 Una variante con `asciifolding` non è stata costruita: nei due test set le query
 hanno gli accenti, quindi non avrebbe misurato nulla. Titolo, lead e corpo sono campi di testo; categorie, agenzie e serie
@@ -132,6 +137,7 @@ Contenuto: un vettore per documento, calcolato una volta e condiviso da tutti.
 | tempo | 121 s per 12.213 documenti, su CPU |
 | struttura | HNSW non quantizzato: +19 MB, costruzione 3,6 volte più lenta |
 | `knn` contro BM25, query con poche parole in comune | MRR@10 da 0,525 a 0,557 (+0,032, p Holm 0,002) |
+| quantizzazione (E8): `int8_hnsw`, `bbq_hnsw` contro HNSW | MRR@10 -0,0004 (non significativo); `bbq` R@100 -0,003 (p Holm 0,03); latenza uguale, 25-26 ms |
 
 Figura: nessuna
 Note del relatore: I vettori sono nel repository, così tutti indicizzano gli stessi e i portatili
@@ -140,9 +146,16 @@ lunghi (512 token) e l'inizio di una notizia ne dice l'essenziale. La query "dis
 miniera" trova "Cina: esplosione in miniera, 11 morti" e notizie simili, nessuna delle quali
 contiene la parola "disastro": il vettore coglie il significato, non le parole. I numeri lo
 confermano dove ce lo aspettavamo: sulle parafrasi `knn` batte BM25 (+0,032 MRR@10), ma da solo
-perde recall (R@100 0,942 contro 0,958) e costa il doppio (28,5 contro 13,9 ms, quasi tutto per
+perde recall (R@100 0,942 contro 0,958) e costa quasi il doppio (25,8 contro 14,6 ms, quasi tutto per
 vettorizzare la query); per questo nel motore i due si combinano, come mostra Fabio. I punteggi di
 similarità sono tutti vicini (0,91-0,96), quindi conta solo l'ordine; per questo la ricerca ibrida
 fonde le classifiche con RRF e non i punteggi. Abbiamo fissato HNSW senza quantizzazione perché
 Elasticsearch 9.5, a 384 dimensioni, sceglierebbe da solo `bbq_hnsw`, la quantizzazione binaria:
-quanto costi in qualità è l'esperimento E8.
+quanto costi in qualità è l'esperimento E8. Risultato: quasi niente. `int8` e `bbq` perdono 0,0004
+di MRR@10, non significativo; `bbq` perde un po' di recall (R@100 -0,003, significativo dopo
+Holm); la latenza non cambia. Il guadagno è nella memoria: la parte che la ricerca tiene in RAM
+passa da 19,2 MB (HNSW) a 5,3 MB (`int8`) e 1,2 MB (`bbq`), perché il grafo si percorre sui
+vettori compressi e i float32 servono solo a riordinare i candidati finali. Con 12.213 documenti
+tutto sta comunque in memoria: la quantizzazione conterebbe con milioni di vettori, e qui mostra
+solo che costerebbe poco in qualità. Su disco gli indici quantizzati sono anzi più grandi, perché
+Elasticsearch tiene anche i vettori originali.

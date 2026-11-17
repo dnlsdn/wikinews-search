@@ -62,6 +62,21 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 17 Nov 2026 17:45, Daniel: final official numbers on Daniel's slides (D7, work in progress)
+
+`slides/daniel.md` updated with Gioia's final run (entry of 17:30, `results/summary.md`):
+1. slide 6 (E1): `manual` nDCG@10 0.648 -> 0.701 (+0.052, p 0.038; one test, so Holm p = p);
+   latency p50 now 19.2 against 14.6 ms (the final latency pass; the `fonti` means are unchanged).
+2. slide 7 (embeddings): `knn` latency 25.8 against 14.6 ms ("almost twice", was "twice"); new
+   row and notes for E8: `int8` and `bbq` lose 0.0004 MRR@10 (Holm p 0.95), `bbq` loses R@100
+   0.003 (Holm p 0.026), latency unchanged (25-26 ms); the gain is memory (19.2 -> 5.3 -> 1.2 MB in
+   RAM, entry of 16 Nov 15:30), which at 12,213 documents does not matter.
+3. slide 4 (non-published pages): the answer of E5, the published boost lowers `manual` nDCG@10
+   from 0.804 to 0.758 (p 0.029), so keeping those pages unpenalised was right.
+For the deck: Fabio's E5 slide and Gioia's results should say the same (the boost hurts). No code
+change; tests 125 passed. Next: read `slides/fabio.md` and `slides/gioia.md` when pushed (22:00)
+for consistency; the deck last, on Wednesday morning.
+
 ### 17 Nov 2026 17:30, Gioia: final official run, numbers frozen (G5 done, G4 done)
 
 `uv run python -m evaluation.run` (full, every configuration, both test sets; started 16:56,
