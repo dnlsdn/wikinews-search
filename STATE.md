@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:17), decisions on repeated results in #17 (Fabio) and #18 (Gioia); Daniel's speech written (18 Nov 10:22, 5:55 min): notes of `slides/daniel.md` and `slides/discorso-daniel.md`; README final (18 Nov 10:29), setup checked from a fresh clone end to end (10:49); next: Fabio's and Gioia's reviews (#17, #18), regenerate the deck, rehearsal, README, repository public, upload |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking; #17 applied (18 Nov 11:58: RRF diagram on slide 3, latency wording); next: Fabio's review of the notes (about 4:00 for slides 1-4, budget 2:30), then F6 ticked |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking; #17 applied (18 Nov 11:58: RRF diagram on slide 3, latency wording); F6 done (18 Nov 12:05): notes of slides 1-4 cut to about 2:37, F6 ticked; restyle of PR #19 confirmed (#14); next: demo rehearsal on Daniel's laptop |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30); #18 applied (10:30: who graded `manual`, same wording on slides 1, 3, 8); G6 done (10:36): notes reviewed and cut to about 5:45, G6 ticked; questions for the oral in `slides/domande-gioia.md` (10:38); next: rehearsal |
 
 How to get the dump (not in git): download
@@ -61,6 +61,27 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 12:05, Fabio: speaker notes cut to about 2:30, F6 done
+
+Fabio's review of `slides/fabio.md`, decided by Fabio. Only the "Note del relatore" of slides 1-4
+changed; titles, tables, figures and numbers are the same as in the 11:58 version (slide 5 and the
+header unchanged). The notes of slides 1-4 went from 568 to 375 words, about 4:00 down to 2:37 at
+2.4 words per second, within the budget of Daniel's entry of 10:22 (about 2:30 for slides 1-4,
+then 3:30 of live demo). Cut, with the same rule as Gioia's: what the table on the same slide
+already shows, and details that stay as answers for the oral questions, not on the slides:
+title-only BM25 -0.104 (slide 2 table), kNN R@100 0.942 against 0.958 and the hybrid +0.086 on
+paraphrases (slide 3 table), the E3b numbers (+0.011 overall, Holm p 0.003; -0.036 on paraphrases,
+Holm p 0.0008: the limit is still said, without numbers). Every number left was checked against
+`results/summary.md` (run of 17 Nov 17:27).
+
+Also for the record (#14): Fabio confirmed the restyle merged from PR #19 by Daniel (commit
+441b1f1), as it is, before the class presentation.
+
+F6 ticked in `PLAN.md`: `slides/fabio.md` reviewed, README "Usage" for the web app done (16 Nov),
+demo script done (F5). No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running).
+For Daniel: regenerate the deck from `slides/fabio.md` (comment in #17). Next: rehearsal of the
+demo on Daniel's laptop with the new look.
 
 ### 18 Nov 2026 12:02, Daniel: web restyle merged before the presentation, deck regenerated (D7)
 

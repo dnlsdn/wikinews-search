@@ -141,7 +141,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
 - [x] **F5, Tue 17 afternoon.** Demo script: 5-6 queries that show the features and the differences between
   configurations; screenshots as a fallback if the live demo fails in class. The demo runs on
   Daniel's laptop: rehearse it there.
-- [ ] **F6, Tue 17 evening.** Own slides (retrieval choices) in `slides/fabio.md`, and the demo.
+- [x] **F6, Tue 17 evening.** Own slides (retrieval choices) in `slides/fabio.md`, and the demo.
 
 ### Gioia: evaluation
 

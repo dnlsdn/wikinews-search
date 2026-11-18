@@ -21,10 +21,10 @@ dell'ablazione.
 
 Figura: results/demo/3-exact-name-bm25-vs-knn.png
 Note del relatore: Il motore non ha una configurazione "giusta" scritta nel codice: ha undici
-configurazioni con un nome, e la stessa funzione serve sia la pagina web sia gli esperimenti di
-Gioia. Così ogni numero delle slide di Gioia corrisponde a qualcosa che si può aprire
-nell'interfaccia, e la modalità Compare (in figura) mette due configurazioni una accanto all'altra
-sulla stessa query: è quello che userò nella demo. La configurazione di default è `hybrid-rrf`.
+configurazioni con un nome, e la stessa funzione serve la pagina web e gli esperimenti di Gioia.
+Ogni numero che vedrete corrisponde a qualcosa che si apre nell'interfaccia; la modalità
+Compare, in figura, mette due configurazioni a confronto sulla stessa query. Il default è
+`hybrid-rrf`.
 
 ## Slide 2: BM25, quali campi e con quali pesi (E2)
 Contenuto: titolo, lead e corpo con pesi 3, 2, 1 era la nostra scelta iniziale; l'esperimento
@@ -38,16 +38,12 @@ l'ha smentita.
 | pesi uguali | **0,800** (+0,032, p 0,0006) | **0,646** |
 
 Figura: results/figures/e1_e2_bm25.png
-Note del relatore: BM25 cerca i tre campi con una `multi_match` di tipo `best_fields`: vince il
-campo che corrisponde meglio, più una parte degli altri. Avevamo dato più peso al titolo per
-intuizione: il titolo di una notizia ne dice l'essenziale. Cercare solo nel titolo però perde
-0,104 di MRR@10, e i pesi uguali battono i nostri di 0,032, in modo significativo. Il guadagno
-è quasi tutto sulle query con poche parole in comune col titolo, le parafrasi: 0,646 contro
-0,525. Quando la query non riusa le parole del titolo, spingere il titolo aiuta i documenti
-sbagliati che quelle parole le hanno. È il motivo per cui le scelte vanno misurate: su questa
-l'intuizione era sbagliata. Le configurazioni di E3 e E5 usano ancora i pesi 3-2-1: le abbiamo
-fissate prima dei risultati, e cambiarle dopo aver visto il test set vorrebbe dire tarare il
-motore sulle stesse query con cui lo valutiamo.
+Note del relatore: BM25 cerca titolo, lead e corpo con una `multi_match` di tipo `best_fields`.
+Avevamo dato più peso al titolo per intuizione, ma i pesi uguali battono i nostri di 0,032, in
+modo significativo, e il guadagno è quasi tutto sulle parafrasi: 0,646 contro 0,525. Se la query
+non riusa le parole del titolo, spingere il titolo premia i documenti sbagliati che quelle
+parole le hanno. E3 ed E5 usano ancora 3-2-1: le configurazioni erano fissate prima dei
+risultati, e cambiarle dopo vorrebbe dire tarare il motore sulle query di test.
 
 ## Slide 3: Lessicale, semantica, ibrida (E3)
 Contenuto: BM25 trova le parole, kNN il significato; l'ibrida fonde le due classifiche con
@@ -62,19 +58,15 @@ reciprocal rank fusion (RRF).
 | latenza p50 | 14,6 ms | 25,8 ms | 43,1 ms |
 
 Figura: schema di RRF (disegnato nel deck)
-Note del relatore: kNN cerca nel grafo HNSW i documenti col vettore più vicino a quello della
-query. Batte BM25 sulle parafrasi (+0,032) ma perde recall (R@100 0,942 contro 0,958): sui nomi
-rari e sulle parole poco comuni sbaglia, come vedrete nella demo. L'ibrida esegue entrambe le
-ricerche, 100 risultati ciascuna, e somma 1/(60 + posizione) di ogni documento nelle due liste.
-Usiamo le posizioni e non i punteggi perché i punteggi BM25 e le similarità coseno sono su
-scale diverse: una somma pesata richiederebbe di tarare un peso. Risultato: su fonti l'ibrida è
-la migliore, tutte le differenze significative, e il guadagno è massimo sulle parafrasi (+0,086
-su BM25). Su manual è significativa solo l'ibrida contro BM25 (+0,103, p 0,010): con 30 query
-gli intervalli sono larghi. Il costo è la latenza: 43 ms contro 15, perché fa due ricerche e
-vettorizza la query; resta sotto i 60 ms anche al 95° percentile. Un limite, misurato dopo aver visto i risultati (E3b):
-contro BM25 a pesi uguali l'ibrida vince in media (+0,011, p 0,003) ma perde sulle parafrasi
-(-0,036, p 0,0008). Un'ibrida costruita sui pesi uguali non l'abbiamo provata: è il passo
-successivo.
+Note del relatore: kNN cerca nel grafo HNSW i vettori più vicini alla query: batte BM25 sulle
+parafrasi ma perde recall sui nomi rari, come vedrete nella demo. L'ibrida esegue le due
+ricerche, 100 risultati ciascuna, e somma 1/(60 + posizione) di ogni documento, come nello
+schema. Usiamo le posizioni perché i punteggi BM25 e le similarità coseno sono su scale diverse:
+una somma pesata richiederebbe di tarare un peso. Su fonti l'ibrida è la migliore, con il
+guadagno massimo sulle parafrasi; su manual è significativa solo contro BM25 (p 0,010), perché
+con 30 query gli intervalli sono larghi. Costa latenza, 43 ms contro 15, ma resta sotto i 60 ms
+anche al 95° percentile. Un limite: contro BM25 a pesi uguali l'ibrida perde sulle parafrasi;
+un'ibrida sui pesi uguali è il passo successivo.
 
 ## Slide 4: Filtri, faccette, pagine non pubblicate (E5)
 Contenuto: i filtri restringono senza cambiare i punteggi; le faccette contano per categoria,
@@ -86,18 +78,13 @@ fonte e anno; la spinta alle pagine pubblicate peggiora i risultati.
 | ibrida, punteggio delle pubblicate x 1,5 | 0,758 (-0,046, p 0,029) |
 
 Figura: results/demo/2-filters-date-agency.png
-Note del relatore: Data, categorie, fonti e "solo pubblicate" sono clausole `filter` di
-Elasticsearch: escludono documenti ma non toccano il punteggio, e passano anche dentro la
-ricerca kNN, così una query vettoriale filtrata restituisce comunque k risultati. Le faccette
-sono aggregazioni sui campi `keyword` e sulla data per anno, calcolate sulla query BM25 anche in
-modalità kNN: sono lessicali per scelta, e contano i risultati di tutta la query, non solo quelli
-filtrati. Le 1.181 pagine non pubblicate (speciali, tabelle, bozze) sono rimaste nell'indice,
-marcate. La spinta alle pubblicate moltiplica per 1,5 il punteggio dopo la fusione, e su manual
-fa scendere nDCG@10 da 0,804 a 0,758, in modo significativo: porta su pagine pubblicate ma meno
-pertinenti, mentre alcune pagine non pubblicate, come uno speciale o una classifica, rispondono
-davvero alla query. Non la misuriamo su
-fonti perché lì il documento giusto è sempre un articolo pubblicato: il test la favorirebbe per
-costruzione. Quindi la configurazione di default non usa la spinta.
+Note del relatore: I filtri sono clausole `filter` di Elasticsearch: escludono documenti senza
+toccare il punteggio, e valgono anche dentro la ricerca kNN, che così restituisce comunque k
+risultati. Le faccette contano per categoria, fonte e anno, sulla query BM25 anche in modalità
+kNN. Le 1.181 pagine non pubblicate restano nell'indice, marcate. La spinta alle pubblicate,
+punteggio per 1,5 dopo la fusione, fa scendere nDCG@10 su manual da 0,804 a 0,758: alcune pagine
+non pubblicate, come uno speciale, rispondono davvero alla query. Non la misuriamo su fonti,
+dove il documento giusto è sempre pubblicato. Quindi il default non usa la spinta.
 
 ## Slide 5: Demo
 Contenuto: cinque query dal vivo sul portatile di Daniel: una ricerca con pagina non pubblicata,
