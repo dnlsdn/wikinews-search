@@ -46,7 +46,7 @@ sui pesi uguali è il passo successivo.
 
 I filtri sono clausole `filter` di Elasticsearch: **escludono documenti senza toccare il
 punteggio**, e valgono anche dentro la ricerca kNN, che così restituisce comunque k risultati. Le
-faccette contano per categoria, fonte e anno, sulla query BM25 anche in modalità kNN. Le **1.181
+faccette contano per categoria e fonte, sulla query BM25 anche in modalità kNN. Le **1.181
 pagine non pubblicate** restano nell'indice, marcate. La spinta alle pubblicate, punteggio per 1,5
 dopo la fusione, **fa scendere nDCG@10 su manual da 0,804 a 0,758**: alcune pagine non
 pubblicate, come uno speciale, rispondono davvero alla query. Non la misuriamo su fonti, dove il

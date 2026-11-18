@@ -62,6 +62,15 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 17:26, Fabio: facets on slide 4 are categories and sources only (#20)
+
+`slides/fabio.md` (slide 4 = deck slide 12, subtitle and speaker notes), `slides/discorso-fabio.md`
+and `slides/domande-fabio.md`: "le faccette contano per categoria, fonte e anno" becomes "per
+categoria e fonte". Reason: `/api/facets` also computes a year histogram, but the interface shows
+only the category and source facets (the dates are a range filter, "Da"/"A", with no counts), so
+the slide now says what the screenshot shows. Decided by Fabio. Nothing to run, nothing changes
+for the others; Daniel regenerates the deck together with the 17:14 changes.
+
 ### 18 Nov 2026 17:14, Fabio: two lines removed from his slides 1 and 5 (#20)
 
 `slides/fabio.md` only, to be picked up at the next deck regeneration (Daniel, #20); nothing to

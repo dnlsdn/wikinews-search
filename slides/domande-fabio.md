@@ -90,8 +90,9 @@ dalla run ufficiale del 17 novembre 17:27 (`results/summary.md`), dal codice di
 20. **E nella ricerca kNN?** Il filtro sta **dentro** la ricerca nel grafo, non dopo: una query
     vettoriale filtrata restituisce comunque k risultati, se esistono. Filtrare dopo potrebbe
     lasciare la pagina quasi vuota.
-21. **Come sono calcolate le faccette?** Aggregazioni su categorie (15), fonti (10) e data per
-    anno, calcolate sulla query BM25 senza i filtri, anche quando la configurazione è kNN. Sono
+21. **Come sono calcolate le faccette?** Aggregazioni su categorie (15) e fonti (10)
+    (l'API conta anche per anno, ma l'interfaccia non lo mostra: per il tempo c'è il filtro per
+    intervallo di date), calcolate sulla query BM25 senza i filtri, anche quando la configurazione è kNN. Sono
     lessicali per scelta: kNN dà un vicino a qualsiasi documento, quindi non ha un "insieme dei
     risultati" da contare. Effetto: in modalità kNN i conteggi descrivono i documenti che
     contengono le parole, non la lista mostrata.
