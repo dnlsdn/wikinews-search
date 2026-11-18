@@ -61,7 +61,7 @@ reciprocal rank fusion (RRF).
 | nDCG@10, manual | 0,701 | 0,764 | **0,804** |
 | latenza p50 | 14,6 ms | 25,8 ms | 43,1 ms |
 
-Figura: results/figures/e3_buckets.png
+Figura: schema di RRF (disegnato nel deck)
 Note del relatore: kNN cerca nel grafo HNSW i documenti col vettore più vicino a quello della
 query. Batte BM25 sulle parafrasi (+0,032) ma perde recall (R@100 0,942 contro 0,958): sui nomi
 rari e sulle parole poco comuni sbaglia, come vedrete nella demo. L'ibrida esegue entrambe le
@@ -71,7 +71,7 @@ scale diverse: una somma pesata richiederebbe di tarare un peso. Risultato: su f
 la migliore, tutte le differenze significative, e il guadagno è massimo sulle parafrasi (+0,086
 su BM25). Su manual è significativa solo l'ibrida contro BM25 (+0,103, p 0,010): con 30 query
 gli intervalli sono larghi. Il costo è la latenza: 43 ms contro 15, perché fa due ricerche e
-vettorizza la query; resta sotto i 100 ms. Un limite, misurato dopo aver visto i risultati (E3b):
+vettorizza la query; resta sotto i 60 ms anche al 95° percentile. Un limite, misurato dopo aver visto i risultati (E3b):
 contro BM25 a pesi uguali l'ibrida vince in media (+0,011, p 0,003) ma perde sulle parafrasi
 (-0,036, p 0,0008). Un'ibrida costruita sui pesi uguali non l'abbiamo provata: è il passo
 successivo.

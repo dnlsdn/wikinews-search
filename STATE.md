@@ -9,7 +9,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:17), decisions on repeated results in #17 (Fabio) and #18 (Gioia); Daniel's speech written (18 Nov 10:22, 5:55 min): notes of `slides/daniel.md` and `slides/discorso-daniel.md`; README final (18 Nov 10:29), setup checked from a fresh clone end to end (10:49); next: Fabio's and Gioia's reviews (#17, #18), regenerate the deck, rehearsal, README, repository public, upload |
-| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking |
+| Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking; #17 applied (18 Nov 11:58: RRF diagram on slide 3, latency wording); next: Fabio's review of the notes (about 4:00 for slides 1-4, budget 2:30), then F6 ticked |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30); #18 applied (10:30: who graded `manual`, same wording on slides 1, 3, 8); G6 done (10:36): notes reviewed and cut to about 5:45, G6 ticked; questions for the oral in `slides/domande-gioia.md` (10:38); next: rehearsal |
 
 How to get the dump (not in git): download
@@ -61,6 +61,18 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 11:58, Fabio: issue #17 applied on `slides/fabio.md` (F6, work in progress)
+
+Issue #17 (Daniel), accepted by Fabio. Two changes on slide 3 of `slides/fabio.md`, nothing else:
+1. `Figura:` is now "schema di RRF (disegnato nel deck)": `e3_buckets.png` stays only on Gioia's
+   slide 5; Daniel's deck draws the RRF diagram (two ranked lists, 1/(60 + rank) summed).
+2. Latency wording, same as Gioia's slide 7: the hybrid "resta sotto i 60 ms anche al 95°
+   percentile" (p95 53.4 ms in `results/summary.md`, E6), instead of "sotto i 100 ms".
+No number changed. No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running).
+For Daniel: regenerate the deck from `slides/fabio.md`. Next: Fabio's review of the whole file
+(the speaker notes of slides 1-4 are about 568 words, about 4:00 at 2.4 words per second, against
+the 2:30 budget), then F6 ticked.
 
 ### 18 Nov 2026 10:56, Daniel: where the deck is built (D7)
 
