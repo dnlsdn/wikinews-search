@@ -10,7 +10,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
 | Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); next: check the three slide files for consistency after 22:00, deck last, on Wednesday |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking |
-| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; next: `slides/gioia.md` by 22:00 |
+| Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30), Gioia's review before ticking G6; next: rehearsal |
 
 How to get the dump (not in git): download
 https://dumps.wikimedia.org/other/enterprise_html/runs/20250320/itwikinews-NS0-20250320-ENTERPRISE-HTML.json.tar.gz
@@ -61,6 +61,28 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 09:30, Gioia: `slides/gioia.md` written (G6, work in progress)
+
+`slides/gioia.md`, in Italian, with the structure of `PLAN.md` ("Slides"), nine short slides
+(about 6 minutes), structure decided by Gioia: (1) how we evaluate, the two test sets side by
+side; (2) `fonti`: the idea and the funnel 17,192 -> 7,072, buckets, language rule and leakage
+check; (3) `manual`: 30 queries with needs, pool of 573 documents (95 found only by `knn`), grades,
+kappa 0.543 / 0.674, blind third judge; (4) statistical checks: bootstrap intervals, paired
+randomization test, Holm, `random` baseline at 0, metrics tested by hand; (5) E3 per bucket
+(`e3_buckets.png`, the key figure); (6) `manual` nDCG@10 with intervals (`manual_ndcg.png`) and
+the human-judged subset; (7) costs, E6 and E8 (`e6_tradeoff.png`); (8) limits; (9) conclusions,
+one row per experiment (confirmed: E1, E3, E4; contradicted: E2, E5).
+
+Every number is from `results/summary.md` and `results/metrics/` of the final run (17 Nov 17:27);
+nothing was rerun. To avoid repeating the other parts, E1 and E4 details stay on Daniel's slides,
+E2, E3 and E5 on Fabio's; Gioia's slides only recall them in the final table, with the same
+numbers. Late against the plan (Tuesday 22:00): written this morning, before the deck.
+
+No code change. Tests: 130 passed. For Daniel: `slides/gioia.md` is ready for the deck; the four
+figures are in `results/figures/` (`e3_buckets.png` is also on Fabio's slide 3: in the deck it
+can be shown once). G6 not ticked yet: Gioia reviews the text first. Next: Gioia's review, then
+G6 ticked, then the rehearsal.
 
 ### 17 Nov 2026 18:10, Fabio: `slides/fabio.md` with the official numbers (F6, work in progress)
 
