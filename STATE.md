@@ -62,6 +62,14 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 13:31, Daniel: rule for slide changes until the delivery (D7)
+
+Decided by Daniel, issue #20 for Fabio and Gioia: the deck is generated from `slides/<name>.md`
+and regenerated at every change, so nobody edits `slides/wikinews-search.pptx` directly (an edit
+there is lost at the next regeneration, and a binary file cannot be merged). Text, tables and
+notes: change your own `.md` file and tell Daniel; layout or drawing changes: describe them in an
+issue for Daniel. Never commit a modified pptx.
+
 ### 18 Nov 2026 13:11, Daniel: public demo online, deck regenerated with Fabio's and Gioia's notes (D7)
 
 **Public demo** at https://wikinews-search.denmarkeast.cloudapp.azure.com (link at the top of the
