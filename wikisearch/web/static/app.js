@@ -168,6 +168,13 @@ function summary(data) {
   return `${data.total} results in ${data.took_ms} ms`;
 }
 
+// Family of a configuration, for the colour of its column header (same colours as the slides).
+function family(config) {
+  if (config.startsWith("hybrid")) return "hybrid";
+  if (config.startsWith("knn")) return "knn";
+  return "bm25";
+}
+
 function renderColumn(config, result, s) {
   const header = s.compare
     ? `<h2>${escapeHtml(config)}</h2><div class="column-status">${
@@ -175,7 +182,7 @@ function renderColumn(config, result, s) {
       }</div>`
     : "";
   if (result.status === "rejected") {
-    return `<section class="column">${header}<p class="column-status">Error: ${escapeHtml(
+    return `<section class="column" data-family="${family(config)}">${header}<p class="column-status">Error: ${escapeHtml(
       result.reason.message
     )}</p></section>`;
   }
@@ -184,7 +191,7 @@ function renderColumn(config, result, s) {
   const items = hits.length
     ? hits.map((h, i) => renderHit(h, first + i)).join("")
     : `<li class="column-status">No results.</li>`;
-  return `<section class="column">${header}<ol class="results">${items}</ol></section>`;
+  return `<section class="column" data-family="${family(config)}">${header}<ol class="results">${items}</ol></section>`;
 }
 
 function renderFacets(data, s) {
