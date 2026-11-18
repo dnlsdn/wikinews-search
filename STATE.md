@@ -62,6 +62,14 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 10:51, Daniel: deck regenerated with Gioia's review (D7)
+
+`slides/wikinews-search.pptx` regenerated from the current `.md` files (commit dc70372): Gioia's
+changes of #18 (who graded `manual`, same wording on slides 1, 3, 8) and her shorter notes are in
+the deck. Times from the notes: Daniel 5:55, Gioia 5:44, Fabio 4:27 (his notes before his
+review; the live demo adds about 3:30). Changed slides checked visually. #18 closed. Waiting for
+Fabio (#17: slide 3 figure line, latency wording, his review), then the last regeneration.
+
 ### 18 Nov 2026 10:49, Daniel: fresh clone checked end to end, with Elasticsearch (D7)
 
 Continuation of the 10:29 entry, the part that needed Elasticsearch (Docker started for it):
