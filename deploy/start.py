@@ -8,6 +8,7 @@ Elasticsearch listens on 127.0.0.1 only, so the only open port is the web app's.
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -21,7 +22,24 @@ APP = "http://127.0.0.1:7860"
 PY = sys.executable
 
 
-def start_es() -> subprocess.Popen:
+BUILT = Path.home() / "esdata"  # written while the image is built
+RUN = Path.home() / "esdata-run"  # the copy Elasticsearch works on at run time
+
+
+def run_data_dir() -> Path:
+    # The indices built into the image live in a read-only image layer. If Elasticsearch opened
+    # them there, the container file system would copy each file to its writable layer on first
+    # write, and Elasticsearch stops when its lock file changes under it ("changed by an external
+    # force"). So the data is copied once to a directory of the writable layer, without the lock.
+    if not RUN.exists():
+        tmp = RUN.with_name(RUN.name + ".tmp")
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.copytree(BUILT, tmp, symlinks=True, ignore=shutil.ignore_patterns("node.lock"))
+        tmp.rename(RUN)
+    return RUN
+
+
+def start_es(data: Path) -> subprocess.Popen:
     env = dict(os.environ, ES_JAVA_OPTS="-Xms1g -Xmx1g")
     settings = [
         "discovery.type=single-node",
@@ -30,7 +48,7 @@ def start_es() -> subprocess.Popen:
         "xpack.ml.enabled=false",
         "cluster.name=wikinews",
         "node.name=es01",
-        f"path.data={Path.home() / 'esdata'}",
+        f"path.data={data}",
     ]
     cmd = [str(ES_HOME / "bin" / "elasticsearch"), "-q"] + [f"-E{s}" for s in settings]
     proc = subprocess.Popen(cmd, env=env)
@@ -60,7 +78,7 @@ def run(*args: str) -> None:
 
 
 def build_index() -> None:
-    es = start_es()
+    es = start_es(BUILT)
     try:
         run("-m", "wikisearch.ingest.index", "--no-csv")
         run("-m", "wikisearch.ingest.index", "--no-csv", "--analyzers", "italian",
@@ -82,7 +100,7 @@ def warm_up() -> None:
 
 
 def serve() -> None:
-    es = start_es()
+    es = start_es(run_data_dir())
     web = subprocess.Popen([PY, "-m", "uvicorn", "wikisearch.web.app:app", "--host", "0.0.0.0", "--port", "7860"])
     threading.Thread(target=warm_up, daemon=True).start()
     # If either process stops, stop the container, so that Docker restarts it.
