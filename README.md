@@ -50,9 +50,12 @@ by two people).
 3. git.
 4. About 5 GB of free disk for the Docker image, the dump, the index and the embedding model.
 
-Checked on 18 November 2026 from a fresh clone on macOS: `uv sync`, the test suite (108 tests pass
-without Elasticsearch; the other 22 need it and are skipped) and the parsing of the dump, which
-gives a `docs.jsonl` identical byte for byte to the one the results were computed on.
+Checked on 18 November 2026 from a fresh clone on macOS, following this README: `uv sync`; the
+parsing of the dump, which gives a `docs.jsonl` identical byte for byte to the one the results
+were computed on; the indexing (two indices in 38 s); the full test suite (130 tests, 108 of them
+also without Elasticsearch); search from the command line and the web app; and
+`evaluation.run --configs bm25-italian knn`, which gives the same metrics as
+`results/summary.md` on both test sets (about 16 minutes, latency measurement included).
 
 ## Setup
 

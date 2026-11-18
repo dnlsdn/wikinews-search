@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:17), decisions on repeated results in #17 (Fabio) and #18 (Gioia); Daniel's speech written (18 Nov 10:22, 5:55 min): notes of `slides/daniel.md` and `slides/discorso-daniel.md`; README final (18 Nov 10:29), setup checked from a fresh clone; next: Fabio's and Gioia's reviews (#17, #18), regenerate the deck, rehearsal, README, repository public, upload |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:17), decisions on repeated results in #17 (Fabio) and #18 (Gioia); Daniel's speech written (18 Nov 10:22, 5:55 min): notes of `slides/daniel.md` and `slides/discorso-daniel.md`; README final (18 Nov 10:29), setup checked from a fresh clone end to end (10:52); next: Fabio's and Gioia's reviews (#17, #18), regenerate the deck, rehearsal, README, repository public, upload |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30); #18 applied (10:30: who graded `manual`, same wording on slides 1, 3, 8); G6 done (10:36): notes reviewed and cut to about 5:45, G6 ticked; questions for the oral in `slides/domande-gioia.md` (10:38); next: rehearsal |
 
@@ -61,6 +61,26 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 10:52, Daniel: fresh clone checked end to end, with Elasticsearch (D7)
+
+Continuation of the 10:29 entry, the part that needed Elasticsearch (Docker started for it):
+1. From the fresh clone, `uv run python -m wikisearch.ingest.index`: `wikinews-standard` 17.5 s,
+   57.4 MB, `wikinews-italian` 17.0 s, 54.9 MB, 12,213 documents each, with the shared vectors
+   (same sizes as `results/indexing.csv`). The indices on Daniel's laptop were rebuilt by this,
+   from an identical `docs.jsonl` and the same vectors; the E8 indices were not touched.
+2. `uv run pytest -q`: 130 passed (the 22 that need Elasticsearch included).
+3. Command line: "Pontecorvo" with `bm25-italian` -> "Si è spento Gillo Pontecorvo" first;
+   "il pontefice è deceduto" with `knn` -> "Il papa emerito Benedetto XVI è morto" first (as in
+   `docs/demo.md`). Web app: `/`, `/api/configs` (11 configurations, default `hybrid-rrf`) and
+   `/api/search` answer.
+4. `uv run python -m evaluation.run --configs bm25-italian knn`: the rows of `bm25-italian` and
+   `knn` in `fonti.csv` and `manual.csv` are identical to the official ones (16 minutes).
+README "Requirements" now states this check. Elasticsearch and Docker stopped again afterwards.
+Nothing committed from the fresh clone.
+
+Next: Fabio's and Gioia's reviews (#17, #18), regenerate the deck, rehearsal, repository public,
+upload.
 
 ### 18 Nov 2026 10:38, Gioia: questions for the oral on the evaluation part
 
