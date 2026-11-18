@@ -62,6 +62,33 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 13:11, Daniel: public demo online, deck regenerated with Fabio's and Gioia's notes (D7)
+
+**Public demo** at https://wikinews-search.denmarkeast.cloudapp.azure.com (link at the top of the
+README). Decided by Daniel; files in `deploy/` and `.dockerignore`, no change to the code, the
+configurations or the numbers.
+1. Where: an Azure virtual machine on Daniel's Azure for Students credit (no credit card),
+   Standard_B2als_v2 (2 vCPU, 4 GB, x86) with 2 GB of swap, Ubuntu 24.04, Denmark East. About 40
+   dollars a month of credit: online until about February, then switched off, nothing charged.
+   Tried and dropped: Hugging Face Spaces (Docker Spaces now need a paid plan), Oracle Cloud
+   Always Free (no Ampere capacity in Turin; Pay As You Go needed a 93 euro card authorization).
+2. How: `deploy/Dockerfile` builds one image with Elasticsearch 9.5.0 (listening only inside the
+   container), the locked dependencies (CPU torch), the embedding model and the indices, built at
+   image build from the public dump and the committed vectors; `deploy/compose.yaml` adds Caddy,
+   the only service open to the outside, with a Let's Encrypt certificate. At start the indices
+   are copied to the container's writable layer (Elasticsearch stops if its lock file changes
+   under it, which happened on the first try).
+3. Checked on the public link: "Pontecorvo" with `bm25-italian` -> "Si è spento Gillo
+   Pontecorvo"; "il pontefice è deceduto" with `knn` -> Benedetto XVI first, with `hybrid-rrf` ->
+   Pontecorvo first (as in `results/demo/4b`); `knn-bbq` works; the document view works.
+4. Update after a push: copy the code to the machine and rerun `docker compose -f
+   deploy/compose.yaml up -d --build` (steps in `deploy/README.md`).
+For the class the live demo stays on Daniel's laptop, as planned; the public link is a backup.
+
+**Deck** regenerated from the current `.md` files: Fabio's review (#17 applied, notes cut, F6
+done) and Gioia's notes are in. Times from the notes: Daniel 5:55, Fabio 3:07 (of which 0:30 on
+the demo slide; the live demo adds about 3:30), Gioia 5:44. #17 closed by Fabio.
+
 ### 18 Nov 2026 12:16, Gioia: Gioia's speech for the presentation
 
 Asked by Gioia. `slides/discorso-gioia.md` (Italian, like the rest of `slides/`), in the format of

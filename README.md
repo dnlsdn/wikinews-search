@@ -6,6 +6,9 @@ A search engine with a web interface over the Italian Wikinews news archive (abo
 Homework 4 of the Data Engineering course (Ingegneria dei Dati, Roma Tre, 2026/27) by
 Gioia Buratti, Fabio Massimo Di Marco and Daniel Sadun.
 
+Online demo: https://wikinews-search.denmarkeast.cloudapp.azure.com (how it is deployed:
+`deploy/README.md`).
+
 Final version for the delivery of 19 November 2026. The presentation is
 `slides/wikinews-search.pptx`; every number in it comes from `results/summary.md` and can be
 reproduced with one command (see "Evaluation"). How the work was planned and carried out:
