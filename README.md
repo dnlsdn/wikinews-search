@@ -6,15 +6,53 @@ A search engine with a web interface over the Italian Wikinews news archive (abo
 Homework 4 of the Data Engineering course (Ingegneria dei Dati, Roma Tre, 2026/27) by
 Gioia Buratti, Fabio Massimo Di Marco and Daniel Sadun.
 
-Status: in progress. See `PLAN.md` and `STATE.md`.
+Final version for the delivery of 19 November 2026. The presentation is
+`slides/wikinews-search.pptx`; every number in it comes from `results/summary.md` and can be
+reproduced with one command (see "Evaluation"). How the work was planned and carried out:
+`PLAN.md` and the log in `STATE.md`.
+
+## What it does, in brief
+
+1. **Data** (Daniel): the Wikinews dump of 20 March 2025, parsed into 12,213 documents. The news
+   date, the sources and the categories are recovered from the wikitext templates, the text and
+   the lead from the HTML; the titles of the cited sources are removed from the searchable text,
+   because they are the queries of the test set (leakage).
+2. **Retrieval** (Fabio): one `search()` function with eleven named configurations: BM25 with two
+   text analyzers and different field weights, kNN on multilingual-e5-small embeddings, and a
+   hybrid that fuses the two rankings with reciprocal rank fusion. A web interface with filters,
+   facets and a side-by-side comparison of two configurations.
+3. **Evaluation** (Gioia): two test sets, `fonti` (7,072 known-item queries built from the
+   headlines of the cited sources) and `manual` (30 queries with graded judgments of a pooled set
+   of 573 documents); standard metrics, bootstrap intervals, paired randomization tests with the
+   Holm correction.
+
+Main results (`results/summary.md`; p-values corrected with Holm):
+
+| experiment | result |
+|---|---|
+| E1 Italian analyzer against standard | MRR@10 on `fonti` 0.743 -> 0.768 (p 0.0002), nDCG@10 on `manual` 0.648 -> 0.701 (p 0.038), and faster |
+| E2 field weights | equal weights beat our title^3 lead^2 body: MRR@10 0.768 -> 0.800 (p 0.0006) |
+| E3 lexical, semantic, hybrid | hybrid best: MRR@10 0.811 (BM25 0.768, kNN 0.781); on paraphrases 0.611 against 0.525 |
+| E4 leakage | searchable sources would inflate MRR@10 from 0.768 to 0.900 |
+| E5 boost of published pages | nDCG@10 0.804 -> 0.758 (p 0.029): not used |
+| E6 cost | median latency 14.6 ms (BM25), 25.8 ms (kNN), 43.1 ms (hybrid) |
+| E8 vector quantization | int8 and BBQ: no measurable loss of MRR@10, memory 19.2 -> 5.3 -> 1.2 MB |
+
+Limits are stated with the results: `manual` has 30 queries, and 20 of them were graded by a
+language model following the same guidelines (the agreement is measured on the 10 queries judged
+by two people).
 
 ## Requirements
 
 1. Docker Desktop (Elasticsearch runs in a container with a 1 GB heap; give Docker at least 3 GB
    of memory). On Windows Docker Desktop needs WSL 2.
 2. [uv](https://docs.astral.sh/uv/): it installs Python 3.12 by itself.
-3. git and GitHub CLI (`gh auth login`), with access to the repository.
+3. git.
 4. About 5 GB of free disk for the Docker image, the dump, the index and the embedding model.
+
+Checked on 18 November 2026 from a fresh clone on macOS: `uv sync`, the test suite (108 tests pass
+without Elasticsearch; the other 22 need it and are skipped) and the parsing of the dump, which
+gives a `docs.jsonl` identical byte for byte to the one the results were computed on.
 
 ## Setup
 
@@ -52,8 +90,34 @@ If it does not answer:
 
 ## Usage
 
-Sections to be completed as the parts are implemented: parsing and indexing, running the web app,
-reproducing the experiments.
+The order is: parse the dump, build the indices, then search (command line or web app) and run
+the evaluation. Every command is the same in PowerShell.
+
+### Data: parsing and indexing
+
+```bash
+uv run python -m wikisearch.ingest.parse
+uv run python -m wikisearch.ingest.index
+```
+
+1. `parse` (about 15 s) reads `data/raw/itwikinews_namespace_0_0.ndjson` and writes
+   `data/processed/docs.jsonl` (12,213 documents, not committed), the committed sample
+   `data/sample/docs.sample.jsonl` and a coverage report `results/parse_report.json`. The fields
+   are described in `docs/contracts.md`, section 1.
+2. `index` builds the two indices `wikinews-standard` and `wikinews-italian` (same fields,
+   different analyzer on the text fields) and loads the document vectors from `data/shared/`.
+   Under a minute; every build appends its time and size to `results/indexing.csv`. Mapping in
+   `docs/contracts.md`, section 2.
+3. The vectors are committed (`data/shared/embeddings.npy`), so nobody needs to compute them.
+   To recompute them: `uv run python -m wikisearch.ingest.embed` (about 2 minutes on a laptop CPU,
+   plus 470 MB for the model the first time), then index again.
+4. The extra indices for E8: `uv run python -m wikisearch.ingest.index --analyzers italian
+   --vector-index int8_hnsw bbq_hnsw`.
+5. The data report with the counts and examples used on the slides:
+   `uv run python -m wikisearch.ingest.report` writes `results/data_report.md`.
+
+To work on a small corpus first: `uv run python -m wikisearch.ingest.index --input
+data/sample/docs.sample.jsonl`.
 
 ### Search and web app
 
@@ -167,6 +231,33 @@ the machine. Options: `--dev` runs on the 1,000 dev queries of `fonti` and write
 configurations and reuses the other runs; the `manual` set is skipped until `qrels.txt` exists;
 the E8 configurations are skipped where their indices are not built.
 
+After a run, two commands read the metric files without searching again:
+
+```bash
+uv run python -m evaluation.figures
+uv run python -m evaluation.manual_human
+```
+
+`figures` draws the four figures in `results/figures/`; `manual_human` recomputes the `manual`
+metrics and comparisons on the 10 queries judged by two people only
+(`results/metrics/manual_human*.csv`), as a check that the conclusions hold without the grades
+given by a model.
+
 Tests of the metrics (hand-computed examples), the significance tests, the test-set builders and
 the runner, all without Elasticsearch: `uv run pytest -q tests/test_metrics.py
 tests/test_build_fonti.py tests/test_judging.py tests/test_merge_judgments.py tests/test_run.py`.
+
+## Repository layout
+
+| path | content |
+|---|---|
+| `wikisearch/ingest/` | parsing, embeddings, indexing, data report (Daniel) |
+| `wikisearch/search/`, `wikisearch/web/` | `search()`, the configurations, the web app and its API (Fabio) |
+| `evaluation/` | test sets, judging tools, metrics, significance tests, experiment runner, figures (Gioia) |
+| `data/sample/`, `data/shared/` | a sample of the documents and the shared embeddings (the dump and the processed corpus are not committed) |
+| `results/` | data report, indexing times, metrics, `summary.md`, figures, demo screenshots |
+| `slides/` | the presentation (`wikinews-search.pptx`), the content of each part in Italian and Daniel's speech |
+| `docs/` | contracts between the parts, what the course expects, the demo script, the briefs of each member |
+| `tests/` | unit tests and contract tests (`uv run pytest -q`) |
+| `PLAN.md`, `STATE.md` | the plan and the shared log of the work |
+
