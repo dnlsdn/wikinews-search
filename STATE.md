@@ -62,6 +62,13 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 18:30, Fabio: stray PowerPoint lock file removed
+
+`slides/~$wikinews-search.pptx` (165 bytes, the lock file PowerPoint writes while the deck is
+open) was committed by mistake with Fabio's commit 4cd0c6f; removed. Not the deck: the real
+`slides/wikinews-search.pptx` is untouched. Fabio checked Daniel's regenerated deck (3104b4d):
+slides 9, 12 and 13 have all of today's changes.
+
 ### 18 Nov 2026 18:00, Daniel: deck regenerated with Fabio's last #20 changes (D7)
 
 `slides/wikinews-search.pptx` regenerated from the current `.md` files (Fabio's commits 3640d18,
