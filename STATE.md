@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft `slides/wikinews-search.pptx` pushed (18 Nov 09:55, 22 slides); next: Fabio's and Gioia's reviews into the deck, rehearsal, README, repository public, upload |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:50), decisions on repeated results in #17 (Fabio) and #18 (Gioia); next: regenerate the deck after their reviews, rehearsal, README, repository public, upload |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30), Gioia's review before ticking G6; next: rehearsal |
 
@@ -61,6 +61,45 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 10:50, Daniel: deck in the homework 2 style, decisions on repeated results (D7, work in progress)
+
+Decided by Daniel (he assembles the deck and keeps the three parts consistent):
+1. **E3 figure once.** `e3_buckets.png` stays only on Gioia's slide 5 (the key result). Fabio's
+   slide 3 shows instead a diagram of how RRF works (two ranked lists, 1/(60 + rank) summed).
+   Issue #17 for Fabio (also: latency wording "sotto i 60 ms anche al 95° percentile", as Gioia).
+2. **Who graded `manual`.** Gioia's slide 1 says "da noi", her slide 8 says 20 of 30 queries were
+   graded by a model: issue #18 asks her to make slide 1 say the same. #16 closed (her slides are
+   in the deck).
+3. **E5 and E8 not repeated by Daniel.** `slides/daniel.md`: slide 4 notes only say that E5
+   measures the boost and Fabio shows it; slide 7 shows only the memory side of E8 (19.2, 5.3,
+   1.2 MB), the quality numbers stay on Gioia's slide 7.
+
+**Deck** `slides/wikinews-search.pptx`, 22 slides, 16:9 (10 x 5.625 in), same style as the homework
+2 deck: dark title band, orange progress bar, booktabs tables, blocks, Calibri, footer with the
+three parts (Dati, Retrieval, Valutazione; the current one in orange) and the slide number.
+Choices and why:
+1. One colour per retrieval family on every slide: BM25 dark, kNN teal, hybrid orange. A listener
+   who has seen one chart reads the next one.
+2. The PNGs of `results/figures/` are redrawn as native charts or drawn shapes from the same
+   numbers (`results/summary.md`, `results/data_report.md`): E2 bars, E3 per bucket, `manual`
+   nDCG@10 as means with their 95% intervals, the latency-quality scatter of E6. They are crisp on
+   the projector and use the deck's colours. The PNGs stay the reference in the repository.
+3. Cover: one query of the demo ("il pontefice è deceduto"), BM25 against kNN, the top 3 of each
+   from `results/demo/4a-paraphrase-bm25-vs-knn.png`: the project in one picture.
+4. Real examples instead of text where the `.md` notes had one: the `{{luogodata}}` template
+   turned into a date, the 14 spellings of "la Repubblica" merged by one key, the leakage pair
+   (source title, article), stemming examples, the five demo queries.
+5. Speaker notes = "Note del relatore" of the `.md` files, headed by the speaker and an estimate of
+   the time (words / 2.4 per second). Estimates: Daniel about 6:45, Fabio about 4:30 plus the live
+   demo, Gioia about 7:00: Daniel's slides 7 and 8 have the longest notes (about 1:45 each).
+The deck is generated by a script on Daniel's laptop (`slides/build/`, not committed: Node and
+`pptxgenjs` are not project dependencies). Titles, tables and notes are read from the three
+`.md` files at every build; the drawings are in the script. So: change the `.md` files, then
+Daniel regenerates; do not edit the pptx.
+
+No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running). Next: Fabio's and
+Gioia's reviews (#17, #18), regenerate, rehearsal with timing, README, repository public, upload.
 
 ### 18 Nov 2026 09:55, Daniel: consistency check of the three slide files, first deck draft (D7, work in progress)
 

@@ -67,9 +67,7 @@ Contenuto: pagine non pubblicate, serie quasi identiche, tabelle; le teniamo tut
 Figura: nessuna
 Note del relatore: Una classifica o uno speciale sulle elezioni possono rispondere a una query
 vera, e la valutazione deve vedere tutte le pagine; se convenga penalizzare le non pubblicate lo
-misura un esperimento (E5): non conviene, la spinta alle pubblicate fa scendere nDCG@10 su `manual`
-da 0,804 a 0,758 (p 0,029), perché porta su pagine pubblicate ma meno pertinenti. Tenerle e trattarle come le altre funziona
-meglio che penalizzarle. Le serie, come i 216 concorsi del SuperEnalotto, hanno titoli uguali a
+misura un esperimento (E5), che mostra Fabio: non conviene. Le serie, come i 216 concorsi del SuperEnalotto, hanno titoli uguali a
 meno dei numeri: `series_key` sostituisce le cifre con `#` e permette di raggrupparle. Le tabelle
 non si possono buttare: 366 pagine sono fatte solo di tabelle e sarebbero rimaste vuote.
 
@@ -137,7 +135,7 @@ Contenuto: un vettore per documento, calcolato una volta e condiviso da tutti.
 | tempo | 121 s per 12.213 documenti, su CPU |
 | struttura | HNSW non quantizzato: +19 MB, costruzione 3,6 volte più lenta |
 | `knn` contro BM25, query con poche parole in comune | MRR@10 da 0,525 a 0,557 (+0,032, p Holm 0,002) |
-| quantizzazione (E8): `int8_hnsw`, `bbq_hnsw` contro HNSW | MRR@10 -0,0004 (non significativo); `bbq` R@100 -0,003 (p Holm 0,03); latenza uguale, 25-26 ms |
+| quantizzazione (E8): memoria della ricerca | HNSW 19,2 MB, `int8_hnsw` 5,3 MB, `bbq_hnsw` 1,2 MB; qualità e latenza nelle slide di Gioia |
 
 Figura: nessuna
 Note del relatore: I vettori sono nel repository, così tutti indicizzano gli stessi e i portatili
@@ -151,9 +149,7 @@ vettorizzare la query); per questo nel motore i due si combinano, come mostra Fa
 similarità sono tutti vicini (0,91-0,96), quindi conta solo l'ordine; per questo la ricerca ibrida
 fonde le classifiche con RRF e non i punteggi. Abbiamo fissato HNSW senza quantizzazione perché
 Elasticsearch 9.5, a 384 dimensioni, sceglierebbe da solo `bbq_hnsw`, la quantizzazione binaria:
-quanto costi in qualità è l'esperimento E8. Risultato: quasi niente. `int8` e `bbq` perdono 0,0004
-di MRR@10, non significativo; `bbq` perde un po' di recall (R@100 -0,003, significativo dopo
-Holm); la latenza non cambia. Il guadagno è nella memoria: la parte che la ricerca tiene in RAM
+quanto costi in qualità è l'esperimento E8, che mostra Gioia: quasi niente. Il guadagno è nella memoria: la parte che la ricerca tiene in RAM
 passa da 19,2 MB (HNSW) a 5,3 MB (`int8`) e 1,2 MB (`bbq`), perché il grafo si percorre sui
 vettori compressi e i float32 servono solo a riordinare i candidati finali. Con 12.213 documenti
 tutto sta comunque in memoria: la quantizzazione conterebbe con milioni di vettori, e qui mostra
