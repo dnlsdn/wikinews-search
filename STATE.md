@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); next: check the three slide files for consistency after 22:00, deck last, on Wednesday |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft `slides/wikinews-search.pptx` pushed (18 Nov 09:55, 22 slides); next: Fabio's and Gioia's reviews into the deck, rehearsal, README, repository public, upload |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30), Gioia's review before ticking G6; next: rehearsal |
 
@@ -61,6 +61,36 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 09:55, Daniel: consistency check of the three slide files, first deck draft (D7, work in progress)
+
+**Consistency check.** Every number in `slides/daniel.md`, `fabio.md` and `gioia.md` was checked
+against `results/summary.md` (run of 17 Nov 17:27): all match (rounding only, e.g. E3b -0.0359 is
+"-0,036" for Fabio and "0,646 contro 0,611" for Gioia; E1 manual p 0.0379 is "0,038" for Daniel
+and "0,04" for Gioia). Points that are not errors but must be decided before the rehearsal:
+1. E3 appears twice with the same table and figure: Fabio slide 3 and Gioia slide 5
+   (`e3_buckets.png`); E5 three times (Daniel 4, Fabio 4, Gioia 6); E8 twice (Daniel 7, Gioia 7).
+   Gioia's header says E2, E3, E5 details stay on Fabio's slides, but her slide 5 is a full E3
+   slide. 22 slides for 20 minutes is tight.
+2. Gioia slide 1 says the `manual` grades are "da noi", her slide 8 says 20 of 30 queries were
+   graded by a model: the two lines should say the same thing.
+3. Latency: Fabio slide 3 "resta sotto i 100 ms", Gioia slide 7 "sotto i 60 ms" (p95 53.4 ms): both
+   true, one wording is enough.
+
+**Deck.** `slides/wikinews-search.pptx`, 22 slides, 16:9: cover (title, the three names in
+alphabetical order by surname, course, repository link, no emails), then Daniel 7, Fabio 5,
+Gioia 9, in the order of `PLAN.md`. Each slide: the title of the `.md` file, the "Contenuto" line
+as subtitle, the table, the figure; "Note del relatore" go into the speaker notes, prefixed with
+the speaker's name. Sober style: white slides, one dark red for the best values (the bold cells
+of the `.md` files), no divider slides, no names on the content slides. The deck is generated
+from the three `.md` files by a script on Daniel's laptop (`slides/build/`, not committed:
+it uses Node and `pptxgenjs`, which are not project dependencies), so changes to the `.md` files
+go into the deck by regenerating it, not by editing the pptx. Not changed: the content of
+Fabio's and Gioia's files (their reviews are still open, F6 and G6 not ticked).
+
+No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running). Next: decide the three
+points above with Fabio and Gioia, regenerate the deck after their reviews (Gioia: before 11:00),
+rehearsal with timing, README, repository public, upload.
 
 ### 18 Nov 2026 09:30, Gioia: `slides/gioia.md` written (G6, work in progress)
 
