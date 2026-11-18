@@ -62,6 +62,29 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 14:40, Fabio: weights notation and zoomed screenshots on Fabio's slides
+
+Decided by Fabio, after looking at the deck (commit 457e863); changes in `slides/fabio.md` and
+`results/demo/` only, as #20 asks:
+1. **Deck slide 10 (Fabio's slide 2, E2)**: the weights are written so that a listener reads
+   them at once: "3x titolo + 2x lead + 1x corpo (la nostra)" instead of "titolo^3 + lead^2 +
+   corpo", and "1x titolo + 1x lead + 1x corpo (pesi uguali)" instead of "pesi uguali". Numbers
+   unchanged.
+2. **Deck slides 9 and 12 (Fabio's slides 1 and 4)**: the screenshots were unreadable when
+   projected (the whole page shrunk into half a slide). New zoomed crops of the restyled
+   screenshots, same pixels, no retake: `results/demo/slide-compare-zoom.png` (the two compare
+   columns of "Pontecorvo", `bm25-italian` against `knn`, about 1.9 times larger) and
+   `results/demo/slide-filters-zoom.png` (a montage: the "Date" and "Sources" filter blocks of
+   the left column, the category list between them left out, next to the three results). The
+   `Figura:` lines point to them. The demo fallback screenshots (`1a` ... `6`) are unchanged.
+The second crop is wide (1166 x 454): in the current half-slide frame it gains only about 1.2
+times; asked Daniel in #20 to place it at full width under the title.
+Also asked in #20, by Fabio: remove the speaker notes from the repository copy of the deck too
+(the uploaded copy already has none). Daniel decides.
+
+No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running). For Daniel:
+regenerate the deck. Next: demo rehearsal.
+
 ### 18 Nov 2026 13:31, Daniel: rule for slide changes until the delivery (D7)
 
 Decided by Daniel, issue #20 for Fabio and Gioia: the deck is generated from `slides/<name>.md`

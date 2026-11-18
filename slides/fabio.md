@@ -19,7 +19,7 @@ dell'ablazione.
 | `hybrid-rrf-published` | spinta alle pagine pubblicate | E5 |
 | `knn-int8`, `knn-bbq` | quantizzazione dei vettori | E8 |
 
-Figura: results/demo/3-exact-name-bm25-vs-knn.png
+Figura: results/demo/slide-compare-zoom.png
 Note del relatore: Il motore non ha una configurazione "giusta" scritta nel codice: ha undici
 configurazioni con un nome, e la stessa funzione serve la pagina web e gli esperimenti di Gioia.
 Ogni numero che vedrete corrisponde a qualcosa che si apre nell'interfaccia; la modalità
@@ -34,8 +34,8 @@ l'ha smentita.
 |---|---|---|
 | solo titolo | 0,663 (-0,104) | 0,283 |
 | solo corpo | 0,726 (-0,042) | 0,621 |
-| titolo^3 + lead^2 + corpo (la nostra) | 0,768 | 0,525 |
-| pesi uguali | **0,800** (+0,032, p 0,0006) | **0,646** |
+| 3x titolo + 2x lead + 1x corpo (la nostra) | 0,768 | 0,525 |
+| 1x titolo + 1x lead + 1x corpo (pesi uguali) | **0,800** (+0,032, p 0,0006) | **0,646** |
 
 Figura: results/figures/e1_e2_bm25.png
 Note del relatore: BM25 cerca titolo, lead e corpo con una `multi_match` di tipo `best_fields`.
@@ -77,7 +77,7 @@ fonte e anno; la spinta alle pagine pubblicate peggiora i risultati.
 | ibrida | **0,804** |
 | ibrida, punteggio delle pubblicate x 1,5 | 0,758 (-0,046, p 0,029) |
 
-Figura: results/demo/2-filters-date-agency.png
+Figura: results/demo/slide-filters-zoom.png
 Note del relatore: I filtri sono clausole `filter` di Elasticsearch: escludono documenti senza
 toccare il punteggio, e valgono anche dentro la ricerca kNN, che così restituisce comunque k
 risultati. Le faccette contano per categoria, fonte e anno, sulla query BM25 anche in modalità
