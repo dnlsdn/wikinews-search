@@ -3,8 +3,9 @@
 The search engine online, on a free server. One container (`Dockerfile`) holds Elasticsearch,
 listening only inside the container, and the web app; Caddy (`compose.yaml`) is the only service
 reachable from outside and serves HTTPS with a free Let's Encrypt certificate. Everything is built
-from public sources: the code from GitHub, the Wikinews dump from Wikimedia, the embedding model
-from Hugging Face; the indices are built once, while the image is built (about 10 minutes).
+from the repository and from public sources: the Wikinews dump from Wikimedia, the embedding model
+from Hugging Face; the indices are built once, while the image is built (about 10 minutes, and
+about 10 GB of free disk during the build).
 
 Server used: an Oracle Cloud **Always Free** machine (Ampere A1, ARM, 2 OCPU and 12 GB of RAM out
 of the 4 and 24 that are free). The same files work on any Linux machine with Docker and about
@@ -37,5 +38,6 @@ To update after a push: `git pull`, then the same `docker compose ... up -d --bu
 
 ## Test on a laptop
 
-`docker build -t wikinews-demo deploy/` then `docker run -p 7860:7860 wikinews-demo` and open
-http://localhost:7860 (the build argument `REF` chooses the branch to clone).
+From the root of the repository: `docker build -f deploy/Dockerfile -t wikinews-demo .`, then
+`docker run -p 7860:7860 wikinews-demo` and open http://localhost:7860. It needs about 10 GB of
+free disk while it builds.

@@ -1,0 +1,10 @@
+# Only what deploy/Dockerfile copies is needed: keep the build context small.
+.git
+.venv
+data/raw
+data/processed
+data/sample
+results
+slides
+course
+**/__pycache__

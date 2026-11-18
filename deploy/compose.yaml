@@ -6,10 +6,8 @@
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        REF: ${REF:-main}
+      context: ..
+      dockerfile: deploy/Dockerfile
     restart: unless-stopped
     mem_limit: 4g
 
