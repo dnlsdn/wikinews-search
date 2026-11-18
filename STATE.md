@@ -62,6 +62,16 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 17:34, Fabio: slide 12 screenshot shows the category facet too (#20)
+
+`results/demo/slide-filters-zoom.png` replaced (was 1166 x 454, now 1168 x 454, same size on the
+slide). It is still a montage of `results/demo/2-filters-date-agency.png`, now with three blocks
+in the left column: "Date" (112,236,362,345), the header and first five entries of "Categories"
+(112,428,362,590) and "Sources" (112,870,362,1000); the results (388,266,1280,720) on the right.
+Reason, decided by Fabio: the slide says "le faccette contano per categoria e fonte", and before
+only the source counts were visible. Nothing to run, nothing changes for the others; Daniel
+regenerates the deck with the other #20 changes of today.
+
 ### 18 Nov 2026 17:35, Daniel: demo GIF in the README
 
 Added `docs/images/demo.gif` (21 s, 960 px, 2.1 MB, blank first frames trimmed at 17:40) under the online demo link of the README,
