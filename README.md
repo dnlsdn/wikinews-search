@@ -9,6 +9,8 @@ Gioia Buratti, Fabio Massimo Di Marco and Daniel Sadun.
 Online demo: https://wikinews-search.denmarkeast.cloudapp.azure.com (how it is deployed:
 `deploy/README.md`).
 
+![Demo: a topical query with the hybrid configuration, then BM25 and kNN side by side on an exact name (Pontecorvo) and on a paraphrase (il pontefice è deceduto)](docs/images/demo.gif)
+
 Final version for the delivery of 19 November 2026. The presentation is
 `slides/wikinews-search.pptx`; every number in it comes from `results/summary.md` and can be
 reproduced with one command (see "Evaluation"). How the work was planned and carried out:
