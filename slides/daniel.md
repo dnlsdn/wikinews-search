@@ -18,10 +18,7 @@ Contenuto: Wikinews in italiano, dump del 20 marzo 2025.
 | notizie 2005-2008 | 55% delle datate |
 
 Figura: nessuna
-Note del relatore: Il dump è un file JSON per pagina, con l'HTML e il wikitext di ogni articolo.
-Alcune pagine compaiono più volte, una per revisione (fino a 13 volte): teniamo la più recente.
-Il corpus è piccolo ma molto sbilanciato: più di metà delle notizie datate è del 2005-2008, e le
-lunghezze vanno da poche righe a oltre 80.000 caratteri.
+Note del relatore: Il corpus è il dump di Wikinews in italiano del 20 marzo 2025: un oggetto JSON per pagina, con l'HTML e il wikitext di ogni articolo. Le righe sono 12.261, ma alcune pagine compaiono più volte, una per revisione: teniamo la più recente e restano 12.213 documenti. Il 90% è pubblicato, il 96% ha una data, quasi diecimila citano almeno una fonte. Il grafico mostra la cosa più evidente: il corpus è piccolo ma molto sbilanciato, più di metà delle notizie datate è del 2005-2008, gli anni in cui Wikinews in italiano era più attiva.
 
 ## Slide 2: Le informazioni sono nei template
 Contenuto: la data non è un campo, l'abstract non è un sommario.
@@ -32,12 +29,7 @@ Contenuto: la data non è un campo, l'abstract non è un sommario.
 | abstract del dump che inizia con la data | 11.632 abstract | lead ricostruito dall'HTML |
 
 Figura: nessuna
-Note del relatore: Il dump ha solo la data dell'ultima modifica, spesso anni dopo. La data della
-notizia è dentro un template in italiano, per esempio `{{luogodata|mercoledì|luogo=Bruxelles|data=20
-maggio 2020}}`, che diventa 2020-05-20. Il testo lo prendiamo dall'HTML, i metadati dal wikitext,
-dove i template sono leggibili. Il lead conta perché è quello che leggono gli embeddings: un
-abstract fatto solo di data, come "martedì 17 giugno 2008", renderebbe simili tutte le notizie
-dello stesso giorno.
+Note del relatore: La prima difficoltà: le informazioni che ci servono non sono campi del dump. Il dump ha solo la data dell'ultima modifica, spesso anni dopo la notizia. La data vera è scritta a mano in un template in italiano, come questo luogodata, che diventa 2020-05-20. La estraiamo dal wikitext per 11.687 documenti e per 40 dalla categoria del giorno; 486 restano senza data, e un campo dice da dove viene ogni data. Lo stesso per l'abstract: in 11.632 pagine inizia con la data, e a volte c'è solo quella, come "martedì 17 giugno 2008". Il lead lo ricostruiamo dall'HTML, con il primo paragrafo vero. Conta perché è quello che leggono gli embeddings: con la sola data, tutte le notizie dello stesso giorno sembrerebbero uguali.
 
 ## Slide 3: Metadati da ripulire
 Contenuto: categorie e agenzie diventano filtri, quindi devono essere pulite.
@@ -48,12 +40,7 @@ Contenuto: categorie e agenzie diventano filtri, quindi devono essere pulite.
 | nomi di agenzia | 2.965 grafie | 2.304 |
 
 Figura: nessuna
-Note del relatore: Fra le categorie ci sono 4.188 categorie di data, una per giorno, e 22 di
-manutenzione come "Pubblicati" o "Articoli da controllare per l'archiviazione": le togliamo,
-perché nel filtro sarebbero solo rumore. Le agenzie sono scritte a mano: la Repubblica compare in
-14 grafie ("la Repubblica", "La Repubblica", "repubblica.it", ...). Le raggruppiamo con una chiave
-normalizzata (minuscole, senza articolo, senza dominio) più qualche alias, e mostriamo la grafia
-più frequente. Senza questo passo, filtrando "la Repubblica" si perderebbe il 28% delle sue fonti.
+Note del relatore: Categorie e fonti diventano filtri e faccette nell'interfaccia, quindi devono essere pulite. Delle quasi seimila categorie, 4.188 sono categorie di data, una per giorno, e 22 sono di manutenzione, come "Pubblicati": le togliamo e ne restano 1.753. Le agenzie sono scritte a mano: la Repubblica compare in 14 grafie. Le raggruppiamo con una chiave normalizzata, cioè minuscole, senza articolo e senza dominio, più qualche alias, e mostriamo la grafia più frequente. Senza questo passo, filtrando "la Repubblica" si perderebbe il 28% delle sue fonti.
 
 ## Slide 4: Non tutte le pagine sono notizie
 Contenuto: pagine non pubblicate, serie quasi identiche, tabelle; le teniamo tutte, marcate.
@@ -65,11 +52,7 @@ Contenuto: pagine non pubblicate, serie quasi identiche, tabelle; le teniamo tut
 | pagine con tabelle | 3.661 (36% del testo) | tabelle come testo, una riga per riga |
 
 Figura: nessuna
-Note del relatore: Una classifica o uno speciale sulle elezioni possono rispondere a una query
-vera, e la valutazione deve vedere tutte le pagine; se convenga penalizzare le non pubblicate lo
-misura un esperimento (E5), che mostra Fabio: non conviene. Le serie, come i 216 concorsi del SuperEnalotto, hanno titoli uguali a
-meno dei numeri: `series_key` sostituisce le cifre con `#` e permette di raggrupparle. Le tabelle
-non si possono buttare: 366 pagine sono fatte solo di tabelle e sarebbero rimaste vuote.
+Note del relatore: Non tutte le pagine sono notizie. 1.181 non sono pubblicate: speciali, palinsesti, classifiche, bozze. Le teniamo, marcate: uno speciale sulle elezioni può rispondere a una query vera, e se convenga penalizzarle lo misura un esperimento, E5, che mostra Fabio. Poi le serie generate da template, come i 216 concorsi del SuperEnalotto, con titoli uguali a meno dei numeri: un campo sostituisce le cifre e permette di raggrupparle. Infine il 36% del testo è in tabelle: le teniamo come testo, una riga per riga, perché 366 pagine sono fatte solo di tabelle e sarebbero rimaste vuote.
 
 ## Slide 5: Leakage
 Contenuto: le query del test set sono scritte dentro le pagine; le togliamo dal testo cercato.
@@ -82,15 +65,7 @@ Contenuto: le query del test set sono scritte dentro le pagine; le togliamo dal 
 | se le fonti fossero cercabili (E4, 7.072 query) | MRR@10 da 0,768 a 0,900 (+0,132, p Holm 0,0001) |
 
 Figura: nessuna
-Note del relatore: Il test set `fonti` usa come query i titoli delle fonti citate, cioè titoli di
-altri giornali sulla stessa notizia; l'articolo giusto è uno solo. Quei titoli però stanno dentro
-la pagina, nel template `{{fonte}}`: se fossero cercabili il test non misurerebbe niente. Non basta
-togliere la sezione "Fonti": in 381 pagine le fonti sono altrove, e in 19 resterebbero anche
-togliendo tutte le sezioni di link. Quindi togliamo ogni template di fonte, dovunque sia. I titoli
-restano in un campo separato, `sources_text`, usato solo per misurare quanto il leakage gonfierebbe
-i risultati (E4). L'abbiamo misurato: con le fonti cercabili MRR@10 sale da 0,77 a 0,90, il 17% in
-più, e sulle query più difficili (poche parole in comune col titolo) da 0,53 a 0,81. Un test set
-con leakage avrebbe fatto sembrare il motore molto migliore di quello che è.
+Note del relatore: Il problema più insidioso riguarda la valutazione. Il test set fonti, che presenta Gioia, usa come query i titoli delle fonti citate: qui "Il Dna lo scagiona, ma ha già scontato 24 anni", un titolo di Euronews; la risposta giusta è l'articolo che lo cita. Ma quel titolo sta dentro la pagina, nel template della fonte: se fosse cercabile, il motore troverebbe la query parola per parola e il test non misurerebbe niente. Non basta togliere la sezione "Fonti": in 381 pagine le fonti sono altrove. Quindi togliamo ogni template di fonte, dovunque sia, e teniamo i titoli in un campo a parte solo per misurare l'effetto, l'esperimento E4: con le fonti cercabili MRR@10 salirebbe da 0,768 a 0,900. Un test con leakage avrebbe fatto sembrare il motore molto migliore di quello che è.
 
 ## Slide 6: Due indici, due analisi del testo
 Contenuto: stessi campi, analyzer `standard` contro `italian` (esperimento E1).
@@ -107,23 +82,7 @@ entrambi p Holm 0,0002; latenza p50 da 19,2 a 14,6 ms.
 E1 su `manual` (30 query, giudizi 0/1/2): nDCG@10 da 0,648 a 0,701 (+0,052, p 0,038).
 
 Figura: nessuna
-Note del relatore: `italian` aggiunge elisione, stop word italiane e uno stemmer leggero:
-"l'Italia" diventa `ital`, "elezioni" ed "elezione" diventano entrambi `elezion`. L'indice viene il 6% più piccolo,
-perché ci sono meno termini distinti. Lo stemmer leggero però non unisce tutto: "scagiona" e
-"scagionato" restano diversi. Gli accenti: lo stemmer li toglie già nelle parole lunghe ("perché"
-e "perche" diventano `perc`), non in quelle corte ("città" e "citta" restano diverse) né nei nomi
-come "Erdoğan". Il risultato di E1: l'analisi italiana migliora sia la precisione in cima
-(MRR@10 +0,025) sia il recall (R@100 +0,013), entrambi significativi dopo la correzione di Holm,
-e costa meno, perché l'indice è più piccolo e la query più veloce (14,6 contro 19,2 ms). Non è
-un compromesso: è meglio su tutto. Lo conferma il secondo test set, `manual`, con giudizi
-graduati: nDCG@10 da 0,648 a 0,701, significativo (p 0,038) ma con intervalli larghi, perché le
-query sono solo 30. Il guadagno è più grande sulle query con poche parole in comune
-col titolo (MRR@10 da 0,475 a 0,525), dove conta riconoscere forme diverse della stessa parola.
-Una variante con `asciifolding` non è stata costruita: nei due test set le query
-hanno gli accenti, quindi non avrebbe misurato nulla. Titolo, lead e corpo sono campi di testo; categorie, agenzie e serie
-sono `keyword`, per filtri e faccette. Mapping rigido: un campo non previsto è un errore. Un nodo,
-uno shard, 1 GB di heap su un portatile con 8 GB. Ogni costruzione è ripetuta tre volte perché la
-prima è più lenta.
+Note del relatore: Indicizziamo con Elasticsearch, un nodo e uno shard su un portatile. Costruiamo due indici con gli stessi campi e due analizzatori: standard e italian, che aggiunge elisione, stop word italiane e uno stemmer leggero. "Elezioni" ed "elezione" diventano elezion, "l'Italia" diventa ital; ma lo stemmer leggero non unisce tutto: scagiona e scagionato restano diversi. Con meno termini distinti l'indice è più piccolo del 6%. Il risultato, l'esperimento E1, è a destra: l'analisi italiana migliora MRR@10 e recall su fonti, entrambi significativi, e nDCG@10 su manual da 0,648 a 0,701; e la query è anche più veloce. Non è un compromesso: è meglio su tutto.
 
 ## Slide 7: Embeddings
 Contenuto: un vettore per documento, calcolato una volta e condiviso da tutti.
@@ -138,20 +97,4 @@ Contenuto: un vettore per documento, calcolato una volta e condiviso da tutti.
 | quantizzazione (E8): memoria della ricerca | HNSW 19,2 MB, `int8_hnsw` 5,3 MB, `bbq_hnsw` 1,2 MB; qualità e latenza nelle slide di Gioia |
 
 Figura: nessuna
-Note del relatore: I vettori sono nel repository, così tutti indicizzano gli stessi e i portatili
-da 8 GB non devono ricalcolarli. Vettorizziamo titolo e lead perché il modello tronca i testi
-lunghi (512 token) e l'inizio di una notizia ne dice l'essenziale. La query "disastro in una
-miniera" trova "Cina: esplosione in miniera, 11 morti" e notizie simili, nessuna delle quali
-contiene la parola "disastro": il vettore coglie il significato, non le parole. I numeri lo
-confermano dove ce lo aspettavamo: sulle parafrasi `knn` batte BM25 (+0,032 MRR@10), ma da solo
-perde recall (R@100 0,942 contro 0,958) e costa quasi il doppio (25,8 contro 14,6 ms, quasi tutto per
-vettorizzare la query); per questo nel motore i due si combinano, come mostra Fabio. I punteggi di
-similarità sono tutti vicini (0,91-0,96), quindi conta solo l'ordine; per questo la ricerca ibrida
-fonde le classifiche con RRF e non i punteggi. Abbiamo fissato HNSW senza quantizzazione perché
-Elasticsearch 9.5, a 384 dimensioni, sceglierebbe da solo `bbq_hnsw`, la quantizzazione binaria:
-quanto costi in qualità è l'esperimento E8, che mostra Gioia: quasi niente. Il guadagno è nella memoria: la parte che la ricerca tiene in RAM
-passa da 19,2 MB (HNSW) a 5,3 MB (`int8`) e 1,2 MB (`bbq`), perché il grafo si percorre sui
-vettori compressi e i float32 servono solo a riordinare i candidati finali. Con 12.213 documenti
-tutto sta comunque in memoria: la quantizzazione conterebbe con milioni di vettori, e qui mostra
-solo che costerebbe poco in qualità. Su disco gli indici quantizzati sono anzi più grandi, perché
-Elasticsearch tiene anche i vettori originali.
+Note del relatore: Per la ricerca semantica calcoliamo un vettore per documento con multilingual-e5-small, 384 dimensioni, su titolo e lead, perché il modello tronca i testi lunghi e l'inizio di una notizia ne dice l'essenziale. Bastano due minuti su CPU, e i vettori sono nel repository, così tutti indicizzano gli stessi. A destra un esempio: "disastro in una miniera" trova "Cina: esplosione in miniera, 11 morti", ma nessun risultato contiene la parola disastro: il vettore coglie il significato. Sulle parafrasi kNN batte BM25, da 0,525 a 0,557 di MRR@10. Infine l'esperimento E8: comprimere i vettori costa quasi niente in qualità, come mostrerà Gioia, e riduce la memoria da 19 a 5 e a poco più di 1 megabyte. Con dodicimila documenti non serve; con milioni sì.
