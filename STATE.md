@@ -62,6 +62,16 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 18:39, Fabio: main force-pushed to drop Co-Authored-By trailers (#21)
+
+Decided by Fabio. Four of Fabio's commits of today had a `Co-Authored-By: Claude` trailer, against
+CLAUDE.md; their messages were rewritten and `main` force-pushed with lease. The tree is identical
+(no file changed), authors and dates unchanged. New hashes: 3640d18 -> 32e7a76, 4cd0c6f -> e4f4756,
+2c36d4d -> ea4a4b1, 0cf1ec4 -> f314b9a, and Daniel's 6d8880b -> 126d348, a5a7fe3 -> 5024da4,
+2e7c060 -> d7a8354, 3104b4d -> f83b84f; older hashes in this log still name the same changes.
+**For the others**: realign before the next push (issue #21: `git fetch` then
+`git reset --hard origin/main` if you have no local commits, otherwise `git pull --rebase`).
+
 ### 18 Nov 2026 18:30, Fabio: stray PowerPoint lock file removed
 
 `slides/~$wikinews-search.pptx` (165 bytes, the lock file PowerPoint writes while the deck is
