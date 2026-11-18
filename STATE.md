@@ -62,6 +62,28 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 12:02, Daniel: web restyle merged before the presentation, deck regenerated (D7)
+
+Change of plan decided by Daniel (issue #14): the restyle of the interface is done **before** the
+class presentation, to show it there. Done by Daniel's session on the branch `web-restyle`,
+pull request #19, approved by Fabio (reported by Daniel) and merged:
+1. `wikisearch/web/static/style.css` rewritten (light grey page, square corners, dark header with
+   the search form, results in white panels); the compare column headers use the colours of the
+   slides for the three families (BM25 dark slate, kNN teal, hybrid orange; `app.js`: a
+   `data-family` attribute, no logic change); `index.html`: a tagline and a footer with the
+   licence of the texts (Wikinotizie, CC BY 4.0; CC BY 2.5 before 25 Sep 2005) and the code link;
+   on a phone the results come before the filters.
+2. Every element id, menu and button is unchanged: `docs/demo.md` is valid step by step. No
+   change to `search()` or the configurations: no number changes. Tests: 130 passed.
+3. `results/demo/`: the eight fallback screenshots retaken with the new style (same links and
+   sizes, headless Chrome). The deck is regenerated with them (Fabio's slides 1 and 4).
+For the rehearsal: the demo on Daniel's laptop now shows the new look.
+
+Also prepared, not on `main` yet: branch `deploy-server` (`deploy/`, `.dockerignore`), a public
+demo on a free Oracle Cloud Always Free machine (one container with Elasticsearch and the web app,
+Caddy for HTTPS). Details when it is online. Hugging Face Spaces was the first idea, but Docker
+Spaces now need a paid plan.
+
 ### 18 Nov 2026 11:58, Fabio: issue #17 applied on `slides/fabio.md` (F6, work in progress)
 
 Issue #17 (Daniel), accepted by Fabio. Two changes on slide 3 of `slides/fabio.md`, nothing else:
