@@ -62,6 +62,13 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 12:18, Fabio: template-generated pages count fixed in `docs/demo.md`
+
+Decided by Fabio. `docs/demo.md` step 5 now says "2,742 pages, 22% of the corpus, are generated
+from templates" instead of "about 2,300", as in `results/data_report.md` (2.6: 76 title patterns
+with 5 or more pages) and Daniel's slide 5. Same number as in `slides/discorso-fabio.md`. Nothing
+else changed in the demo. No code change. Next: demo rehearsal on Daniel's laptop.
+
 ### 18 Nov 2026 12:15, Fabio: Fabio's speech for the oral presentation
 
 `slides/discorso-fabio.md` (Italian; format of `slides/discorso-daniel.md`): Fabio's speech per

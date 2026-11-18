@@ -130,7 +130,7 @@ Actions (Daniel):
 Show: 9 of the top 10 are lottery draw pages that differ only by number and date ("Italia:
 concorso n. 134/2007 del SuperEnalotto", "135/2007", ...).
 
-Say: "About 2,300 pages are generated from templates: lottery draws, match reports. They crowd
+Say: "2,742 pages, 22% of the corpus, are generated from templates: lottery draws, match reports. They crowd
 the result page. Collapsing them by series is the stretch experiment E7."
 
 Fallback: http://localhost:8000/?q=concorso+superenalotto&config=bm25-italian
