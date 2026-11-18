@@ -1,4 +1,4 @@
-# Public demo of wikinews-search on a Hugging Face Space (Docker, free CPU tier).
+# Public demo of wikinews-search: one container with Elasticsearch and the web app.
 # One container: Elasticsearch on 127.0.0.1 (not reachable from outside) and the web app on 7860.
 # Everything is built from public sources: the code from GitHub, the Wikinews dump from Wikimedia,
 # the embedding model from Hugging Face. The indices are built once, while the image is built.
@@ -14,7 +14,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir uv==0.11.28
 
-# Spaces run the container as user 1000; Elasticsearch also refuses to run as root.
+# A non-root user: Elasticsearch refuses to run as root.
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
@@ -28,7 +28,7 @@ RUN curl -fsSL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsear
     | tar -xz -C /home/user \
     && mv /home/user/elasticsearch-${ES_VERSION} /home/user/es
 
-RUN git clone --depth 1 --branch "${REF}" "${REPO}" app
+RUN git clone --branch "${REF}" "${REPO}" app
 WORKDIR /home/user/app
 
 # The locked dependencies, with the CPU build of torch instead of the CUDA one (no GPU here).
@@ -51,7 +51,7 @@ RUN mkdir -p data/raw \
 RUN .venv/bin/python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-small')"
 
 # The indices, built with the committed vectors (data/shared/), as in the README.
-RUN .venv/bin/python deploy/huggingface/start.py --build-index
+RUN .venv/bin/python deploy/start.py --build-index
 
 EXPOSE 7860
-CMD [".venv/bin/python", "deploy/huggingface/start.py"]
+CMD [".venv/bin/python", "deploy/start.py"]

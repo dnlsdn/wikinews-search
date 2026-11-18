@@ -1,7 +1,7 @@
-"""Start the public demo inside the Hugging Face Space container (see Dockerfile).
+"""Start the public demo inside its container (see deploy/Dockerfile).
 
-    python deploy/huggingface/start.py --build-index   # at image build: start Elasticsearch, index, stop
-    python deploy/huggingface/start.py                 # at run time: Elasticsearch, warm-up, web app on 7860
+    python deploy/start.py --build-index   # at image build: start Elasticsearch, index, stop
+    python deploy/start.py                 # at run time: Elasticsearch, warm-up, web app on 7860
 
 Elasticsearch listens on 127.0.0.1 only, so the only open port is the web app's.
 """
@@ -85,7 +85,7 @@ def serve() -> None:
     es = start_es()
     web = subprocess.Popen([PY, "-m", "uvicorn", "wikisearch.web.app:app", "--host", "0.0.0.0", "--port", "7860"])
     threading.Thread(target=warm_up, daemon=True).start()
-    # If either process stops, stop the container, so that the Space restarts it.
+    # If either process stops, stop the container, so that Docker restarts it.
     while es.poll() is None and web.poll() is None:
         time.sleep(5)
     for proc in (es, web):
