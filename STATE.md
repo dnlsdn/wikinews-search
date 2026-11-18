@@ -64,7 +64,7 @@ sessions"). The session briefing lists the open ones.
 
 ### 18 Nov 2026 17:35, Daniel: demo GIF in the README
 
-Added `docs/images/demo.gif` (21 s, 960 px, 2.2 MB) under the online demo link of the README,
+Added `docs/images/demo.gif` (21 s, 960 px, 2.1 MB, blank first frames trimmed at 17:40) under the online demo link of the README,
 so whoever opens the repository sees the interface working without starting anything (and still
 sees it when the Azure demo is switched off). It was recorded on the public demo with a headless
 browser and shows three steps of `docs/demo.md`: `terremoto in Abruzzo` with `hybrid-rrf`, then
