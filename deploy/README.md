@@ -1,40 +1,60 @@
 # Public demo
 
-The search engine online, on a free server. One container (`Dockerfile`) holds Elasticsearch,
-listening only inside the container, and the web app; Caddy (`compose.yaml`) is the only service
-reachable from outside and serves HTTPS with a free Let's Encrypt certificate. Everything is built
-from the repository and from public sources: the Wikinews dump from Wikimedia, the embedding model
-from Hugging Face; the indices are built once, while the image is built (about 10 minutes, and
-about 10 GB of free disk during the build).
+The search engine online. One container (`Dockerfile`) holds Elasticsearch, listening only inside
+the container, and the web app; Caddy (`compose.yaml`) is the only service reachable from outside
+and serves HTTPS with a free Let's Encrypt certificate. The image is built from the repository
+files and from public sources: the Wikinews dump from Wikimedia and the embedding model from
+Hugging Face. The indices are built once, while the image is built (about 15 minutes, and about
+10 GB of free disk during the build).
 
-Server used: an Oracle Cloud **Always Free** machine (Ampere A1, ARM, 2 OCPU and 12 GB of RAM out
-of the 4 and 24 that are free). The same files work on any Linux machine with Docker and about
-4 GB of free RAM.
+## Where it runs
+
+An Azure virtual machine paid by the Azure for Students credit (no credit card): size
+Standard_B2als_v2 (2 vCPU, 4 GB of RAM, x86), Ubuntu 24.04, 30 GB Standard SSD, region Denmark
+East (the student subscription allows only a few European regions, and the smaller sizes were not
+available in the others on 18 November 2026). About 40 dollars a month of credit with the disk and
+the public address, so the 100 dollars last until about February; when the credit ends the machine
+is switched off, nothing is charged. A 2 GB swap file is added because 4 GB of RAM is just enough
+for Elasticsearch (1 GB heap) and the embedding model.
+
+Address: https://wikinews-search.denmarkeast.cloudapp.azure.com (a free host name given by Azure).
 
 ## Steps
 
-1. Oracle Cloud console: create a Compute instance with image Canonical Ubuntu 24.04, shape
-   VM.Standard.A1.Flex (2 OCPU, 12 GB), a public IPv4 address and your SSH public key.
-2. In the virtual cloud network of the instance, security list: add two ingress rules, TCP 80
-   and TCP 443 from 0.0.0.0/0.
-3. On the machine (`ssh ubuntu@<ip>`):
+1. Machine (Azure CLI, after `az login`):
 
    ```bash
-   sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2 git
-   sudo iptables -I INPUT 6 -p tcp -m multiport --dports 80,443 -m state --state NEW -j ACCEPT
-   sudo netfilter-persistent save
-   git clone https://github.com/dnlsdn/wikinews-search.git && cd wikinews-search
-   sudo DOMAIN=<ip with dashes>.sslip.io docker compose -f deploy/compose.yaml up -d --build
+   az group create -n wikinews -l denmarkeast
+   az vm create -g wikinews -n wikinews --image Canonical:ubuntu-24_04-lts:server:latest \
+     --size Standard_B2als_v2 --admin-username ubuntu --ssh-key-values <public key> \
+     --public-ip-sku Standard --public-ip-address-dns-name wikinews-search \
+     --storage-sku StandardSSD_LRS --os-disk-size-gb 30 --nsg-rule SSH
+   az vm open-port -g wikinews -n wikinews --port 80,443 --priority 1010
    ```
 
-   The Ubuntu images of Oracle Cloud reject every port but 22 in `iptables`: the second command
-   opens 80 and 443, the third keeps the rule after a reboot. `sslip.io` is a free DNS name that
-   points to the IP written in it (`1-2-3-4.sslip.io` -> 1.2.3.4), so Caddy can get a certificate
-   without buying a domain.
-4. Check: `sudo docker compose -f deploy/compose.yaml logs -f app` until "warm-up done", then open
-   `https://<ip with dashes>.sslip.io`.
+2. On the machine: swap and Docker.
 
-To update after a push: `git pull`, then the same `docker compose ... up -d --build`.
+   ```bash
+   sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile
+   sudo swapon /swapfile && echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+   sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2
+   ```
+
+3. The code: `git clone` of this repository on the machine (or, from a laptop with the
+   repository, `git archive main | ssh ubuntu@<host> "mkdir -p wikinews-search && tar -x -C wikinews-search"`).
+4. Build and start:
+
+   ```bash
+   cd wikinews-search
+   sudo DOMAIN=<host name> docker compose -f deploy/compose.yaml up -d --build
+   ```
+
+5. Check: `sudo docker compose -f deploy/compose.yaml logs -f app` until "warm-up done", then open
+   `https://<host name>`.
+
+To update: copy the new code, then the same `docker compose ... up -d --build`. The same files work
+on any Linux machine with Docker, 4 GB of RAM and swap (for example an Oracle Cloud Always Free
+Ampere machine, when one is available: the image builds on ARM too).
 
 ## Test on a laptop
 
