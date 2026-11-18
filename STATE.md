@@ -8,7 +8,7 @@ Shared memory of the project. Read it before starting, update it before every pu
 | Part | Owner | State |
 |---|---|---|
 | Repository, plan, contracts, skeleton | Daniel | done (16 Nov) |
-| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:17), decisions on repeated results in #17 (Fabio) and #18 (Gioia); Daniel's speech written (18 Nov 10:22, 5:55 min): notes of `slides/daniel.md` and `slides/discorso-daniel.md`; README final (18 Nov 10:29), setup checked from a fresh clone end to end (10:49); public demo online (18 Nov); deck regenerated with Fabio's #20 changes (18 Nov 16:20); demo GIF in the README (17:35); next: rehearsal; last, just before the upload of the pptx: clean the repository of the tooling files, make it public, upload |
+| Data and indexing | Daniel | D1-D4 and D6 done (16 Nov 14:50), D7 slide draft in `slides/daniel.md` (15:05), D5 done (15:45: E8 indices `int8`/`bbq` built, measurement waits for Fabio's configurations and Gioia's runner; no asciifolding variant); queries approved (#9); judgments pushed (17 Nov 14:25: M01-M05 by Daniel, M11-M20 by Claude, see log); blind third-judge grades of the 49 M01-M10 disagreements posted in #13 and #15 (17:05); delivery decided (17:22): pptx only, cover with names and repository link, no emails; final official numbers on `slides/daniel.md` (17:45); consistency check of the three slide files done and first deck draft pushed (18 Nov 09:55); deck redone in the homework 2 style (18 Nov 10:17), decisions on repeated results in #17 (Fabio) and #18 (Gioia); Daniel's speech written (18 Nov 10:22, 5:55 min): notes of `slides/daniel.md` and `slides/discorso-daniel.md`; README final (18 Nov 10:29), setup checked from a fresh clone end to end (10:49); public demo online (18 Nov); deck regenerated with Fabio's #20 changes (18 Nov 16:20); demo GIF in the README (17:35); deck regenerated with Fabio's last #20 changes (18:00); next: rehearsal; last, just before the upload of the pptx: clean the repository of the tooling files, make it public, upload |
 | Search and interface | Fabio | F1-F4 done (16 Nov 16:30); E8 configurations `knn-int8`, `knn-bbq` (16:35, issue #6); F5 work in progress (16:55): `docs/demo.md` and `results/demo/` pushed, rehearsal on Daniel's laptop missing (issue #8); F6 in progress (17:05): README usage done, slide outline decided, `slides/fabio.md` written after the official run (Tue 20:00-22:00); G4 judgments pushed (17 Nov 16:50: M06-M10 by Fabio, M21-M30 by Claude, see log); F5 done (17 Nov 17:35): `docs/demo.md` rewritten as interface actions and checked live; F6 in progress (18:10): `slides/fabio.md` written with the official numbers, Fabio's review before ticking; #17 applied (18 Nov 11:58: RRF diagram on slide 3, latency wording); F6 done (18 Nov 12:05): notes of slides 1-4 cut to about 2:37, F6 ticked; restyle of PR #19 confirmed (#14); next: demo rehearsal on Daniel's laptop |
 | Evaluation | Gioia | G1 done (16 Nov 12:30): metrics, TREC files, significance tested; G2 done (16 Nov 15:45), language rule fixed (22:03): `fonti` test set, 7,072 queries; G3 done (ticked 17 Nov 17:05): queries, guidelines, tool and pool done, judging files pushed; queries approved unchanged by Daniel and Fabio (issue #9 closed); G4: all three judgment files merged (17 Nov 17:05), kappa 0.543; 49 disagreements adjudicated blind by Daniel's session (#13, #15), `qrels.txt` final (17:10); G4 ticked; G5 done (17 Nov 17:30): final official run on `fonti` and `manual`, `results/metrics/` and `results/summary.md` pushed, G5 ticked; G6 in progress (17 Nov 17:35): four figures in `results/figures/`, `manual` on M01-M10 in `results/metrics/manual_human*.csv`, reading per experiment in the log; `slides/gioia.md` written (18 Nov 09:30); #18 applied (10:30: who graded `manual`, same wording on slides 1, 3, 8); G6 done (10:36): notes reviewed and cut to about 5:45, G6 ticked; questions for the oral in `slides/domande-gioia.md` (10:38); Gioia's speech in `slides/discorso-gioia.md` (18 Nov 12:16, 5:44 min, same text as the notes); next: rehearsal |
 
@@ -61,6 +61,24 @@ Not here: messages between sessions are GitHub issues (`CLAUDE.md`, "Talking to 
 sessions"). The session briefing lists the open ones.
 
 ## Log
+
+### 18 Nov 2026 18:00, Daniel: deck regenerated with Fabio's last #20 changes (D7)
+
+`slides/wikinews-search.pptx` regenerated from the current `.md` files (Fabio's commits 3640d18,
+4cd0c6f, 2c36d4d); the uploaded copy (no notes) and its PDF regenerated with it, in Daniel's notes
+folder. Changes:
+1. **Slide 9**: subtitle ends at "... una configurazione con un nome." (no "manopola
+   dell'ablazione").
+2. **Slide 12**: subtitle and speaker note say "le faccette contano per categoria e fonte" (no
+   "e anno"); the new `results/demo/slide-filters-zoom.png` with the category facet, same layout.
+3. **Slide 13 (Demo)**: no subtitle and no caption, only the list of the five queries. The build
+   script used to take the subtitle of this slide from the first clause of "Contenuto:" and wrote
+   the caption itself: both removed in the script, so the new "Contenuto:" text (an instruction,
+   not slide text) does not reach the slide.
+Slides 9, 12 and 13 checked visually on the PDF, the slide 12 note checked in the pptx; no other
+slide and no number changed. Tests: 108 passed, 22 skipped. #20 answered. Also told in #14: the
+demo GIF of the README (17:35 entry) is already done, before the delivery. Next: rehearsal; last,
+just before the upload: clean the repository of the tooling files, make it public, upload.
 
 ### 18 Nov 2026 17:34, Fabio: slide 12 screenshot shows the category facet too (#20)
 
