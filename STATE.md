@@ -62,6 +62,15 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 10:56, Daniel: where the deck is built (D7)
+
+The deck script and Daniel's speech script moved from `slides/build/` (local, not committed) to
+Daniel's notes folder, next to his copies of the presentation, as for homework 2. One command,
+`costruisci.py` there, writes: `slides/wikinews-search.pptx` in the repository (with notes, the
+team's copy, to commit as before), a copy with notes, a copy **without notes** (the one to
+upload: the speech stays out of the handed-in file, as for homework 2) and its PDF. Nothing
+changes for Fabio and Gioia: they edit their `.md` files and Daniel regenerates.
+
 ### 18 Nov 2026 10:51, Daniel: deck regenerated with Gioia's review (D7)
 
 `slides/wikinews-search.pptx` regenerated from the current `.md` files (commit dc70372): Gioia's
