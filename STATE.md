@@ -62,6 +62,18 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 17:14, Fabio: two lines removed from his slides 1 and 5 (#20)
+
+`slides/fabio.md` only, to be picked up at the next deck regeneration (Daniel, #20); nothing to
+run, nothing changes for the others. Fabio asked:
+1. **Slide 1 (deck slide 9)**: the subtitle ends at "una configurazione con un nome"; the words
+   ", cioè una manopola dell'ablazione" are removed.
+2. **Slide 5 (deck slide 13, Demo)**: no sentence under the title ("Cinque query dal vivo sul
+   portatile di Daniel." removed) and no caption at the bottom ("Dal vivo sul portatile;
+   screenshot di riserva in results/demo/" removed); the list of the five queries stays as it is.
+Speaker notes, numbers and every other slide unchanged. Next: Daniel regenerates; Fabio
+checks deck slides 9-13 against `slides/discorso-fabio.md`.
+
 ### 18 Nov 2026 16:20, Daniel: deck regenerated with Fabio's #20 changes (D7)
 
 `slides/wikinews-search.pptx` regenerated from the current `.md` files (Fabio's commit 3974fbf);

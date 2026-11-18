@@ -7,8 +7,7 @@ giusto, "manual" sono 30 query con giudizi 0/1/2.
 
 ## Slide 1: Una ricerca, molte configurazioni
 Contenuto: una sola funzione `search(query, configurazione)`, usata dall'interfaccia e dalla
-valutazione; ogni scelta di progetto è una configurazione con un nome, cioè una manopola
-dell'ablazione.
+valutazione; ogni scelta di progetto è una configurazione con un nome.
 
 | configurazione | cosa cambia | esperimento |
 |---|---|---|
@@ -87,10 +86,11 @@ non pubblicate, come uno speciale, rispondono davvero alla query. Non la misuria
 dove il documento giusto è sempre pubblicato. Quindi il default non usa la spinta.
 
 ## Slide 5: Demo
-Contenuto: cinque query dal vivo sul portatile di Daniel: una ricerca con pagina non pubblicata,
-filtri per data e fonte, un nome proprio (vince BM25), una parafrasi (vince kNN, poi l'ibrida),
-le serie quasi identiche del SuperEnalotto.
-Figura: nessuna (dal vivo; screenshot di riserva in `results/demo/`)
+Contenuto: solo l'elenco delle cinque query, senza frase sotto il titolo: una ricerca con pagina
+non pubblicata, filtri per data e fonte, un nome proprio (vince BM25), una parafrasi (vince kNN,
+poi l'ibrida), le serie quasi identiche del SuperEnalotto.
+Figura: nessuna, e nessuna didascalia sulla slide (la demo è dal vivo; gli screenshot di riserva
+in `results/demo/` sono solo per noi)
 Note del relatore: Io parlo, Daniel usa l'interfaccia. Passi, azioni e frasi in `docs/demo.md`.
 Il punto da far vedere: i numeri delle slide precedenti corrispondono a casi concreti. BM25 trova
 "Pontecorvo" e kNN no; kNN trova "il pontefice è deceduto" (Benedetto XVI primo) dove BM25 lo
