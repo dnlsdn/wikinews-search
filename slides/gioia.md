@@ -19,11 +19,10 @@ confronto con un test di significatività.
 Figura: nessuna
 Note del relatore: Un benchmark ha tre parti: documenti, query, giudizi di rilevanza. I documenti
 sono i 12.213 di Daniel; query e giudizi li abbiamo costruiti in due modi. `fonti` è grande e
-automatico: tante query, ma una sola risposta giusta, quindi misura la ricerca di un elemento
-noto, e la metrica naturale è MRR. `manual` è piccolo e giudicato con tre gradi, in parte da noi e in parte da un modello: misura
-la qualità di tutta la prima pagina, e lì usiamo nDCG. Ogni scelta di progetto è una
-configurazione con un nome, e ogni esperimento confronta due configurazioni che differiscono in
-una sola cosa: è un'ablazione.
+automatico, con una sola risposta giusta per query: misura la ricerca di un elemento noto, e la
+metrica naturale è MRR. `manual` è piccolo, con tre gradi di rilevanza, in parte da noi e in parte
+da un modello: misura tutta la prima pagina, con nDCG. Ogni esperimento confronta due
+configurazioni che differiscono in una sola cosa: è un'ablazione.
 
 ## Slide 2: Il test set `fonti`
 Contenuto: la query è il titolo con cui un altro giornale ha dato la stessa notizia; la risposta
@@ -40,16 +39,13 @@ giusta è l'articolo che lo cita.
 
 Figura: nessuna
 Note del relatore: Ogni articolo di Wikinews cita le sue fonti con il loro titolo. Quel titolo è
-una query realistica, scritta da un'altra persona per un altro giornale, e sappiamo già qual è
-la risposta giusta: migliaia di query senza lavoro manuale. Il corso dice che termini presi a
-caso dai documenti non sono buone query di test: queste invece sono titoli veri. Teniamo una sola
-query per articolo, così gli articoli con tante fonti non pesano di più. Per ogni query misuriamo
-quante parole ha in comune con il titolo dell'articolo e la mettiamo in un gruppo: overlap basso
-(2.643 query, sono parafrasi), medio (3.571), alto (858). Il gruppo basso è quello dove la
-ricerca semantica dovrebbe servire. Due controlli: la regola sulla lingua, verificata a occhio su
-100 titoli, perché i titoli in inglese favorivano il modello multilingue; e il leakage, cioè il
-titolo della fonte presente nel testo cercato: 7 query su 300 (2,3%), sovrapposizione naturale tra
-giornali, non un errore del parser.
+una query realistica, scritta da un altro giornale, e sappiamo già qual è la risposta giusta:
+migliaia di query senza lavoro manuale. Il corso sconsiglia termini presi a caso dai documenti:
+questi sono titoli veri. Una sola query per articolo, così gli articoli con tante fonti non pesano
+di più. Dividiamo le query per parole in comune con il titolo dell'articolo: overlap basso, cioè
+parafrasi, 2.643; medio 3.571; alto 858. Due controlli: la regola sulla lingua, verificata a occhio
+su 100 titoli, perché i titoli in inglese favorivano il modello multilingue; e il leakage, il
+titolo della fonte già nel testo: 7 query su 300, sovrapposizione naturale tra giornali.
 
 ## Slide 3: Il test set `manual`
 Contenuto: 30 query scritte prima di vedere i risultati, ognuna con il suo bisogno informativo;
@@ -63,16 +59,13 @@ giudicato il pool delle prime 10 posizioni di cinque configurazioni.
 | accordo su 10 query giudicate due volte | 72,5%, kappa di Cohen 0,543 (0/1/2), 0,674 (rilevante sì/no) |
 
 Figura: nessuna
-Note del relatore: Le 30 query le abbiamo scritte prima di guardare un solo risultato, per non
-scegliere query su cui il sistema va bene. Ognuna ha un bisogno informativo, una frase: come dice
-il corso, la rilevanza si giudica rispetto al bisogno, non alle parole della query. Giudicare
-tutto il corpus è impossibile, quindi pooling: le prime 10 posizioni delle cinque configurazioni
-confrontate, unite e mescolate, così chi giudica non sa quale sistema ha trovato cosa. Il pool
-contiene 95 documenti trovati solo da kNN: senza la configurazione vettoriale nel pool, kNN
-sarebbe stato penalizzato. Dieci query le hanno giudicate due persone: kappa 0,54, accordo
-moderato sui tre gradi, sostanziale sul rilevante o non rilevante. I disaccordi sono quasi
-tutti su "quanto" è rilevante, non "se" lo è. I 49 disaccordi li ha risolti un terzo giudice
-alla cieca (un modello), senza sapere chi avesse dato quale voto; il kappa è calcolato sui voti originali.
+Note del relatore: Le 30 query le abbiamo scritte prima di vedere un solo risultato, ognuna con il
+suo bisogno informativo: come dice il corso, la rilevanza si giudica rispetto al bisogno, non alle
+parole della query. Giudicare tutto il corpus è impossibile, quindi pooling: le prime 10 posizioni
+di cinque configurazioni, unite e mescolate, così chi giudica non sa quale sistema ha trovato cosa.
+95 documenti li ha trovati solo kNN: senza kNN nel pool sarebbe stato penalizzato. Su dieci query
+giudicate da due persone il kappa è 0,54: accordo moderato sui tre gradi, sostanziale su rilevante
+sì o no. I 49 disaccordi li ha risolti un terzo giudice alla cieca (un modello).
 
 ## Slide 4: Quando una differenza è vera
 Contenuto: intervallo di confidenza bootstrap al 95% per ogni media, test di randomizzazione
@@ -87,14 +80,12 @@ appaiato per ogni confronto, correzione di Holm, baseline casuale.
 | tutte le query, semi fissi, un comando | nessuna scelta di campione da difendere, numeri riproducibili |
 
 Figura: nessuna
-Note del relatore: Una media da sola non basta. Per ogni media ricampioniamo le query 10.000
-volte e riportiamo l'intervallo al 95%. Per ogni confronto usiamo il test di randomizzazione
-appaiato: per ogni query scambiamo a caso i punteggi delle due configurazioni e contiamo quante
-volte la differenza è grande almeno come quella osservata. Siccome ogni esperimento fa molti
-confronti, correggiamo i p con Holm, che controlla la probabilità di anche un solo falso
-positivo nella famiglia. Un esempio: ibrida contro BM25 sulle query facili ha p 0,03, ma dopo
-la correzione 0,18, e quindi non la chiamiamo significativa. La baseline casuale fa zero, come
-deve: è il pavimento.
+Note del relatore: Una media da sola non basta: per ogni media ricampioniamo le query 10.000 volte
+e riportiamo l'intervallo al 95%. Per ogni confronto, test di randomizzazione appaiato: per ogni
+query scambiamo a caso i punteggi delle due configurazioni e contiamo quante volte la differenza è
+grande almeno come quella osservata. Con molti confronti per esperimento correggiamo i p con Holm.
+Un esempio: ibrida contro BM25 sulle query facili ha p 0,03, dopo la correzione 0,18, quindi non la
+chiamiamo significativa. La baseline casuale fa zero, come deve: è il pavimento.
 
 ## Slide 5: Il risultato chiave: dove serve la ricerca semantica (E3)
 Contenuto: sulle query facili tutti sono vicini a 1; sulle parafrasi l'ibrida guadagna 0,086 su
@@ -107,13 +98,12 @@ BM25.
 | ibrida RRF | **0,811** | **0,611** | **0,915** | 0,990 |
 
 Figura: results/figures/e3_buckets.png
-Note del relatore: Questa è la figura che riassume il progetto. Quando la query riusa le parole
-del titolo, gruppo alto, BM25 è già quasi perfetto e kNN è leggermente peggio. Quando la query è
-una parafrasi, gruppo basso, BM25 scende a 0,525: lì kNN aiuta (+0,032) e l'ibrida ancora di più
-(+0,086), tutto significativo dopo Holm. kNN da solo però perde recall: R@100 0,942 contro 0,958
-di BM25. L'ibrida prende il meglio dei due ed è la migliore in media, 0,811, con intervalli che
-non si sovrappongono a quelli di BM25. Un confronto deciso dopo aver visto i risultati, E3b: BM25
-con pesi uguali sui campi batte l'ibrida sulle parafrasi (0,646 contro 0,611); lo dichiariamo.
+Note del relatore: Questa è la figura che riassume il progetto. Quando la query riusa le parole del
+titolo, BM25 è già quasi perfetto. Quando è una parafrasi, overlap basso, BM25 scende a 0,525: lì
+kNN aiuta (+0,032) e l'ibrida ancora di più (+0,086), tutto significativo dopo Holm. kNN da solo
+però perde recall: R@100 0,942 contro 0,958. L'ibrida prende il meglio dei due ed è la migliore in
+media, 0,811. Un confronto deciso dopo aver visto i risultati, E3b: BM25 con pesi uguali sui campi
+batte l'ibrida sulle parafrasi (0,646 contro 0,611); lo dichiariamo.
 
 ## Slide 6: La prima pagina, sul test set `manual`
 Contenuto: l'ibrida ha la nDCG@10 più alta; con 30 query solo le differenze grandi sono
@@ -129,11 +119,10 @@ significative.
 
 Figura: results/figures/manual_ndcg.png
 Note del relatore: Su `manual` l'ordine è lo stesso di `fonti`: analizzatore italiano meglio dello
-standard (+0,052, p 0,04), ibrida meglio di BM25 (+0,103, p 0,010). kNN sopra BM25 di 0,063 ma
-non significativo: con 30 query gli intervalli sono larghi, e lo diciamo. La spinta alle pagine
-pubblicate peggiora (-0,046, p 0,03), quindi non è nella configurazione di default. Sulle sole 10
-query giudicate da due persone la direzione è la stessa per E1, ibrida contro BM25 e E5, ma
-nessuna differenza è significativa: 10 query sono troppo poche per confermare o smentire.
+standard (+0,052, p 0,04), ibrida meglio di BM25 (+0,103, p 0,010). kNN sopra BM25 di 0,063, ma non
+significativo: con 30 query gli intervalli sono larghi. La spinta alle pagine pubblicate peggiora
+(-0,046, p 0,03), quindi non è nel default. Sulle sole 10 query giudicate da persone la direzione è
+la stessa, ma 10 query sono troppo poche per la significatività.
 
 ## Slide 7: Quanto costa la qualità (E6, E8)
 Contenuto: più qualità costa latenza, ma tutto resta sotto i 60 ms; quantizzare i vettori non
@@ -147,13 +136,12 @@ costa qualità.
 | ibrida RRF | 0,811 | 43,1 ms | 53,4 ms |
 
 Figura: results/figures/e6_tradeoff.png
-Note del relatore: Latenza misurata su 500 query, dopo un riscaldamento, con tutte le
-configurazioni eseguite in ordine casuale per ogni query, così hanno le stesse cache; per kNN è
-incluso il calcolo del vettore della query. Su un MacBook Air M4 con 16 GB. L'ibrida fa due
-ricerche e costa circa tre volte BM25, ma resta sotto i 60 ms al 95° percentile. E8: comprimere i
-vettori a 8 bit (int8) o a 1 bit (BBQ) non cambia MRR@10 in modo misurabile (-0,0004, p 0,95);
-BBQ perde un poco di recall (R@100 -0,003, p 0,03). La latenza non cambia perché il corpus è
-piccolo: il vantaggio è la memoria, che Daniel ha misurato.
+Note del relatore: Latenza su 500 query, dopo un riscaldamento, con le configurazioni in ordine
+casuale per ogni query, così hanno le stesse cache; per kNN è incluso il calcolo del vettore della
+query. L'ibrida fa due ricerche e costa circa tre volte BM25, ma resta sotto i 60 ms al 95°
+percentile. E8: comprimere i vettori a 8 bit o a 1 bit non cambia MRR@10 in modo misurabile (p
+0,95); BBQ perde un poco di recall (R@100 -0,003). La latenza non cambia perché il corpus è
+piccolo: il vantaggio è la memoria, che ha mostrato Daniel.
 
 ## Slide 8: Limiti
 Contenuto: li dichiariamo perché cambiano come leggere i numeri.
@@ -168,12 +156,11 @@ Contenuto: li dichiariamo perché cambiano come leggere i numeri.
 | E3b scelto dopo aver visto i risultati | va letto come indicazione, non come ipotesi testata |
 
 Figura: nessuna
-Note del relatore: Ogni valutazione ha limiti; questi sono i nostri. Il più importante per
-`manual`: per stare nei tempi, le query da M11 a M30 le ha giudicate un modello linguistico,
-seguendo le stesse linee guida, e un modello ha fatto da terzo giudice sui disaccordi. Le query
-giudicate due volte da persone sono dieci, ed è su quelle che misuriamo l'accordo. Per questo
-riportiamo anche i risultati sulle sole dieci query giudicate da umani. Le configurazioni E2 ed
-E4 sono misurate solo su `fonti`, perché i loro documenti non sono nel pool.
+Note del relatore: Questi limiti cambiano come leggere i numeri. Il più importante per `manual`:
+per stare nei tempi, le query da M11 a M30 le ha giudicate un modello linguistico con le stesse
+linee guida, e un modello ha fatto da terzo giudice. L'accordo lo misuriamo sulle dieci query
+giudicate da persone, e su quelle riportiamo anche i risultati. E2 ed E4 sono misurati solo su
+`fonti`, perché i loro documenti non sono nel pool.
 
 ## Slide 9: Conclusioni
 Contenuto: una riga per esperimento; le scelte confermate e quelle smentite dai numeri.

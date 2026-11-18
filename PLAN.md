@@ -164,7 +164,7 @@ Tick a box only when the "done when" is true, and log it in `STATE.md`.
   judgments per person; 10 queries judged by two people to measure agreement).
 - [x] **G5, Mon 16 (runner on BM25) - Tue 17 20:00 (official run).** `evaluation/run.py`: runs every configuration on every test set, writes runs,
   metrics CSV, significance tests and latency; one command reproduces all numbers.
-- [ ] **G6, Tue 17 evening.** Tables and plots for the slides (`results/figures/`), reading of
+- [x] **G6, Tue 17 evening.** Tables and plots for the slides (`results/figures/`), reading of
   the results, own slides (test strategy, results) in `slides/gioia.md`.
 
 ## Slides
