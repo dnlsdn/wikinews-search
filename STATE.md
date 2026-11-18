@@ -62,6 +62,27 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 12:08, Fabio: questions for the oral on the retrieval part
+
+`slides/domande-fabio.md` (Italian, like the rest of `slides/`; same format as
+`slides/domande-gioia.md`): 29 questions the professor may ask on Fabio's part, with short
+answers and their numbers (one `search()` and the named configurations, BM25 fields and weights,
+kNN, RRF, filters and facets, E5, latency, the demo), four points to be careful about, and the
+numbers to remember. Every number is from `results/summary.md` (run of 17 Nov 17:27), the code
+of `wikisearch/search/` or earlier log entries; nothing was rerun. Not part of the deck: Daniel
+does not need to do anything with it.
+
+Two points found while checking, for whoever presents the numbers:
+1. `hybrid-rrf` is the best configuration on `fonti` only among those without the published
+   boost: `hybrid-rrf-published` has MRR@10 0.814 against 0.811 (not tested, and favoured by
+   construction on `fonti`). On `manual` the hybrid is the best by nDCG@10, but `knn` has the
+   higher MRR@10 (0.925 against 0.911).
+2. The reason given for E5 (published pages that are less relevant pushed up, unpublished
+   specials that answer the query pushed down) is an interpretation, not counted per query.
+
+No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running). Next: demo rehearsal
+on Daniel's laptop with the new look.
+
 ### 18 Nov 2026 12:05, Fabio: speaker notes cut to about 2:30, F6 done
 
 Fabio's review of `slides/fabio.md`, decided by Fabio. Only the "Note del relatore" of slides 1-4
