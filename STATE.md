@@ -62,6 +62,24 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 18 Nov 2026 12:15, Fabio: Fabio's speech for the oral presentation
+
+`slides/discorso-fabio.md` (Italian; format of `slides/discorso-daniel.md`): Fabio's speech per
+slide, with the gist, the timing and the key passages in bold. Slides 1-4: the same words as the
+"Note del relatore" of `slides/fabio.md` (checked word by word), 375 words, 0:00-2:37. Slide 5,
+the live demo: the five steps of `docs/demo.md` in Italian, with Daniel's actions in square
+brackets; 358 spoken words (about 2:30) plus the waits for Daniel's actions, about 3:20, so
+Fabio's part is about 6:00. Also the spare query ("rincaro del greggio") and what to do if the
+demo fails (screenshots of `results/demo/`). No transition sentence to Gioia (as agreed for every
+speaker). The notes of slide 5 in `slides/fabio.md` stay short: the deck does not change.
+
+One number differs between files: `docs/demo.md` step 5 says "about 2,300" template-generated
+pages; `results/data_report.md` (2.6) and Daniel's slide say 2,742 (22%, series of 5 or more
+pages). The speech uses 2,742; `docs/demo.md` not changed yet (Fabio decides).
+
+No code change. Tests: 108 passed, 22 skipped (Elasticsearch not running). Next: demo rehearsal
+on Daniel's laptop with the speech.
+
 ### 18 Nov 2026 12:08, Fabio: questions for the oral on the retrieval part
 
 `slides/domande-fabio.md` (Italian, like the rest of `slides/`; same format as
