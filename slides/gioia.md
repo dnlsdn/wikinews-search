@@ -14,13 +14,13 @@ confronto con un test di significatività.
 | test set | query | giudizi | domanda a cui risponde | metriche |
 |---|---|---|---|---|
 | `fonti` | 7.072 | 1 documento giusto, automatico | il motore trova la notizia? | MRR@10, R@10, R@100 |
-| `manual` | 30 | 573 documenti graduati 0/1/2, da noi | la prima pagina è buona? | P@10, nDCG@10, MAP, MRR@10 |
+| `manual` | 30 | 573 documenti graduati 0/1/2: 10 query da due di noi, 20 da un modello (vedi Limiti) | la prima pagina è buona? | P@10, nDCG@10, MAP, MRR@10 |
 
 Figura: nessuna
 Note del relatore: Un benchmark ha tre parti: documenti, query, giudizi di rilevanza. I documenti
 sono i 12.213 di Daniel; query e giudizi li abbiamo costruiti in due modi. `fonti` è grande e
 automatico: tante query, ma una sola risposta giusta, quindi misura la ricerca di un elemento
-noto, e la metrica naturale è MRR. `manual` è piccolo e giudicato a mano con tre gradi: misura
+noto, e la metrica naturale è MRR. `manual` è piccolo e giudicato con tre gradi, in parte da noi e in parte da un modello: misura
 la qualità di tutta la prima pagina, e lì usiamo nDCG. Ogni scelta di progetto è una
 configurazione con un nome, e ogni esperimento confronta due configurazioni che differiscono in
 una sola cosa: è un'ablazione.
@@ -72,7 +72,7 @@ contiene 95 documenti trovati solo da kNN: senza la configurazione vettoriale ne
 sarebbe stato penalizzato. Dieci query le hanno giudicate due persone: kappa 0,54, accordo
 moderato sui tre gradi, sostanziale sul rilevante o non rilevante. I disaccordi sono quasi
 tutti su "quanto" è rilevante, non "se" lo è. I 49 disaccordi li ha risolti un terzo giudice
-alla cieca, senza sapere chi avesse dato quale voto; il kappa è calcolato sui voti originali.
+alla cieca (un modello), senza sapere chi avesse dato quale voto; il kappa è calcolato sui voti originali.
 
 ## Slide 4: Quando una differenza è vera
 Contenuto: intervallo di confidenza bootstrap al 95% per ogni media, test di randomizzazione
@@ -162,7 +162,7 @@ Contenuto: li dichiariamo perché cambiano come leggere i numeri.
 |---|---|
 | `fonti` ha un solo documento giusto per query | misura la ricerca della notizia, non la qualità della pagina |
 | `manual` ha 30 query | intervalli larghi, solo le differenze grandi sono significative |
-| giudizi di `manual` dati da noi, autori del sistema | possibile distorsione; mitigata dal pool mescolato |
+| 10 query di `manual` giudicate da noi, autori del sistema | possibile distorsione; mitigata dal pool mescolato |
 | 20 query su 30 giudicate da un modello, disaccordi risolti da un modello | il kappa è tra umani, ma la maggior parte dei voti no |
 | documenti non giudicati contano come non rilevanti | sottostima per configurazioni fuori dal pool |
 | E3b scelto dopo aver visto i risultati | va letto come indicazione, non come ipotesi testata |
