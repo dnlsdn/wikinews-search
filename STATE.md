@@ -62,6 +62,15 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 19 Nov 2026 15:45, Daniel: two labels shortened on slides 6 and 8 (D7)
+
+Decided by Daniel. Only the drawing (Daniel's deck script), no `.md` file and no number changed:
+1. **Slide 6** (Leakage): the E4 bar label reads "fonti tolte dal testo cercato" (no "(noi)").
+2. **Slide 8** (Embeddings): the E8 caption reads "stessa qualità; a 12.213 documenti la RAM non è
+   un problema" (no "(slide di Gioia)").
+Deck regenerated with the uploaded copy and its PDF; slides 6 and 8 checked visually. Nothing to do
+for Fabio and Gioia.
+
 ### 19 Nov 2026 15:20, Daniel: deck regenerated with Gioia's last two changes (D7)
 
 `slides/wikinews-search.pptx` regenerated from the current `.md` files (Gioia's commits 80320fc and
