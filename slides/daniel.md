@@ -15,7 +15,6 @@ Contenuto: Wikinews in italiano, dump del 20 marzo 2025.
 | pubblicati | 11.032 (90%) |
 | con data | 11.727 (96%) |
 | con almeno una fonte | 9.891 |
-| notizie 2005-2008 | 55% delle datate |
 
 Figura: nessuna
 Note del relatore: Il corpus è il dump di Wikinews in italiano del 20 marzo 2025: un oggetto JSON per pagina, con l'HTML e il wikitext di ogni articolo. Le righe sono 12.261, ma alcune pagine compaiono più volte, una per revisione: teniamo la più recente e restano 12.213 documenti. Il 90% è pubblicato, il 96% ha una data, quasi diecimila citano almeno una fonte. Il grafico mostra la cosa più evidente: il corpus è piccolo ma molto sbilanciato, più di metà delle notizie datate è del 2005-2008, gli anni in cui Wikinews in italiano era più attiva.
@@ -29,7 +28,7 @@ Contenuto: la data non è un campo, l'abstract non è un sommario.
 | abstract del dump che inizia con la data | 11.632 abstract | lead ricostruito dall'HTML |
 
 Figura: nessuna
-Note del relatore: La prima difficoltà: le informazioni che ci servono non sono campi del dump. Il dump ha solo la data dell'ultima modifica, spesso anni dopo la notizia. La data vera è scritta a mano in un template in italiano, come questo luogodata, che diventa 2020-05-20. La estraiamo dal wikitext per 11.687 documenti e per 40 dalla categoria del giorno; 486 restano senza data, e un campo dice da dove viene ogni data. Lo stesso per l'abstract: in 11.632 pagine inizia con la data, e a volte c'è solo quella, come "martedì 17 giugno 2008". Il lead lo ricostruiamo dall'HTML, con il primo paragrafo vero. Conta perché è quello che leggono gli embeddings: con la sola data, tutte le notizie dello stesso giorno sembrerebbero uguali.
+Note del relatore: La prima difficoltà: le informazioni che ci servono non sono campi del dump. Il dump ha solo la data dell'ultima modifica, spesso anni dopo la notizia. La data vera è scritta a mano in un template in italiano, come questo luogodata, che diventa 2020-05-20. La estraiamo dal wikitext per 11.687 documenti e per 40 dalla categoria del giorno; 486 restano senza data, e un campo dice da dove viene ogni data. Lo stesso per l'abstract: in 11.632 pagine inizia con la data, e a volte c'è solo quella, come "19 dicembre 2005". Il lead lo ricostruiamo dall'HTML, dal primo paragrafo vero: "Evo Morales vince le presidenziali in Bolivia". Conta perché è quello che leggono gli embeddings: con la sola data, tutte le notizie dello stesso giorno sembrerebbero uguali.
 
 ## Slide 3: Metadati da ripulire
 Contenuto: categorie e agenzie diventano filtri, quindi devono essere pulite.
@@ -47,9 +46,9 @@ Contenuto: pagine non pubblicate, serie quasi identiche, tabelle; le teniamo tut
 
 | | documenti | scelta |
 |---|---|---|
-| non pubblicate (speciali, palinsesti, tabelle, bozze) | 1.181 | tenute con `published: false` |
-| serie generate da template (5+ pagine) | 2.742 (22%) | tenute, con `series_key` |
-| pagine con tabelle | 3.661 (36% del testo) | tabelle come testo, una riga per riga |
+| speciali, palinsesti, classifiche, bozze | 1.181 (pagine) | tenute con `published: false` |
+| 5 o più pagine dallo stesso template | 2.742 (pagine, il 22%) | tenute, con `series_key` |
+| le tabelle sono il 36% di tutto il testo | 3.661 (pagine) | tabelle come testo, una riga per riga |
 
 Figura: nessuna
 Note del relatore: Non tutte le pagine sono notizie. 1.181 non sono pubblicate: speciali, palinsesti, classifiche, bozze. Le teniamo, marcate: uno speciale sulle elezioni può rispondere a una query vera, e se convenga penalizzarle lo misura un esperimento, E5, che mostra Fabio. Poi le serie generate da template, come i 216 concorsi del SuperEnalotto, con titoli uguali a meno dei numeri: un campo sostituisce le cifre e permette di raggrupparle. Infine il 36% del testo è in tabelle: le teniamo come testo, una riga per riga, perché 366 pagine sono fatte solo di tabelle e sarebbero rimaste vuote.
@@ -92,9 +91,8 @@ Contenuto: un vettore per documento, calcolato una volta e condiviso da tutti.
 | modello | multilingual-e5-small, 384 dimensioni |
 | testo | "passage: " + titolo + lead |
 | tempo | 121 s per 12.213 documenti, su CPU |
-| struttura | HNSW non quantizzato: +19 MB, costruzione 3,6 volte più lenta |
-| `knn` contro BM25, query con poche parole in comune | MRR@10 da 0,525 a 0,557 (+0,032, p Holm 0,002) |
+| parafrasi, 2.643 query | MRR@10: kNN 0,557, BM25 0,525 (p Holm 0,002) |
 | quantizzazione (E8): memoria della ricerca | HNSW 19,2 MB, `int8_hnsw` 5,3 MB, `bbq_hnsw` 1,2 MB; qualità e latenza nelle slide di Gioia |
 
-Figura: nessuna
-Note del relatore: Per la ricerca semantica calcoliamo un vettore per documento con multilingual-e5-small, 384 dimensioni, su titolo e lead, perché il modello tronca i testi lunghi e l'inizio di una notizia ne dice l'essenziale. Bastano due minuti su CPU, e i vettori sono nel repository, così tutti indicizzano gli stessi. A destra un esempio: "disastro in una miniera" trova "Cina: esplosione in miniera, 11 morti", ma nessun risultato contiene la parola disastro: il vettore coglie il significato. Sulle parafrasi kNN batte BM25, da 0,525 a 0,557 di MRR@10. Infine l'esperimento E8: comprimere i vettori costa quasi niente in qualità, come mostrerà Gioia, e riduce la memoria da 19 a 5 e a poco più di 1 megabyte. Con dodicimila documenti non serve; con milioni sì.
+Figura: results/figures/embedding_map.png (vettori veri della query "disastro in una miniera", `uv run python -m wikisearch.ingest.embedding_map`)
+Note del relatore: Per la ricerca semantica calcoliamo un vettore per documento con multilingual-e5-small, 384 dimensioni, su titolo e lead, perché il modello tronca i testi lunghi e l'inizio di una notizia ne dice l'essenziale. Il disegno mostra cosa fa kNN, sui vettori veri: al centro la query "disastro in una miniera", e la distanza dal centro è la distanza vera tra i vettori. Nel cerchio tratteggiato i primi cinque risultati: tutti incidenti in miniera, nessuno con la parola disastro nel titolo. "Disastro aereo in Perù" la contiene, ma è solo decimo: il vettore coglie il significato, non le parole. Sulle parafrasi kNN batte BM25, da 0,525 a 0,557 di MRR@10. Infine l'esperimento E8: comprimere i vettori costa quasi niente in qualità e riduce la memoria da 19 a 5 e a poco più di 1 megabyte. Con dodicimila documenti non serve; con milioni sì.

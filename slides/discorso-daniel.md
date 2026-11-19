@@ -1,6 +1,6 @@
 # Wikinews search - discorso di Daniel
 
-Homework 4, parte di Daniel (dati e indicizzazione): copertina e slide 2-8, circa 5:55 minuti. Lo stesso testo è nelle note del pptx (`slides/wikinews-search.pptx`) e in `slides/daniel.md`.
+Homework 4, parte di Daniel (dati e indicizzazione): copertina e slide 2-8, circa 6:05 minuti. Lo stesso testo è nelle note del pptx (`slides/wikinews-search.pptx`) e in `slides/daniel.md`.
 
 ## 1. Copertina (0:00-0:39)
 
@@ -14,41 +14,41 @@ Buongiorno. Siamo Gioia Buratti, Fabio Massimo Di Marco e Daniel Sadun. Abbiamo 
 
 Il corpus è il dump di Wikinews in italiano del **20 marzo 2025**: un oggetto JSON per pagina, con l'HTML e il wikitext di ogni articolo. Le righe sono 12.261, ma alcune pagine compaiono più volte, una per revisione: teniamo la più recente e restano **12.213 documenti**. Il 90% è pubblicato, il 96% ha una data, quasi diecimila citano almeno una fonte. Il grafico mostra la cosa più evidente: il corpus è piccolo ma **molto sbilanciato**, più di metà delle notizie datate è del **2005-2008**, gli anni in cui Wikinews in italiano era più attiva.
 
-## 3. Le informazioni sono nei template (1:19-2:10)
+## 3. Le informazioni sono nei template (1:19-2:12)
 
 *data e lead non sono campi: data dal template, lead dall'HTML*
 
-La prima difficoltà: le informazioni che ci servono **non sono campi del dump**. Il dump ha solo la data dell'ultima modifica, spesso anni dopo la notizia. La data vera è scritta a mano in un **template in italiano**, come questo luogodata, che diventa 2020-05-20. La estraiamo dal wikitext per 11.687 documenti e per 40 dalla categoria del giorno; 486 restano senza data, e un campo dice da dove viene ogni data. Lo stesso per l'abstract: in 11.632 pagine **inizia con la data**, e a volte c'è solo quella, come "martedì 17 giugno 2008". Il lead lo ricostruiamo dall'HTML, con il primo paragrafo vero. Conta perché è quello che leggono gli embeddings: **con la sola data, tutte le notizie dello stesso giorno sembrerebbero uguali**.
+La prima difficoltà: le informazioni che ci servono **non sono campi del dump**. Il dump ha solo la data dell'ultima modifica, spesso anni dopo la notizia. La data vera è scritta a mano in un **template in italiano**, come questo luogodata, che diventa 2020-05-20. La estraiamo dal wikitext per 11.687 documenti e per 40 dalla categoria del giorno; 486 restano senza data, e un campo dice da dove viene ogni data. Lo stesso per l'abstract: in 11.632 pagine **inizia con la data**, e a volte c'è solo quella, come "19 dicembre 2005". Il lead lo ricostruiamo dall'HTML, dal primo paragrafo vero: "Evo Morales vince le presidenziali in Bolivia". Conta perché è quello che leggono gli embeddings: **con la sola data, tutte le notizie dello stesso giorno sembrerebbero uguali**.
 
-## 4. Metadati da ripulire (2:10-2:45)
+## 4. Metadati da ripulire (2:12-2:47)
 
 *categorie e agenzie diventano filtri: via le categorie inutili, una chiave per le grafie*
 
 Categorie e fonti diventano **filtri e faccette** nell'interfaccia, quindi devono essere pulite. Delle quasi seimila categorie, 4.188 sono categorie di data, una per giorno, e 22 sono di manutenzione, come "Pubblicati": le togliamo e ne restano 1.753. Le agenzie sono scritte a mano: **la Repubblica compare in 14 grafie**. Le raggruppiamo con una **chiave normalizzata**, cioè minuscole, senza articolo e senza dominio, più qualche alias, e mostriamo la grafia più frequente. Senza questo passo, filtrando "la Repubblica" **si perderebbe il 28% delle sue fonti**.
 
-## 5. Non tutte le pagine sono notizie (2:45-3:25)
+## 5. Non tutte le pagine sono notizie (2:47-3:27)
 
 *non pubblicate, serie, tabelle: tutto tenuto e marcato*
 
 Non tutte le pagine sono notizie. **1.181 non sono pubblicate**: speciali, palinsesti, classifiche, bozze. Le teniamo, marcate: uno speciale sulle elezioni può rispondere a una query vera, e **se convenga penalizzarle lo misura un esperimento**, E5, che mostra Fabio. Poi le **serie generate da template**, come i 216 concorsi del SuperEnalotto, con titoli uguali a meno dei numeri: un campo sostituisce le cifre e permette di raggrupparle. Infine il **36% del testo è in tabelle**: le teniamo come testo, una riga per riga, perché 366 pagine sono fatte solo di tabelle e sarebbero rimaste vuote.
 
-## 6. Leakage (3:25-4:21)
+## 6. Leakage (3:27-4:23)
 
 *le query di fonti sono dentro le pagine: le togliamo, E4 misura quanto conta*
 
 Il problema più insidioso riguarda la valutazione. Il test set fonti, che presenta Gioia, usa come query **i titoli delle fonti citate**: qui "Il Dna lo scagiona, ma ha già scontato 24 anni", un titolo di Euronews; la risposta giusta è l'articolo che lo cita. Ma quel titolo **sta dentro la pagina**, nel template della fonte: se fosse cercabile, il motore troverebbe la query parola per parola e **il test non misurerebbe niente**. Non basta togliere la sezione "Fonti": in 381 pagine le fonti sono altrove. Quindi **togliamo ogni template di fonte, dovunque sia**, e teniamo i titoli in un campo a parte solo per misurare l'effetto, l'esperimento E4: con le fonti cercabili **MRR@10 salirebbe da 0,768 a 0,900**. Un test con leakage avrebbe fatto sembrare il motore molto migliore di quello che è.
 
-## 7. Due indici, due analisi del testo (4:21-5:04)
+## 7. Due indici, due analisi del testo (4:23-5:06)
 
 *standard contro italian: meglio su tutto, anche più veloce*
 
 Indicizziamo con **Elasticsearch**, un nodo e uno shard su un portatile. Costruiamo **due indici con gli stessi campi** e due analizzatori: standard e **italian**, che aggiunge elisione, stop word italiane e uno **stemmer leggero**. "Elezioni" ed "elezione" diventano elezion, "l'Italia" diventa ital; ma lo stemmer leggero non unisce tutto: scagiona e scagionato restano diversi. Con meno termini distinti l'indice è più piccolo del 6%. Il risultato, l'esperimento E1, è a destra: l'analisi italiana migliora MRR@10 e recall su fonti, entrambi significativi, e **nDCG@10 su manual da 0,648 a 0,701**; e la query è anche più veloce. **Non è un compromesso: è meglio su tutto.**
 
-## 8. Embeddings (5:04-5:55)
+## 8. Embeddings (5:06-6:05)
 
 *un vettore per documento su titolo e lead; kNN capisce le parafrasi; E8: memoria*
 
-Per la ricerca semantica calcoliamo **un vettore per documento** con multilingual-e5-small, 384 dimensioni, su **titolo e lead**, perché il modello tronca i testi lunghi e l'inizio di una notizia ne dice l'essenziale. Bastano due minuti su CPU, e i vettori sono nel repository, così tutti indicizzano gli stessi. A destra un esempio: "disastro in una miniera" trova "Cina: esplosione in miniera, 11 morti", ma **nessun risultato contiene la parola disastro**: il vettore coglie il significato. Sulle parafrasi **kNN batte BM25**, da 0,525 a 0,557 di MRR@10. Infine l'esperimento E8: comprimere i vettori costa quasi niente in qualità, come mostrerà Gioia, e **riduce la memoria da 19 a 5 e a poco più di 1 megabyte**. Con dodicimila documenti non serve; con milioni sì.
+Per la ricerca semantica calcoliamo **un vettore per documento** con multilingual-e5-small, 384 dimensioni, su **titolo e lead**, perché il modello tronca i testi lunghi e l'inizio di una notizia ne dice l'essenziale. Il disegno mostra **cosa fa kNN, sui vettori veri**: al centro la query "disastro in una miniera", e **la distanza dal centro è la distanza vera** tra i vettori. Nel cerchio tratteggiato i primi cinque risultati: **tutti incidenti in miniera**, nessuno con la parola disastro nel titolo. "Disastro aereo in Perù" la contiene, ma è **solo decimo**: il vettore coglie il significato, non le parole. Sulle parafrasi **kNN batte BM25**, da 0,525 a 0,557 di MRR@10. Infine l'esperimento E8: comprimere i vettori costa quasi niente in qualità e **riduce la memoria da 19 a 5 e a poco più di 1 megabyte**. Con dodicimila documenti non serve; con milioni sì.
 
 ## Domande a cui rispondo io
 
@@ -64,8 +64,9 @@ Per la ricerca semantica calcoliamo **un vettore per documento** con multilingua
 10. **Perché il prefisso passage: e perché titolo più lead?** I modelli **e5** sono addestrati con i prefissi **"passage: "** per i documenti e **"query: "** per le query: senza, la qualità cala. Titolo e lead perché il modello tronca a **512 token** e l'inizio di una notizia ne contiene l'essenziale.
 11. **Cos'è HNSW?** Un **grafo di prossimità a più livelli** per la ricerca approssimata dei vicini: si parte dal livello alto, con pochi nodi e collegamenti lunghi, e si scende verso quelli più fitti avvicinandosi alla query. Approssimato: non garantisce i k vicini esatti, ma è molto più veloce della ricerca esaustiva.
 12. **Cosa misura E8 e perché su disco gli indici quantizzati sono più grandi?** Quanto costa in qualità comprimere i vettori: **int8** (8 bit per dimensione) e **BBQ** (1 bit). MRR@10 perde 0,0004, non significativo; BBQ perde un po' di recall (R@100 -0,003). La memoria della ricerca scende da **19,2 a 5,3 e 1,2 MB**. Su disco sono più grandi perché Elasticsearch tiene anche i **vettori originali**, che usa per riordinare i candidati finali.
-13. **I punteggi coseno sono tutti vicini: è un problema?** Vanno da 0,91 a 0,96, quindi **conta solo l'ordine**, non il valore: per questo la ricerca ibrida fonde le **classifiche** con RRF e non i punteggi (lo spiega Fabio).
-14. **Perché il motore non accetta frasi tra virgolette, AND/OR o prefissi?** Scelta: la query è trattata come **linguaggio naturale**, una multi_match su titolo, lead e corpo. Nei titoli di giornale le virgolette sono **citazioni, non operatori**: **958 delle 7.072 query di fonti** (14%) contengono virgolette: 571 dritte, 304 caporali « », 90 tipografiche. Per esempio Berlusconi si dissocia dalla Lega: "Piena solidarietà a Ciampi". Se diventassero phrase query, quelle ricerche diventerebbero molto più restrittive. Le phrase query si potrebbero aggiungere con match_phrase (servono le posizioni, che l'indice ha) come **configurazione separata**, da misurare come le altre: è un passo successivo, non fatto per non cambiare i numeri dopo il congelamento del codice.
+13. **I punteggi coseno sono tutti vicini: è un problema?** Vanno da 0,91 a 0,96, quindi **conta solo l'ordine**, non il valore: per questo la ricerca ibrida fonde le **classifiche** con RRF e non i punteggi (lo spiega Fabio). Attenzione ai due numeri: Elasticsearch riporta **(1 + coseno) / 2**, quindi il coseno 0,90 del disegno della slide 8 è un punteggio di 0,95.
+14. **Il disegno degli embeddings è una proiezione? Come si legge?** 384 dimensioni non si disegnano. Nel disegno **la distanza dal centro è esatta**: 1 meno la similarità coseno con la query, calcolata su tutti i 12.213 vettori, come fa kNN (ma con una scansione esatta invece del grafo HNSW). **La direzione invece è solo un modo di disporre i punti**: l'angolo di ogni documento in una PCA a due dimensioni dei vettori disegnati, così le notizie simili tra loro finiscono dalla stessa parte. Disegnati: gli 8 più vicini, i 5 titoli con disastro più vicini e 300 notizie a caso, che stanno quasi tutte attorno a 0,75. Si rifà con **uv run python -m wikisearch.ingest.embedding_map**.
+15. **Perché il motore non accetta frasi tra virgolette, AND/OR o prefissi?** Scelta: la query è trattata come **linguaggio naturale**, una multi_match su titolo, lead e corpo. Nei titoli di giornale le virgolette sono **citazioni, non operatori**: **958 delle 7.072 query di fonti** (14%) contengono virgolette: 571 dritte, 304 caporali « », 90 tipografiche. Per esempio Berlusconi si dissocia dalla Lega: "Piena solidarietà a Ciampi". Se diventassero phrase query, quelle ricerche diventerebbero molto più restrittive. Le phrase query si potrebbero aggiungere con match_phrase (servono le posizioni, che l'indice ha) come **configurazione separata**, da misurare come le altre: è un passo successivo, non fatto per non cambiare i numeri dopo il congelamento del codice.
 
 ## Numeri da avere in testa
 
