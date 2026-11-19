@@ -1,8 +1,8 @@
 # Contracts
 
 The three parts of the project (ingestion, search, evaluation) are built in parallel by three people.
-They meet only at the interfaces below. **Do not change a contract without writing it in the
-"Contract changes" section of `STATE.md` and telling the group**: the other two parts depend on it.
+They meet only at the interfaces below. **Do not change a contract without telling the group**:
+the other two parts depend on it.
 
 ## 1. Processed document (`data/processed/docs.jsonl`)
 

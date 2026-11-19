@@ -13,8 +13,7 @@ Online demo: https://wikinews-search.denmarkeast.cloudapp.azure.com (how it is d
 
 Final version for the delivery of 19 November 2026. The presentation is
 `slides/wikinews-search.pptx`; every number in it comes from `results/summary.md` and can be
-reproduced with one command (see "Evaluation"). How the work was planned and carried out:
-`PLAN.md` and the log in `STATE.md`.
+reproduced with one command (see "Evaluation"). How the work was split and planned: `PLAN.md`.
 
 ## What it does, in brief
 
@@ -264,8 +263,8 @@ tests/test_build_fonti.py tests/test_judging.py tests/test_merge_judgments.py te
 | `evaluation/` | test sets, judging tools, metrics, significance tests, experiment runner, figures (Gioia) |
 | `data/sample/`, `data/shared/` | a sample of the documents and the shared embeddings (the dump and the processed corpus are not committed) |
 | `results/` | data report, indexing times, metrics, `summary.md`, figures, demo screenshots |
-| `slides/` | the presentation (`wikinews-search.pptx`), the content of each part in Italian and Daniel's speech |
-| `docs/` | contracts between the parts, what the course expects, the demo script, the briefs of each member |
+| `slides/` | the presentation (`wikinews-search.pptx`), the content of each part in Italian |
+| `docs/` | contracts between the parts, what the course expects, the demo script |
 | `tests/` | unit tests and contract tests (`uv run pytest -q`) |
-| `PLAN.md`, `STATE.md` | the plan and the shared log of the work |
+| `PLAN.md` | the plan: split of the work, experiments, timeline |
 

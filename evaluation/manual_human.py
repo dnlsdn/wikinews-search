@@ -2,8 +2,8 @@
 
     uv run python -m evaluation.manual_human
 
-20 of the 30 `manual` queries (M11-M30) carry grades given by a model (STATE.md, log of 17 Nov,
-issue #15); M01-M10 were judged by two people each (disagreements adjudicated by a third judge).
+20 of the 30 `manual` queries (M11-M30) carry grades given by a model (issue #15); M01-M10 were
+judged by two people each (disagreements adjudicated by a third judge).
 This script recomputes the `manual` means, their 95% bootstrap intervals and the comparisons of
 E1, E3 and E5 on M01-M10 only, to show whether the conclusions hold without the model's grades.
 

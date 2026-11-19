@@ -17,8 +17,7 @@ instructions on GitHub.
 ## Team and ownership
 
 Each person owns a part of the system, the matching part of the presentation, and the directories
-below. If something outside your directories must change, open a GitHub issue for its owner
-(rules in `CLAUDE.md`, "Talking to the other sessions").
+below. If something outside your directories must change, open a GitHub issue for its owner.
 
 | Person | GitHub | Part | Directories | Presentation |
 |---|---|---|---|---|
@@ -27,11 +26,11 @@ below. If something outside your directories must change, open a GitHub issue fo
 | Gioia | gioburattii | evaluation: test sets, metrics, experiment runner, results | `evaluation/`, `results/`, `tests/test_metrics.py`, `tests/test_evaluation.py` | test strategy and experimental results |
 
 Shared files: `wikisearch/schema.py`, `wikisearch/config.py`, `docs/contracts.md` (change only as
-described there), `STATE.md` (everyone appends), `PLAN.md` (everyone ticks their own boxes),
+described there), `PLAN.md` (everyone ticks their own boxes),
 `README.md` (each person writes the "Usage" subsection of their part), `slides/` (one file each).
 
 Laptops: Daniel and Gioia on macOS with 8 GB of RAM, Fabio on Windows with 16 GB. Everything
-must run on both systems (rules in `CLAUDE.md`). The live demo and the presentation run on
+must run on both systems. The live demo and the presentation run on
 **Daniel's laptop**.
 
 ## Why this split works
@@ -48,8 +47,7 @@ must run on both systems (rules in `CLAUDE.md`). The live demo and the presentat
 ## Handoffs
 
 The moments when one part unblocks another. Whoever completes the left column opens a GitHub
-issue to the person on the right (or comments on their open issue), so their session finds it in
-the briefing.
+issue to the person on the right (or comments on their open issue).
 
 | When this is pushed | By | Message to | So that they can |
 |---|---|---|---|
@@ -83,17 +81,14 @@ uses all the queries, not a sample.
 
 ## Steps
 
-Summary of the steps. The detailed instructions (files, functions, checks, what to do while
-waiting for someone else) are in the personal briefs: `docs/briefs/daniel.md`,
-`docs/briefs/fabio.md`, `docs/briefs/gioia.md`. Prompts to start a Claude Code session are in
-`docs/briefs/README.md`.
+Summary of the steps of each person.
 
 Everyone runs Elasticsearch and builds the indices on their own laptop with Daniel's scripts
 (the dump and the indices are not in git; the embeddings are, so all laptops index the same
 vectors). The **official numbers** are produced once, at code freeze, by Gioia on her laptop,
 after pulling and rebuilding the indices.
 
-Tick a box only when the "done when" is true, and log it in `STATE.md`.
+Tick a box only when the "done when" is true.
 
 ### Daniel: data and indexing
 

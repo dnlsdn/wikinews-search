@@ -1,7 +1,7 @@
 # Live demo script (Fabio)
 
 Five queries, in this order, about four minutes in all. **Fabio speaks, Daniel operates the
-laptop** (agreed on 17 Nov, `STATE.md` entry of 14:50, issue #8). Everything is done **through the
+laptop** (agreed on 17 Nov, issue #8). Everything is done **through the
 interface**: the query typed in the search box, the configuration chosen in the menu, the Compare
 toggle, the two date fields, the source checkbox, "Clear filters". This shows that the interface
 works, not only prepared URLs. Each step lists Daniel's actions, what Fabio points at, and the

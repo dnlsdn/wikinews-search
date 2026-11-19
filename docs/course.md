@@ -3,8 +3,8 @@
 The project is graded at the oral exam of Ingegneria dei Dati (prof. Paolo Merialdo, Roma Tre). This
 file summarises, in our own words, what the course teaches and asks that matters for this
 homework, with references to the course material. **The slides themselves are not in the
-repository** (they belong to the professor and this repository becomes public): every member has
-them; to let your Claude read the originals, copy them into `course/` (ignored by git).
+repository** (they belong to the professor): every member has them; local copies go in `course/`,
+which is ignored by git.
 
 Use this file to keep the work aligned with the course: use the course's terms and methods, and
 when a choice departs from them, say why.
