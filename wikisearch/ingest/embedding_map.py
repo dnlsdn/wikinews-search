@@ -1,7 +1,7 @@
 """Figure for the embeddings slide: what kNN does, drawn on the real vectors.
 
     uv run python -m wikisearch.ingest.embedding_map
-    # -> results/figures/embedding_map.png (static) and embedding_map.gif (animated, 12 s loop)
+    # -> results/figures/embedding_map.png (static) and embedding_map.gif (animated, 14 s loop)
 
 The query "disastro in una miniera" is embedded with the search-side prefix ("query: ") and
 compared with the shared document vectors (`data/shared/embeddings.npy`), exactly as the `knn`
@@ -20,9 +20,10 @@ meaning), and 300 random documents as background. Ranks 6 to 9 are not drawn: th
 outside the circle (e5 similarities are compressed) and would hide where the top 5 ends.
 
 The animation (the deck shows it on slide 8; the PDF shows the static PNG) tells the same thing in
-time: the documents appear, then the query, then a circle grows from the query and the documents
-light up as it reaches them, until it holds 5 (the top 5 of `knn`); last, the titles with
-"disastro" appear, the first one only 10th. Both files have the size they take on the slide, so
+time. It starts from the complete figure (what PowerPoint shows outside the slide show), holds it,
+fades the search out, then a circle grows from the query and the documents light up as it reaches
+them, until it holds 5 (the top 5 of `knn`); last, the titles with "disastro" appear, the first
+one only 10th, and the figure is complete again (14 s loop). Both files have the size they take on the slide, so
 their fonts are in real points. Labels in Italian: the figure goes on the Italian slides.
 """
 
@@ -47,7 +48,8 @@ FPS = 12
 
 # deck colours (slides: dark ink, orange accent, teal for the kNN family, grey, slide background)
 DK, OR, TEAL, GR, MUT, BG = "#23373B", "#EB811B", "#4E7C8A", "#A9B4B6", "#6B7B7E", "#FAFAFA"
-TEAL_FILL = (0.306, 0.486, 0.541, 0.08)
+TEAL_RGB = (0.306, 0.486, 0.541)  # TEAL as RGB
+TEAL_FILL = TEAL_RGB + (0.08,)
 
 
 def short(title: str, width: int = 24) -> str:
@@ -142,16 +144,34 @@ def animate(L: dict, out) -> None:
     fig, ax, A = draw(L, dpi=160)
     qtext = ax.text(-0.225, 0.232, f"«{QUERY}»", ha="left", va="top", fontsize=9.5, color=OR)
     cap = ax.text(0.205, -0.17, "", fontsize=9, color=MUT, va="center", ha="left")
-    t_bg, t_q, t_grow0, t_grow1, t_top, t_word, t_end = 0.0, 1.0, 2.0, 5.5, 6.0, 8.0, 12.5
+    # The first frame is the complete figure (what PowerPoint shows outside the slide show, and the
+    # thumbnails): it holds, the search fades out, then it is redrawn; the last frame is complete
+    # again, so the loop has no jump. Background and query stay on the whole time.
+    t_hold, t_grow0, t_grow1, t_top, t_word, t_end = 2.5, 3.5, 7.0, 7.5, 9.5, 14.0
 
     def ramp(t: float, start: float, length: float = 0.5) -> float:
         return min(1.0, max(0.0, (t - start) / length))
 
     def frame(n: int) -> list:
         t = n / FPS
-        A["rand"].set_alpha(0.55 * ramp(t, t_bg, 0.8))
-        for a in (A["star"], A["qlab"], qtext):
-            a.set_alpha(ramp(t, t_q))
+        if t < t_hold + 0.5:  # complete figure, then fading out
+            fade = 1.0 - ramp(t, t_hold)
+            A["circle"].set_visible(True)
+            A["circle"].set_radius(L["r5"])
+            A["circle"].set_linestyle((0, (3, 2)))
+            # set_alpha would overwrite the transparency of the fill: fade fill and edge separately
+            A["circle"].set_facecolor(TEAL_FILL[:3] + (TEAL_FILL[3] * fade,))
+            A["circle"].set_edgecolor(TEAL_RGB + (fade,))
+            for s in list(A["near"].values()) + list(A["word"].values()):
+                s.set_alpha(fade)
+            show(A["l_near"], fade)
+            show(A["l_word"], fade)
+            cap.set_text("il vettore guarda il significato,\nnon le parole")
+            cap.set_alpha(fade)
+            return []
+        A["circle"].set_facecolor(TEAL_FILL)
+        A["circle"].set_edgecolor(TEAL_RGB + (1.0,))
+        cap.set_alpha(1.0)
         g = min(1.0, max(0.0, (t - t_grow0) / (t_grow1 - t_grow0)))
         r = max(0.0001, g * g * (3 - 2 * g) * L["r5"])  # smoothstep
         A["circle"].set_visible(t >= t_grow0)

@@ -62,6 +62,14 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 19 Nov 2026 09:45, Daniel: the slide 8 GIF starts from the complete map (D7)
+
+Outside the slide show PowerPoint shows the first frame of a GIF, which was the empty map. Now the
+first frame is the complete figure: it holds 2.5 s, the search fades out (background and query
+stay), then it is redrawn as before; the last frame is the complete figure again, so the loop has
+no jump (14 s). `uv run python -m wikisearch.ingest.embedding_map`; decks regenerated, PDF
+unchanged. Nothing changes for the others.
+
 ### 19 Nov 2026 09:35, Daniel: slide 8 map animated (D7)
 
 Decided by Daniel, after comparing an animated map and an animated HNSW schema: the map, because
