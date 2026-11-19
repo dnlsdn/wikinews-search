@@ -62,6 +62,17 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 19 Nov 2026 10:22, Gioia: speech rewritten to be spoken
+
+`slides/discorso-gioia.md` was a copy of the speaker notes; now it is written to be said aloud:
+an opening that picks up from Fabio's demo, transitions between the slides, the same numbers
+(checked again against `results/summary.md`, run of 17 Nov 17:27). About 870 words, 6:00 at 2.4
+words per second; new timings in the headings. The speech already avoids the three slips listed in
+`slides/domande-gioia.md`: it says "24 comparisons on `fonti`" (slide 4 still says 27), it does
+not say that kNN beats BM25 on `manual`. Two new sections: what to cut when late, what not to
+say. The speaker notes in the pptx and `slides/gioia.md` are unchanged (Daniel's deck); nothing
+changes for the others.
+
 ### 19 Nov 2026 09:45, Daniel: the slide 8 GIF starts from the complete map (D7)
 
 Outside the slide show PowerPoint shows the first frame of a GIF, which was the empty map. Now the
