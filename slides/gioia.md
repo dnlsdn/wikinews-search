@@ -14,7 +14,7 @@ confronto con un test di significatività.
 | test set | query | giudizi | domanda a cui risponde | metriche |
 |---|---|---|---|---|
 | `fonti` | 7.072 | 1 documento giusto, automatico | il motore trova la notizia? | MRR@10, R@10, R@100 |
-| `manual` | 30 | 573 documenti graduati 0/1/2: 10 query da due di noi, 20 da un modello (vedi Limiti) | la prima pagina è buona? | P@10, nDCG@10, MAP, MRR@10 |
+| `manual` | 30 | 573 documenti graduati 0/1/2 | la prima pagina è buona? | P@10, nDCG@10, MAP, MRR@10 |
 
 Figura: nessuna
 Note del relatore: Un benchmark ha tre parti: documenti, query, giudizi di rilevanza. I documenti
