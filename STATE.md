@@ -62,6 +62,21 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 19 Nov 2026 09:35, Daniel: slide 8 map animated (D7)
+
+Decided by Daniel, after comparing an animated map and an animated HNSW schema: the map, because
+it shows the point of the slide (neighbours by meaning) on our vectors, while an HNSW drawing would
+be generic (HNSW stays an oral answer). `uv run python -m wikisearch.ingest.embedding_map` now
+writes `results/figures/embedding_map.png` and `embedding_map.gif` (12 s loop, same drawing and
+size): the documents appear, then the query, then a circle grows from the query and lights the
+documents it reaches until it holds 5, the top 5 of `knn`; last, the titles with "disastro" (the
+first one 10th). The decks (repository copy, copies with and without notes) carry the GIF on slide
+8, which PowerPoint plays by itself in the slide show; the PDF is built from a still copy with the
+PNG, since a PDF would show only the first, empty frame. Speech of slide 8 now says the circle grows
+until it holds five documents (6:08 in all). No number changed; nothing to do for Fabio and Gioia.
+Check at the rehearsal that the GIF plays on Daniel's laptop. Next: rehearsal; last, just before
+the upload: clean the repository of the tooling files, make it public, upload.
+
 ### 19 Nov 2026 09:25, Daniel: slide 6 (leakage) redrawn as one picture (D7)
 
 Decided by Daniel: the slide had too many separate pieces (two blocks, a caption, the template, the
