@@ -150,8 +150,6 @@ Contenuto: li dichiariamo perché cambiano come leggere i numeri.
 |---|---|
 | `fonti` ha un solo documento giusto per query | misura la ricerca della notizia, non la qualità della pagina |
 | `manual` ha 30 query | intervalli larghi, solo le differenze grandi sono significative |
-| 10 query di `manual` giudicate da noi, autori del sistema | possibile distorsione; mitigata dal pool mescolato |
-| 20 query su 30 giudicate da un modello, disaccordi risolti da un modello | il kappa è tra umani, ma la maggior parte dei voti no |
 | documenti non giudicati contano come non rilevanti | sottostima per configurazioni fuori dal pool |
 | E3b scelto dopo aver visto i risultati | va letto come indicazione, non come ipotesi testata |
 
