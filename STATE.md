@@ -62,6 +62,17 @@ sessions"). The session briefing lists the open ones.
 
 ## Log
 
+### 19 Nov 2026 09:25, Daniel: slide 6 (leakage) redrawn as one picture (D7)
+
+Decided by Daniel: the slide had too many separate pieces (two blocks, a caption, the template, the
+bars, a line on the 381 pages). Now: on the left the page of the right answer (title, text, "Fonti"
+with the `{{fonte}}` template, the query inside it in orange); on the right the query of `fonti`,
+with an arrow into the template ("è già nella pagina, parola per parola"); below, the two E4 bars
+(0.768 against 0.900). The 381 pages are said in the speech only, the decision is in the subtitle.
+Only the drawing changed (Daniel's deck script): `slides/daniel.md`, the speech and every number are
+unchanged. Deck regenerated. Next: rehearsal; last, just before the upload: clean the repository
+of the tooling files, make it public, upload.
+
 ### 19 Nov 2026 09:10, Daniel: last review of Daniel's slides 2-8, map of the vectors on slide 8 (D7)
 
 Decided by Daniel. Text in `slides/daniel.md`, drawing in Daniel's deck script; deck regenerated
